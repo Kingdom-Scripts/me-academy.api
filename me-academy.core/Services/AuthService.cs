@@ -1,23 +1,23 @@
 using Mapster;
+using me_academy.core.Interfaces;
+using me_academy.core.Models.App;
+using me_academy.core.Models.App.Constants;
+using me_academy.core.Models.Input.Auth;
+using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View.Auth;
+using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Saharaviewpoint.Core.Interfaces;
-using Saharaviewpoint.Core.Models.App;
-using Saharaviewpoint.Core.Models.App.Constants;
-using Saharaviewpoint.Core.Models.Input.Auth;
-using Saharaviewpoint.Core.Models.Utilities;
-using Saharaviewpoint.Core.Models.View.Auth;
-using Saharaviewpoint.Core.Utilities;
 
-namespace Saharaviewpoint.Core.Services;
+namespace me_academy.core.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly SaharaviewpointContext _context;
+    private readonly MeAcademyContext _context;
     private readonly ITokenGenerator _tokenGenerator;
     private readonly UserSession _userSession;
 
-    public AuthService(SaharaviewpointContext context, ITokenGenerator tokenGenerator, UserSession userSession)
+    public AuthService(MeAcademyContext context, ITokenGenerator tokenGenerator, UserSession userSession)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _tokenGenerator = tokenGenerator ?? throw new ArgumentNullException(nameof(tokenGenerator));
@@ -35,7 +35,6 @@ public class AuthService : IAuthService
 
         // create user object
         var user = model.Adapt<User>();
-        user.Type = UserTypes.CLIENT;
         user.HashedPassword = model.Password.HashPassword();
 
         var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == (int)Roles.Client);

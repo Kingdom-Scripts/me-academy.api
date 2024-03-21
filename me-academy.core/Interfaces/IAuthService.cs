@@ -1,12 +1,10 @@
-using Saharaviewpoint.Core.Models.Input.Auth;
-using Saharaviewpoint.Core.Models.Utilities;
+using me_academy.core.Models.Input.Auth;
+using me_academy.core.Models.Utilities;
 
-namespace Saharaviewpoint.Core.Interfaces;
+namespace me_academy.core.Interfaces;
 
 public interface IAuthService
 {
-    Task<Result> CreateClient(RegisterModel model);
-
     Task<Result> AuthenticateUser(LoginModel model);
 
     Task<Result> RefreshToken(RefreshTokenModel model);
