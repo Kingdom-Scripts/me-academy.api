@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>me-academy.api</name>
+    </assembly>
+    <members>
+        <member name="M:me_academy.api.Controllers.BaseController.ProcessResponse(me_academy.core.Models.Utilities.Result)">
+            <summary>
+            Returns the appropriate HTTP Response.
+            </summary>
+            <param name="result">The result.</param>
+            <returns></returns>
+        </member>
+        <member name="T:me_academy.api.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.One">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.One.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.One.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.One.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Two">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Two.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Two.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Two.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
