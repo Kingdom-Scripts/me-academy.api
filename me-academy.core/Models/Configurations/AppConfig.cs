@@ -10,5 +10,5 @@ public class AppConfig
 public class BaseURLs
 {
     public string AdminClient { get; set; }
-    public string MailerSend { get; set; }
+    public string Client { get; set; }
 }

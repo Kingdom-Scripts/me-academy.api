@@ -10,9 +10,6 @@ public class User : BaseAppModel
     [MaxLength(50)]
     public required string Email { get; set; }
 
-    [Required]
-    public required string Type { get; set; }
-
     [MaxLength(50)]
     public string? FirstName { get; set; }
 
@@ -28,6 +25,7 @@ public class User : BaseAppModel
 
     [Required]
     public bool IsActive { get; set; } = true;
+    public bool EmailConfirmed { get; set; } = false;
 
     [Required]
     public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;

@@ -26,15 +26,15 @@ public static class ServiceExtensions
     {
         // set up database
         string connectionString = configuration.GetConnectionString("MeAcademy");
-        services.AddDbContext<MeAcademyContext>(opt =>
-        {
-            opt.UseSqlServer(connectionString,
-                b => b.MigrationsAssembly("me_academy.api"));
-            opt.LogTo(Console.WriteLine, LogLevel.Information);
-        });
+        services.AddDbContext<MeAcademyContext>(
+            (sp, options) => options
+                .UseSqlServer(connectionString, b => b.MigrationsAssembly("me-academy.api"))
+                .AddInterceptors(
+                    sp.GetRequiredService<SoftDeleteInterceptor>())
+                .LogTo(Console.WriteLine, LogLevel.Information));
 
         // Add fluent validation.
-        services.AddValidatorsFromAssembly(Assembly.Load("me_academy.core"));
+        services.AddValidatorsFromAssembly(Assembly.Load("me-academy.core"));
         services.AddFluentValidationAutoValidation(configuration =>
         {
             // Disable the built-in .NET model (data annotations) validation.
@@ -97,9 +97,11 @@ public static class ServiceExtensions
                         .AddDestinationTransform(DestinationTransform.EmptyCollectionIfNull);
 
         services.AddSingleton<ICacheService, CacheService>();
+        services.TryAddSingleton<SoftDeleteInterceptor>();
 
         services.TryAddScoped<UserSession>();
         services.TryAddScoped<ITokenGenerator, TokenGenerator>();
+        services.TryAddScoped<IEmailService, EmailService>();
 
         services.TryAddTransient<IAuthService, AuthService>();
 

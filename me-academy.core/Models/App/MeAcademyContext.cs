@@ -7,9 +7,7 @@ public class MeAcademyContext : DbContext
     public MeAcademyContext()
     { }
 
-    public MeAcademyContext(DbContextOptions<MeAcademyContext> options) : base(options)
-    {
-    }
+    public MeAcademyContext(DbContextOptions<MeAcademyContext> options) : base(options) { }
 
     public required DbSet<Role> Roles { get; set; }
     public required DbSet<User> Users { get; set; }
@@ -22,10 +20,6 @@ public class MeAcademyContext : DbContext
         base.OnModelCreating(builder);
 
         builder.HasDefaultSchema("dbo");
-
-        builder
-            .Entity<User>()
-            .ToTable(p => p.HasCheckConstraint("CK_User_Type", "[Type] IN ('Business', 'Client', 'Manager')"));
 
         builder.Entity<UserRole>(entity =>
         {

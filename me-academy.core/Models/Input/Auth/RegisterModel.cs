@@ -18,7 +18,7 @@ public class RegisterModelValidation : AbstractValidator<RegisterModel>
         RuleFor(x => x.FirstName).Length(2, 20);
         RuleFor(x => x.LastName).Length(2, 20);
         RuleFor(x => x.Email).EmailAddress();
-        RuleFor(x => x.ConfirmPassword).Equal(p => p.Password);
+        RuleFor(x => x.ConfirmPassword).Equal(p => p.Password).WithMessage("Your passwords do not match.");
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Your password cannot be empty")
             .MinimumLength(8).WithMessage("Your password length must be at least 8.")
