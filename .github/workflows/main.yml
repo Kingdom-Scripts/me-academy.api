@@ -38,7 +38,7 @@ jobs:
                 NUGET_AUTH_TOKEN: ${{ github.token }}
                   
             - name: Build
-              run: dotnet publish --configuration Release
+              run: dotnet publish me-academy.api --configuration Release
 
             # Clone this repository (deploy branch) inside the "deploy" folder
             # Before clearing out, move .git folder out of the "deploy" folder
@@ -54,7 +54,7 @@ jobs:
                 mkdir deploy
                 mv deploy-.git deploy/.git
                 cd deploy
-                cp -R ../bin/Release/net7.0/publish .
+                cp -R ../me-academy.api/bin/Release/net7.0/publish .
                 git add .
                 git diff --staged --quiet || git commit -m "Update Artifacts"
                 git push
