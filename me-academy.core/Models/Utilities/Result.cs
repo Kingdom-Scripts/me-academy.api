@@ -1,5 +1,5 @@
 // ReSharper disable once RedundantUsingDirective
-
+using Newtonsoft.Json;
 using me_academy.core.Interfaces;
 
 namespace me_academy.core.Models.Utilities;
