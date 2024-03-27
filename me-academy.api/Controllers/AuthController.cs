@@ -19,15 +19,15 @@ public class AuthController : BaseController
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
     }
 
-    [HttpPost("sign-up")]
-    [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult<AuthDataView>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> SignUp(RegisterModel model)
-    {
-        var res = await _authService.Register(model);
-        return ProcessResponse(res);
-    }
+    // [HttpPost("sign-up")]
+    // [AllowAnonymous]
+    // [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult<AuthDataView>))]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    // public async Task<IActionResult> SignUp(RegisterModel model)
+    // {
+    //     var res = await _authService.Register(model);
+    //     return ProcessResponse(res);
+    // }
 
     [HttpGet("request-email-confirmation")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
