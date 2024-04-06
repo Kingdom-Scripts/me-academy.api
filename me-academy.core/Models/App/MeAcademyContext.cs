@@ -35,7 +35,28 @@ public class MeAcademyContext : DbContext
         builder.Entity<DurationType>()
             .ToTable(p => p.HasCheckConstraint("CK_DurationType_Name", "[Name] IN ('Days', 'Weeks', 'Months', 'Years')"));
 
+        builder.Entity<Course>()
+            .HasIndex(c => c.Uid);
+
+        builder.Entity<Document>()
+            .HasOne(d => d.CreatedBy)
+            .WithMany()
+            .HasForeignKey(d => d.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
         builder.Entity<CourseDocument>()
             .HasKey(cd => new { cd.CourseId, cd.DocumentId });
+
+        builder.Entity<CourseAuditLog>()
+            .HasOne(cal => cal.Course)
+            .WithMany(c => c.CourseAuditLogs)
+            .HasForeignKey(cal => cal.CourseId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CourseAuditLog>()
+            .HasOne(cal => cal.CreatedBy)
+            .WithMany()
+            .HasForeignKey(cal => cal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

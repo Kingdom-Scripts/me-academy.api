@@ -19,6 +19,11 @@ public class AuthController : BaseController
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
     }
 
+    /// <summary>
+    /// Register a new user
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns>Returns a user token for the user's account</returns>
     [HttpPost("sign-up")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult<AuthDataView>))]
@@ -29,6 +34,10 @@ public class AuthController : BaseController
         return ProcessResponse(res);
     }
 
+    /// <summary>
+    /// Request email confirmation again
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("request-email-confirmation")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
@@ -38,6 +47,11 @@ public class AuthController : BaseController
         return ProcessResponse(res);
     }
 
+    /// <summary>
+    /// Confirm email address
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost("confirm-email")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
@@ -48,6 +62,11 @@ public class AuthController : BaseController
         return ProcessResponse(res);
     }
 
+    /// <summary>
+    /// Authenticate a user
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost("token")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<AuthDataView>))]
@@ -58,6 +77,11 @@ public class AuthController : BaseController
         return ProcessResponse(res);
     }
 
+    /// <summary>
+    /// Refresh user token
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost("refresh-token")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<AuthDataView>))]
@@ -68,6 +92,11 @@ public class AuthController : BaseController
         return ProcessResponse(res);
     }
 
+    /// <summary>
+    /// Logout a user
+    /// </summary>
+    /// <param name="userReference"></param>
+    /// <returns></returns>
     [HttpPost("{userReference}/logout")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
@@ -77,6 +106,10 @@ public class AuthController : BaseController
         return ProcessResponse(res);
     }
 
+    /// <summary>
+    /// Get user profile
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("profile")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<UserProfileView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]

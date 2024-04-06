@@ -12,7 +12,7 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    [Migration("20240402070251_Three")]
+    [Migration("20240406153422_Three")]
     partial class Three
     {
         /// <inheritdoc />
@@ -129,6 +129,8 @@ namespace me_academy.api.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
+
+                    b.HasIndex("Uid");
 
                     b.HasIndex("UpdatedById");
 
@@ -460,15 +462,15 @@ namespace me_academy.api.Migrations
             modelBuilder.Entity("me_academy.core.Models.App.CourseAuditLog", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.Course", "Course")
-                        .WithMany()
+                        .WithMany("CourseAuditLogs")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Course");
@@ -479,7 +481,7 @@ namespace me_academy.api.Migrations
             modelBuilder.Entity("me_academy.core.Models.App.CourseDocument", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.Course", "Course")
-                        .WithMany("Resources")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -528,7 +530,7 @@ namespace me_academy.api.Migrations
                     b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
@@ -566,7 +568,7 @@ namespace me_academy.api.Migrations
 
             modelBuilder.Entity("me_academy.core.Models.App.Course", b =>
                 {
-                    b.Navigation("Resources");
+                    b.Navigation("CourseAuditLogs");
 
                     b.Navigation("UsefulLinks");
                 });

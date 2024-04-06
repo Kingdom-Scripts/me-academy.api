@@ -104,19 +104,14 @@ public static class ServiceExtensions
 
         TypeAdapterConfig<Course, CourseDetailView>
             .NewConfig()
-            .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList())
-            .AfterMapping((src, dest) =>
-            {
-                // Extract DocumentView objects from CourseDocument and add them to CourseDetailView
-                dest.Resources = src.Resources.Select(cd => new DocumentView
-                {
-                    Id = cd.DocumentId,
-                    Name = cd.Document!.Name,
-                    Type = cd.Document.Type,
-                    Url = cd.Document.Url,
-                    ThumbnailUrl = cd.Document.ThumbnailUrl
-                }).ToList();
-            });
+            .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList());
+
+        TypeAdapterConfig<CourseDocument, DocumentView>
+            .NewConfig()
+            .Map(dest => dest.Name, src => src.Document!.Name)
+            .Map(dest => dest.Type, src => src.Document!.Type)
+            .Map(dest => dest.Url, src => src.Document!.Url)
+            .Map(dest => dest.ThumbnailUrl, src => src.Document!.ThumbnailUrl);
 
         services.AddSingleton<ICacheService, CacheService>();
 

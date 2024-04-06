@@ -36,5 +36,5 @@ public class Course : BaseAppModel, ISoftDeletable
     public User? UpdatedBy { get; set; }
     public User? DeletedBy { get; set; }
     public List<CourseLink> UsefulLinks { get; set; } = new();
-    public List<CourseDocument> Resources { get; set; } = new();
+    public List<CourseAuditLog> CourseAuditLogs { get; set; } = new();
 }

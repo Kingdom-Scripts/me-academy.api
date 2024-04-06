@@ -99,8 +99,7 @@ namespace me_academy.api.Migrations
                         column: x => x.CreatedById,
                         principalSchema: "dbo",
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -139,15 +138,13 @@ namespace me_academy.api.Migrations
                         column: x => x.CourseId,
                         principalSchema: "dbo",
                         principalTable: "Courses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_CourseAuditLogs_Users_CreatedById",
                         column: x => x.CreatedById,
                         principalSchema: "dbo",
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -265,6 +262,12 @@ namespace me_academy.api.Migrations
                 schema: "dbo",
                 table: "Courses",
                 column: "DeletedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Courses_Uid",
+                schema: "dbo",
+                table: "Courses",
+                column: "Uid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_UpdatedById",

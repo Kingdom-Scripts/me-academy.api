@@ -12,7 +12,7 @@ public class CourseDetailView : CourseView
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
     public List<CourseLinkView> UsefulLinks { get; set; } = new();
-    public List<DocumentView> Resources { get; set; } = new();
+    public IEnumerable<DocumentView> Resources { get; set; }
 
     public ReferencedUserView? CreatedBy { get; set; }
     public ReferencedUserView? UpdatedBy { get; set; }
