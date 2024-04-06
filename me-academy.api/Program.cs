@@ -55,21 +55,22 @@ builder.Services.AddSwaggerGen(swagger =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\""
+        Description =
+            "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\""
     });
 
     swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-                new OpenApiSecurityScheme
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
                 {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                Array.Empty<string>()
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
         }
     });
 
@@ -102,8 +103,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
 }
-    app.UseSwagger();
-    app.UseSwaggerUI();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseMiddleware<ErrorHandlerMiddleware>();
 

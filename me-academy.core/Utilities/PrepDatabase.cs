@@ -42,14 +42,10 @@ public static class PrepDatabase
             context.Database.ExecuteSqlRaw($"DBCC CHECKIDENT ('Roles', RESEED, 0)");
 
             context.Roles.AddRange(
-                new Role { Name = nameof(Roles.SvpAdmin) },
-                new Role { Name = nameof(Roles.SvpManager) },
-                new Role { Name = nameof(Roles.BusinessAdmin) },
-                new Role { Name = nameof(Roles.BusinessManager) },
-                new Role { Name = nameof(Roles.BusinessClient) },
-                new Role { Name = nameof(Roles.Client) },
-                new Role { Name = nameof(Roles.SuperAdmin) }
-                );
+                new Role { Name = nameof(Roles.SuperAdmin) },
+                new Role { Name = nameof(Roles.Admin) },
+                new Role { Name = nameof(Roles.Customer) }
+            );
         }
 
         context.SaveChanges();

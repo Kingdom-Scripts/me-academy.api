@@ -7,6 +7,9 @@ using Mapster;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.App;
 using me_academy.core.Models.Input.Auth;
+using me_academy.core.Models.Input.Courses;
+using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View.Courses;
 using me_academy.core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -84,8 +87,6 @@ public static class ServiceExtensions
                 .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                 .RequireAuthenticatedUser()
                 .Build();
-
-            options.AddPolicy("BasicAccess", policy => policy.RequireClaim("SubscriptionPlan", "Basic"));
         });
 
         //Mapster global Setting. This can also be overwritten per transform
@@ -96,14 +97,37 @@ public static class ServiceExtensions
                         .AddDestinationTransform((string x) => x ?? "")
                         .AddDestinationTransform(DestinationTransform.EmptyCollectionIfNull);
 
-        services.AddSingleton<ICacheService, CacheService>();
-        services.TryAddSingleton<SoftDeleteInterceptor>();
+        // map courses models
+        TypeAdapterConfig<CourseModel, Course>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
 
+        TypeAdapterConfig<Course, CourseDetailView>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList())
+            .AfterMapping((src, dest) =>
+            {
+                // Extract DocumentView objects from CourseDocument and add them to CourseDetailView
+                dest.Resources = src.Resources.Select(cd => new DocumentView
+                {
+                    Id = cd.DocumentId,
+                    Name = cd.Document!.Name,
+                    Type = cd.Document.Type,
+                    Url = cd.Document.Url,
+                    ThumbnailUrl = cd.Document.ThumbnailUrl
+                }).ToList();
+            });
+
+        services.AddSingleton<ICacheService, CacheService>();
+
+        services.TryAddScoped<SoftDeleteInterceptor>();
         services.TryAddScoped<UserSession>();
         services.TryAddScoped<ITokenGenerator, TokenGenerator>();
+        services.TryAddScoped<IFileService, FileService>();
         services.TryAddScoped<IEmailService, EmailService>();
 
         services.TryAddTransient<IAuthService, AuthService>();
+        services.TryAddTransient<ICourseService, CourseService>();
 
         return services;
     }
