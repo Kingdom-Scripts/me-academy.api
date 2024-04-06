@@ -28,6 +28,53 @@
             <param name="fileName">The file name, with its extension.</param>
             <returns></returns>
         </member>
+        <member name="M:me_academy.api.Controllers.AuthController.SignUp(me_academy.core.Models.Input.Auth.RegisterModel)">
+            <summary>
+            Register a new user
+            </summary>
+            <param name="model"></param>
+            <returns>Returns a user token for the user's account</returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AuthController.RequestEmailConfirmation">
+            <summary>
+            Request email confirmation again
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AuthController.ConfirmEmail(me_academy.core.Models.Input.Auth.ConfirmEmailModel)">
+            <summary>
+            Confirm email address
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AuthController.AuthenticateUser(me_academy.core.Models.Input.Auth.LoginModel)">
+            <summary>
+            Authenticate a user
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AuthController.RefreshToken(me_academy.core.Models.Input.Auth.RefreshTokenModel)">
+            <summary>
+            Refresh user token
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AuthController.AuthenticateUserAsync(System.String)">
+            <summary>
+            Logout a user
+            </summary>
+            <param name="userReference"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AuthController.UserProfile">
+            <summary>
+            Get user profile
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:me_academy.api.Controllers.BaseController.ProcessResponse(me_academy.core.Models.Utilities.Result)">
             <summary>
             Returns the appropriate HTTP Response.
