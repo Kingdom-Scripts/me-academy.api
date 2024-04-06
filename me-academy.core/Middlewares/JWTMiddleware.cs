@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using me_academy.core.Constants;
 using me_academy.core.Interfaces;
@@ -111,10 +112,11 @@ public class JWTMiddleware
             };
 
             // attach account to context on successful jwt validation
-            context.Items["User"] = new UserView()
+            context.Items["User"] = new
             {
                 Uid = uid,
-                Id = int.Parse(id)
+                Id = int.Parse(id),
+                Roles = jwtToken.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList()
             };
 
             return true;

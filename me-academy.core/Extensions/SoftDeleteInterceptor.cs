@@ -1,4 +1,5 @@
 using me_academy.core.Interfaces;
+using me_academy.core.Models.Input.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -7,6 +8,13 @@ namespace me_academy.core.Extensions;
 
 public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
 {
+    private readonly UserSession _userSession;
+
+    public SoftDeleteInterceptor(UserSession userSession)
+    {
+        _userSession = userSession ?? throw new ArgumentNullException(nameof(userSession));
+    }
+
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
@@ -29,6 +37,7 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
         {
             softDeletable.State = EntityState.Modified;
             softDeletable.Entity.IsDeleted = true;
+            softDeletable.Entity.DeletedById = _userSession.UserId;
             softDeletable.Entity.DeletedOn = DateTime.UtcNow;
         }
 

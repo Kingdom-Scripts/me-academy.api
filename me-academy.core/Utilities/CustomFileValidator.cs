@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using me_academy.core.Models.App.Constants;
+using Microsoft.AspNetCore.Http;
 
 namespace me_academy.core.Utilities;
 
@@ -10,28 +11,28 @@ public static class CustomFileValidator
         public string? ErrorMessage { get; set; }
     }
 
-    public static FileValidationResult HaveValidFile(IFormFile? design)
+    public static FileValidationResult HaveValidFile(IFormFile? file)
     {
-        if (design == null)
+        if (file == null)
         {
             return new FileValidationResult { IsValid = true };
         }
 
-        if (design.Length == 0)
+        if (file.Length == 0)
         {
             return new FileValidationResult { IsValid = false, ErrorMessage = "No file provided or the file is empty." };
         }
 
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".pdf" };
-        var maxFileSize = 5 * 1024 * 1024; // 5 MB
+        string[] allowedExtensions = DocumentTypes.AllowedTypes;
+        int maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-        var fileExtension = Path.GetExtension(design.FileName).ToLowerInvariant();
+        string fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
         if (!allowedExtensions.Contains(fileExtension))
         {
             return new FileValidationResult { IsValid = false, ErrorMessage = "Invalid file extension." };
         }
 
-        if (design.Length > maxFileSize)
+        if (file.Length > maxFileSize)
         {
             return new FileValidationResult { IsValid = false, ErrorMessage = "File size exceeds the maximum allowed size." };
         }
