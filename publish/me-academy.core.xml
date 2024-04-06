@@ -44,6 +44,16 @@
             A foreign key to the user who assigned this role to this user
             </summary>
         </member>
+        <member name="P:me_academy.core.Models.Input.PagingOptionModel.PageIndex">
+            <summary>
+            The page index/number to query. Defaults to 1
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Input.PagingOptionModel.PageSize">
+            <summary>
+            The page size to return or how many items to return. Defaults to 15
+            </summary>
+        </member>
         <member name="T:me_academy.core.Models.Utilities.BadErrorResult">
             <summary>
             Represents an error result, derived from the <see cref="T:me_academy.core.Models.Utilities.Result"/> class.
@@ -248,6 +258,41 @@
             </summary>
         </member>
         <member name="P:me_academy.core.Models.Utilities.ErrorResult`1.Paging">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="T:me_academy.core.Models.Utilities.ForbiddenResult">
+            <summary>
+            Represents a forbidden error result, derived from the <see cref="T:me_academy.core.Models.Utilities.Result"/> class.
+            </summary>
+        </member>
+        <member name="M:me_academy.core.Models.Utilities.ForbiddenResult.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:me_academy.core.Models.Utilities.ForbiddenResult"/> class with a default failure status.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.ForbiddenResult.Detail">
+            <summary>
+            Additional details about the error.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.ForbiddenResult.Instance">
+            <summary>
+            The instance where the error occurred.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.ForbiddenResult.Path">
+            <summary>
+            The path associated with the error.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.ForbiddenResult.Content">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.ForbiddenResult.Paging">
             <summary>
             <inheritdoc/>
             </summary>

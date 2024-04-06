@@ -4,11 +4,108 @@
         <name>me-academy.api</name>
     </assembly>
     <members>
+        <member name="M:me_academy.api.Controllers.AssetsController.UploadAsset(System.String,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Upload a file for a course
+            </summary>
+            <param name="folder">The course folder (typically the course UID)</param>
+            <param name="file">The file to be uploaded</param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AssetsController.GetThumbnail(System.String,System.String)">
+            <summary>
+            Get a thumbnail for a file
+            </summary>
+            <param name="folder">The course folder (typically the course UID)</param>
+            <param name="fileName">The file name, with its extension</param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AssetsController.GetAsset(System.String,System.String)">
+            <summary>
+            Get a file for a course
+            </summary>
+            <param name="folder">The course folder (typically the course UID)</param>
+            <param name="fileName">The file name, with its extension.</param>
+            <returns></returns>
+        </member>
         <member name="M:me_academy.api.Controllers.BaseController.ProcessResponse(me_academy.core.Models.Utilities.Result)">
             <summary>
             Returns the appropriate HTTP Response.
             </summary>
             <param name="result">The result.</param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.CreateCourse(me_academy.core.Models.Input.Courses.CourseModel)">
+            <summary>
+            Create a new course
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.AddResourceToCourse(System.String,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Add a resource (file) to a course
+            </summary>
+            <param name="courseUid"></param>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.RemoveResourceFromCourse(System.String,System.Int32)">
+            <summary>
+            Remove a resource (file) from a course
+            </summary>
+            <param name="courseUid"></param>
+            <param name="documentId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.UpdateCourse(System.String,me_academy.core.Models.Input.Courses.CourseModel)">
+            <summary>
+            Update a course
+            </summary>
+            <param name="courseUid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.DeleteCourse(System.String)">
+            <summary>
+            Delete a course
+            </summary>
+            <param name="courseUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.GetCourse(System.String)">
+            <summary>
+            Get the details of a course
+            </summary>
+            <param name="courseUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.ListCourses(me_academy.core.Models.Input.Courses.CourseSearchModel)">
+            <summary>
+            List courses
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.PublishCourse(System.String)">
+            <summary>
+            Publish a course that is still in draft
+            </summary>
+            <param name="courseUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.ActivateCourse(System.String)">
+            <summary>
+            Activate a course, making it available for students
+            </summary>
+            <param name="courseUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.DeactivateCourse(System.String)">
+            <summary>
+            Deactivate a course, making it unavailable to students
+            </summary>
+            <param name="courseUid"></param>
             <returns></returns>
         </member>
         <member name="T:me_academy.api.Migrations.InitialCreate">
@@ -45,6 +142,18 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.Two.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Three">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Three.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Three.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Three.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
