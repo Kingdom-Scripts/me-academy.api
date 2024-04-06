@@ -211,7 +211,6 @@ public class CourseService : ICourseService
             .Include(c => c.UpdatedBy)
             .Include(c => c.DeletedBy)
             .Include(c => c.UsefulLinks)
-            .Include(c => c.Resources).ThenInclude(r => r.Document)
             .ProjectToType<CourseDetailView>()
             .FirstOrDefaultAsync();
 
@@ -220,6 +219,11 @@ public class CourseService : ICourseService
 
         // update view count
         UpdateCourseViewCount(courseUid);
+
+        result.Resources = _context.CourseDocuments
+            .Where(cd => cd.CourseId == result.Id)
+            .Select(cd => cd.Document)
+            .ProjectToType<DocumentView>();
 
         return new SuccessResult(result);
     }
