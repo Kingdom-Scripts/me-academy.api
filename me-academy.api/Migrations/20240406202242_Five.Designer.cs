@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240406202242_Five")]
+    partial class Five
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,47 +211,6 @@ namespace me_academy.api.Migrations
                     b.ToTable("CourseLink", "dbo");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.CoursePrice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("DeletedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DurationId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("DurationId");
-
-                    b.ToTable("CoursePrices", "dbo");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.CourseViewCount", b =>
                 {
                     b.Property<int>("Id")
@@ -319,7 +281,7 @@ namespace me_academy.api.Migrations
                     b.ToTable("Documents", "dbo");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.Duration", b =>
+            modelBuilder.Entity("me_academy.core.Models.App.DurationType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -345,7 +307,7 @@ namespace me_academy.api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Durations", "dbo", t =>
+                    b.ToTable("DurationTypes", "dbo", t =>
                         {
                             t.HasCheckConstraint("CK_DurationType_Type", "[Type] IN ('Days', 'Weeks', 'Months', 'Years')");
                         });
@@ -554,25 +516,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.CoursePrice", b =>
-                {
-                    b.HasOne("me_academy.core.Models.App.Course", "Course")
-                        .WithMany("CoursePrices")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("me_academy.core.Models.App.Duration", "Duration")
-                        .WithMany()
-                        .HasForeignKey("DurationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Duration");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.CourseViewCount", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.Course", "Course")
@@ -634,8 +577,6 @@ namespace me_academy.api.Migrations
             modelBuilder.Entity("me_academy.core.Models.App.Course", b =>
                 {
                     b.Navigation("CourseAuditLogs");
-
-                    b.Navigation("CoursePrices");
 
                     b.Navigation("UsefulLinks");
                 });

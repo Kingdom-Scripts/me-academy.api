@@ -23,7 +23,7 @@ public static class CustomFileValidator
             return new FileValidationResult { IsValid = false, ErrorMessage = "No file provided or the file is empty." };
         }
 
-        string[] allowedExtensions = DocumentTypes.AllowedTypes;
+        string[] allowedExtensions = DocumentTypeEnum.AllowedTypes;
         int maxFileSize = 5 * 1024 * 1024; // 5 MB
 
         string fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();

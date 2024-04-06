@@ -13,6 +13,7 @@ public interface ICourseService
     Task<Result> UpdateCourse(string courseUid, CourseModel model);
     Task<Result> DeleteCourse(string courseUid);
     Task<Result> GetCourse(string courseUid);
+    Task<Result> AddCourseView(string courseUid);
     Task<Result> ListCourses(CourseSearchModel request);
     Task<Result> PublishCourse(string courseUid);
     Task<Result> ActivateCourse(string courseUid);

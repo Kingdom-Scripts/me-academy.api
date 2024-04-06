@@ -103,6 +103,20 @@ public class CoursesController : BaseController
     }
 
     /// <summary>
+    /// Update the view count of a course, used for analytics. This is called when a user views a course.
+    /// </summary>
+    /// <param name="courseUid"></param>
+    /// <returns></returns>
+    [HttpPost("{courseUid}/view")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> AddCourseView(string courseUid)
+    {
+        var res = await _courseService.AddCourseView(courseUid);
+        return ProcessResponse(res);
+    }
+
+    /// <summary>
     /// List courses
     /// </summary>
     /// <param name="request"></param>

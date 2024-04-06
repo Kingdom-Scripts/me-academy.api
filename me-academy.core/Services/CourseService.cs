@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using CourseView = me_academy.core.Models.View.Courses.CourseView;
+using ErrorEventArgs = Microsoft.AspNetCore.Components.Web.ErrorEventArgs;
 
 namespace me_academy.core.Services;
 
@@ -47,6 +48,17 @@ public class CourseService : ICourseService
         var course = model.Adapt<Course>();
         course.CreatedById = _userSession.UserId;
         course.Uid = course.Title.Trim().ToLower().Replace(" ", "-", StringComparison.OrdinalIgnoreCase);
+
+        // add prices
+        if (model.Prices.Any())
+        {
+            course.CoursePrices = model.Prices.Select(p => new CoursePrice
+            {
+                Price = p.Price,
+                DurationId = p.DurationId,
+                IsActive = true
+            }).ToList();
+        }
 
         // add audit log
         AddCourseAuditLog(course, CourseAuditLogConstants.Created(course.Title, _userSession.Uid));
@@ -156,7 +168,7 @@ public class CourseService : ICourseService
         // validate that course with title doesn't exist
         bool courseExist = await _context.Courses
             .AnyAsync(c => c.Id != course.Id
-                           && string.Equals(c.Title, model.Title, StringComparison.OrdinalIgnoreCase));
+                           && c.Title.ToLower().Trim() == model.Title.ToLower().Trim());
 
         if (courseExist)
             return new ErrorResult("A course with this title already exist. Please choose another title.");
@@ -165,6 +177,17 @@ public class CourseService : ICourseService
         course = model.Adapt(course);
         course.UpdatedById = _userSession.UserId;
         course.UpdatedOnUtc = DateTime.UtcNow;
+
+        // add prices
+        if (model.Prices.Any())
+        {
+            course.CoursePrices = model.Prices.Select(p => new CoursePrice
+            {
+                Price = p.Price,
+                DurationId = p.DurationId,
+                IsActive = true
+            }).ToList();
+        }
 
         // save the data
         _context.Courses.Update(course);
@@ -211,14 +234,13 @@ public class CourseService : ICourseService
             .Include(c => c.UpdatedBy)
             .Include(c => c.DeletedBy)
             .Include(c => c.UsefulLinks)
+            .Include(c => c.CoursePrices.Where(cp => cp.IsActive && !cp.IsDeleted))
+            .ThenInclude(cp => cp.Duration)
             .ProjectToType<CourseDetailView>()
             .FirstOrDefaultAsync();
 
         if (result is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
-
-        // update view count
-        UpdateCourseViewCount(courseUid);
 
         result.Resources = _context.CourseDocuments
             .Where(cd => cd.CourseId == result.Id)
@@ -226,6 +248,39 @@ public class CourseService : ICourseService
             .ProjectToType<DocumentView>();
 
         return new SuccessResult(result);
+    }
+
+    public async Task<Result> AddCourseView(string courseUid)
+    {
+        var course = await _context.Courses
+            .Where(c => c.Uid == courseUid)
+            .FirstOrDefaultAsync();
+        if (course == null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
+
+        course.ViewCount++;
+        _context.Courses.Update(course);
+
+        var countDetail = new CourseViewCount
+        {
+            CourseId = course.Id,
+            ViewedById = _userSession.UserId != 0 ? _userSession.UserId : null,
+            IpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString()
+        };
+        await _context.AddRangeAsync(countDetail);
+
+        int saved = await _context.SaveChangesAsync();
+
+        if (saved > 0)
+            _logger.LogInformation("Course view count updated for course: {CourseTitle}", course.Title);
+        else
+            _logger.LogError(
+                "An error occurred while updating course view count for course: {CourseTitle}. Current view count before failure: {Count}",
+                course.Title, course.ViewCount - 1);
+
+        return saved > 0
+            ? new SuccessResult(StatusCodes.Status200OK, "Course view count updated successfully.")
+            : new ErrorResult("Failed to update course view count. Please try again.");
     }
 
     public async Task<Result> ListCourses(CourseSearchModel request)
@@ -339,34 +394,5 @@ public class CourseService : ICourseService
             CreatedById = _userSession.UserId
         };
         await _context.AddAsync(newLog);
-    }
-
-    private async void UpdateCourseViewCount(string courseUid)
-    {
-        var course = await _context.Courses
-            .Where(c => c.Uid == courseUid)
-            .FirstOrDefaultAsync();
-        if (course == null)
-            return;
-
-        course.ViewCount++;
-        _context.Courses.Update(course);
-
-        var countDetail = new CourseViewCount
-        {
-            CourseId = course.Id,
-            ViewedById = _userSession.UserId != 0 ? _userSession.UserId : null,
-            IpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString()
-        };
-        await _context.AddRangeAsync(countDetail);
-
-        int saved = await _context.SaveChangesAsync();
-
-        if (saved > 0)
-            _logger.LogInformation("Course view count updated for course: {CourseTitle}", course.Title);
-        else
-            _logger.LogError(
-                "An error occurred while updating course view count for course: {CourseTitle}. Current view count before failure: {Count}",
-                course.Title, course.ViewCount - 1);
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240406214859_Seven")]
+    partial class Seven
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,7 +231,7 @@ namespace me_academy.api.Migrations
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DurationId")
+                    b.Property<int>("DurationTypeId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
@@ -244,7 +247,7 @@ namespace me_academy.api.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("DurationId");
+                    b.HasIndex("DurationTypeId");
 
                     b.ToTable("CoursePrices", "dbo");
                 });
@@ -319,7 +322,7 @@ namespace me_academy.api.Migrations
                     b.ToTable("Documents", "dbo");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.Duration", b =>
+            modelBuilder.Entity("me_academy.core.Models.App.DurationType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -345,7 +348,7 @@ namespace me_academy.api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Durations", "dbo", t =>
+                    b.ToTable("DurationTypes", "dbo", t =>
                         {
                             t.HasCheckConstraint("CK_DurationType_Type", "[Type] IN ('Days', 'Weeks', 'Months', 'Years')");
                         });
@@ -562,15 +565,15 @@ namespace me_academy.api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("me_academy.core.Models.App.Duration", "Duration")
+                    b.HasOne("me_academy.core.Models.App.DurationType", "DurationType")
                         .WithMany()
-                        .HasForeignKey("DurationId")
+                        .HasForeignKey("DurationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Course");
 
-                    b.Navigation("Duration");
+                    b.Navigation("DurationType");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.CourseViewCount", b =>
