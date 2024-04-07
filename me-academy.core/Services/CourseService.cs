@@ -8,6 +8,7 @@ using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Courses;
+using me_academy.core.Models.View.UtilityView;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -55,8 +56,7 @@ public class CourseService : ICourseService
             course.CoursePrices = model.Prices.Select(p => new CoursePrice
             {
                 Price = p.Price,
-                DurationId = p.DurationId,
-                IsActive = true
+                DurationId = p.DurationId
             }).ToList();
         }
 
@@ -159,6 +159,7 @@ public class CourseService : ICourseService
     {
         // get the course
         var course = await _context.Courses
+            .Include(c => c.CoursePrices)
             .Where(c => c.Uid == courseUid)
             .FirstOrDefaultAsync();
 
@@ -178,15 +179,30 @@ public class CourseService : ICourseService
         course.UpdatedById = _userSession.UserId;
         course.UpdatedOnUtc = DateTime.UtcNow;
 
-        // add prices
-        if (model.Prices.Any())
+        // update the IsDeleted for the removed prices
+        var removedPrices = course.CoursePrices
+            .Where(cp => model.Prices.All(p => p.DurationId != cp.DurationId))
+            .ToList();
+
+        _context.CoursePrices.RemoveRange(removedPrices);
+
+        // add new prices
+        foreach (var price in model.Prices)
         {
-            course.CoursePrices = model.Prices.Select(p => new CoursePrice
+            var existingPrice = course.CoursePrices.FirstOrDefault(cp => cp.DurationId == price.DurationId);
+            if (existingPrice != null)
             {
-                Price = p.Price,
-                DurationId = p.DurationId,
-                IsActive = true
-            }).ToList();
+                existingPrice.Price = price.Price;
+                existingPrice.IsDeleted = false;
+            }
+            else
+            {
+                course.CoursePrices.Add(new CoursePrice
+                {
+                    Price = price.Price,
+                    DurationId = price.DurationId
+                });
+            }
         }
 
         // save the data
@@ -194,7 +210,7 @@ public class CourseService : ICourseService
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
-            ? new SuccessResult(course.Adapt<CourseView>())
+            ? new SuccessResult(course.Adapt<CourseDetailView>())
             : new ErrorResult("Failed to update course. Please try again.");
     }
 
@@ -234,13 +250,16 @@ public class CourseService : ICourseService
             .Include(c => c.UpdatedBy)
             .Include(c => c.DeletedBy)
             .Include(c => c.UsefulLinks)
-            .Include(c => c.CoursePrices.Where(cp => cp.IsActive && !cp.IsDeleted))
+            .Include(c => c.CoursePrices)
             .ThenInclude(cp => cp.Duration)
             .ProjectToType<CourseDetailView>()
             .FirstOrDefaultAsync();
 
         if (result is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
+
+        // remove deleted prices
+        result.CoursePrices = result.CoursePrices.Where(cp => !cp.IsDeleted).ToList();
 
         result.Resources = _context.CourseDocuments
             .Where(cd => cd.CourseId == result.Id)

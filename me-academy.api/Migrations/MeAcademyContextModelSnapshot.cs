@@ -77,7 +77,7 @@ namespace me_academy.api.Migrations
                     b.Property<int?>("DeletedById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("DeletedOn")
+                    b.Property<DateTime?>("DeletedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -225,26 +225,24 @@ namespace me_academy.api.Migrations
                     b.Property<int?>("DeletedById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("DeletedOn")
+                    b.Property<DateTime?>("DeletedOnUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("DurationId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId");
-
                     b.HasIndex("DurationId");
+
+                    b.HasIndex("CourseId", "DurationId")
+                        .IsUnique();
 
                     b.ToTable("CoursePrices", "dbo");
                 });

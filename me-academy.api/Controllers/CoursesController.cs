@@ -2,6 +2,7 @@ using me_academy.core.Interfaces;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Courses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace me_academy.api.Controllers;
@@ -66,7 +67,7 @@ public class CoursesController : BaseController
     /// <param name="model"></param>
     /// <returns></returns>
     [HttpPut("{courseUid}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseView>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseDetailView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> UpdateCourse(string courseUid, CourseModel model)
     {
@@ -93,6 +94,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
+    [AllowAnonymous] // TODO: remove this line
     [HttpGet("{courseUid}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseDetailView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
