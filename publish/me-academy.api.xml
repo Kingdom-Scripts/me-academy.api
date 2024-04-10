@@ -82,6 +82,12 @@
             <param name="result">The result.</param>
             <returns></returns>
         </member>
+        <member name="M:me_academy.api.Controllers.ConfigsController.ListDurations">
+            <summary>
+            List all pricing durations
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:me_academy.api.Controllers.CoursesController.CreateCourse(me_academy.core.Models.Input.Courses.CourseModel)">
             <summary>
             Create a new course
@@ -123,6 +129,13 @@
         <member name="M:me_academy.api.Controllers.CoursesController.GetCourse(System.String)">
             <summary>
             Get the details of a course
+            </summary>
+            <param name="courseUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.AddCourseView(System.String)">
+            <summary>
+            Update the view count of a course, used for analytics. This is called when a user views a course.
             </summary>
             <param name="courseUid"></param>
             <returns></returns>
@@ -201,6 +214,66 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.Three.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Four">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Four.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Four.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Four.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Five">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Five.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Five.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Five.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Six">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Six.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Six.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Six.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Seven">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Seven.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Seven.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Seven.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Eight">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Eight.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Eight.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Eight.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
