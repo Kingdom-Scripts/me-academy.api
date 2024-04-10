@@ -6,5 +6,5 @@ public interface ISoftDeletable
 
     int? DeletedById { get; set; }
 
-    DateTime? DeletedOn { get; set; }
+    DateTime? DeletedOnUtc { get; set; }
 }

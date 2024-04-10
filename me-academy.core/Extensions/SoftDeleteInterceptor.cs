@@ -10,10 +10,8 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
 {
     private readonly UserSession _userSession;
 
-    public SoftDeleteInterceptor(UserSession userSession)
-    {
+    public SoftDeleteInterceptor(UserSession userSession) =>
         _userSession = userSession ?? throw new ArgumentNullException(nameof(userSession));
-    }
 
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
@@ -38,7 +36,7 @@ public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
             softDeletable.State = EntityState.Modified;
             softDeletable.Entity.IsDeleted = true;
             softDeletable.Entity.DeletedById = _userSession.UserId;
-            softDeletable.Entity.DeletedOn = DateTime.UtcNow;
+            softDeletable.Entity.DeletedOnUtc = DateTime.UtcNow;
         }
 
         return base.SavingChangesAsync(eventData, result, cancellationToken);

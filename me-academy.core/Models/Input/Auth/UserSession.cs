@@ -6,7 +6,7 @@ public class UserSession
 {
     public int UserId { get; set; }
     public string Uid { get; set; } = null!;
-    public string Type { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
     private List<string> _roles = new();
 

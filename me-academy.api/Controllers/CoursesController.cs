@@ -1,7 +1,9 @@
 using me_academy.core.Interfaces;
+using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Courses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace me_academy.api.Controllers;
@@ -35,12 +37,26 @@ public class CoursesController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="file"></param>
     /// <returns></returns>
-    [HttpPost("{courseUid}/resource")]
+    [HttpPost("{courseUid}/resources")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult<DocumentView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> AddResourceToCourse(string courseUid, IFormFile file)
+    public async Task<IActionResult> AddResourceToCourse(string courseUid, [FromForm] FileUploadModel file)
     {
         var res = await _courseService.AddResourceToCourse(courseUid, file);
+        return ProcessResponse(res);
+    }
+
+    /// <summary>
+    /// Retrieve a list of the files attached to a course
+    /// </summary>
+    /// <param name="courseUid"></param>
+    /// <returns></returns>
+    [HttpGet("{courseUid}/resources")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<DocumentView>>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> ListResources(string courseUid)
+    {
+        var res = await _courseService.ListResources(courseUid);
         return ProcessResponse(res);
     }
 
@@ -50,7 +66,7 @@ public class CoursesController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="documentId"></param>
     /// <returns></returns>
-    [HttpDelete("{courseUid}/resource/{documentId}")]
+    [HttpDelete("{courseUid}/resources/{documentId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> RemoveResourceFromCourse(string courseUid, int documentId)
@@ -66,7 +82,7 @@ public class CoursesController : BaseController
     /// <param name="model"></param>
     /// <returns></returns>
     [HttpPut("{courseUid}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseView>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseDetailView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> UpdateCourse(string courseUid, CourseModel model)
     {
@@ -93,6 +109,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
+    [AllowAnonymous] // TODO: remove this line
     [HttpGet("{courseUid}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseDetailView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]

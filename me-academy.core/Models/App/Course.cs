@@ -31,7 +31,7 @@ public class Course : BaseAppModel, ISoftDeletable
 
     [Required] public bool IsDeleted { get; set; } = false;
     public int? DeletedById { get; set; }
-    public DateTime? DeletedOn { get; set; }
+    public DateTime? DeletedOnUtc { get; set; }
 
     public User? CreatedBy { get; set; }
     public User? UpdatedBy { get; set; }

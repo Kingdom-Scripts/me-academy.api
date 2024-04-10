@@ -30,13 +30,5 @@ public class NewCourseValidation : AbstractValidator<CourseModel>
 
         RuleForEach(x => x.Tags)
             .MaximumLength(20).WithMessage("Tag cannot exceed 20 characters.");
-
-        // RuleForEach(x => x.Resources)
-        //     .Custom((file, context) =>
-        //     {
-        //         var validationResult = CustomFileValidator.HaveValidFile(file);
-        //         if (!validationResult.IsValid)
-        //             context.AddFailure($"File: {validationResult.ErrorMessage}");
-        //     });
     }
 }

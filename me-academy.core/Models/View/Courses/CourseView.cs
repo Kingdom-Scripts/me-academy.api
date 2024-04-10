@@ -12,6 +12,6 @@ public class CourseView
     public int CreatedById { get; set; }
     public required bool IsDraft { get; set; }
     public bool IsActive { get; set; }
-    public DateTime CreatedOnUtc { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
     public DateTime? PublishedOnUtc { get; set; }
 }
