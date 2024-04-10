@@ -95,12 +95,19 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.CoursesController.AddResourceToCourse(System.String,Microsoft.AspNetCore.Http.IFormFile)">
+        <member name="M:me_academy.api.Controllers.CoursesController.AddResourceToCourse(System.String,me_academy.core.Models.Input.FileUploadModel)">
             <summary>
             Add a resource (file) to a course
             </summary>
             <param name="courseUid"></param>
             <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.ListResources(System.String)">
+            <summary>
+            Retrieve a list of the files attached to a course
+            </summary>
+            <param name="courseUid"></param>
             <returns></returns>
         </member>
         <member name="M:me_academy.api.Controllers.CoursesController.RemoveResourceFromCourse(System.String,System.Int32)">
@@ -274,6 +281,54 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.Eight.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Nine">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Nine.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Nine.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Nine.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Ten">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Ten.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Ten.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Ten.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Eleven">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Eleven.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Eleven.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Eleven.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Twelve">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Twelve.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Twelve.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Twelve.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
