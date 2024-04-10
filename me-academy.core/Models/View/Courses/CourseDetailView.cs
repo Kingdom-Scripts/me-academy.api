@@ -12,9 +12,10 @@ public class CourseDetailView : CourseView
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
     public List<CourseLinkView> UsefulLinks { get; set; } = new();
-    public IEnumerable<DocumentView> Resources { get; set; }
-
+    public IEnumerable<DocumentView> Resources { get; set; } = new List<DocumentView>();
     public ReferencedUserView? CreatedBy { get; set; }
     public ReferencedUserView? UpdatedBy { get; set; }
     public ReferencedUserView? DeletedBy { get; set; }
+
+    public List<CoursePriceView> CoursePrices { get; set; } = new();
 }

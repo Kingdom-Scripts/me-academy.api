@@ -14,8 +14,9 @@ public class MeAcademyContext : DbContext
     public required DbSet<UserRole> UserRoles { get; set; }
     public required DbSet<RefreshToken> RefreshTokens { get; set; }
     public required DbSet<Code> Codes { get; set; }
-    public required DbSet<DurationType> DurationTypes { get; set; }
+    public required DbSet<Duration> Durations { get; set; }
     public required DbSet<Course> Courses { get; set; }
+    public required DbSet<CoursePrice> CoursePrices { get; set; }
     public required DbSet<CourseDocument> CourseDocuments { get; set; }
     public required DbSet<Document> Documents { get; set; }
     public required DbSet<CourseViewCount> CourseViewCounts { get; set; }
@@ -32,8 +33,8 @@ public class MeAcademyContext : DbContext
             entity.HasKey(t => new { t.RoleId, t.UserId });
         });
 
-        builder.Entity<DurationType>()
-            .ToTable(p => p.HasCheckConstraint("CK_DurationType_Name", "[Name] IN ('Days', 'Weeks', 'Months', 'Years')"));
+        builder.Entity<Duration>()
+            .ToTable(p => p.HasCheckConstraint("CK_DurationType_Type", "[Type] IN ('Days', 'Weeks', 'Months', 'Years')"));
 
         builder.Entity<Course>()
             .HasIndex(c => c.Uid);

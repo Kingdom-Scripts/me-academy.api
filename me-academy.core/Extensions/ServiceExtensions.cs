@@ -106,6 +106,10 @@ public static class ServiceExtensions
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList());
 
+        TypeAdapterConfig<CoursePrice, CoursePriceView>
+            .NewConfig()
+            .Map(dest => dest.Name, src => src.Duration!.Name);
+
         TypeAdapterConfig<CourseDocument, DocumentView>
             .NewConfig()
             .Map(dest => dest.Name, src => src.Document!.Name)
@@ -123,6 +127,7 @@ public static class ServiceExtensions
 
         services.TryAddTransient<IAuthService, AuthService>();
         services.TryAddTransient<ICourseService, CourseService>();
+        services.TryAddTransient<IConfigService, ConfigService>();
 
         return services;
     }

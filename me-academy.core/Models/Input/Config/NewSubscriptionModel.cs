@@ -5,7 +5,7 @@ namespace me_academy.core.Models.Input.Config;
 public class NewSubscriptionModel
 {
     public int Quantity { get; set; }
-    public required string DurationType { get; set; }
+    public required string Duration { get; set; }
 }
 
 public class NewSubscriptionValidation : AbstractValidator<NewSubscriptionModel>
@@ -19,8 +19,8 @@ public class NewSubscriptionValidation : AbstractValidator<NewSubscriptionModel>
     {
         RuleFor(x => x.Quantity)
             .GreaterThanOrEqualTo(1).WithMessage("Please provide a valid quantity");
-        RuleFor(x => x.DurationType)
-            .NotNull().WithMessage("Please provide a duration type.")
+        RuleFor(x => x.Duration)
+            .NotNull().WithMessage("Please provide a duration.")
             .Must(value => _acceptableDuration.Contains(value))
             .WithMessage($"Only {string.Join(", ", _acceptableDuration)} are acceptable values.");
     }

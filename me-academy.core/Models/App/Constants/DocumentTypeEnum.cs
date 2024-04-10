@@ -1,6 +1,6 @@
 ﻿namespace me_academy.core.Models.App.Constants;
 
-public class DocumentTypes
+public class DocumentTypeEnum
 {
     public const string IMAGE = "Image";
     public const string PDF = "PDF";

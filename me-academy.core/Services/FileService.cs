@@ -88,7 +88,7 @@ public class FileService : IFileService
         string fileType = GetDocumentType(ext);
         string fileUploadName = $"{Guid.NewGuid()}{ext}";
         string filePath = Path.Combine(folderPath, fileUploadName);
-        if (filePath != DocumentTypes.IMAGE)
+        if (filePath != DocumentTypeEnum.IMAGE)
         {
             await using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -106,7 +106,7 @@ public class FileService : IFileService
             Name = file.FileName,
             Type = fileType,
             Url = $"{folder}/{fileUploadName}",
-            ThumbnailUrl = fileType == DocumentTypes.IMAGE
+            ThumbnailUrl = fileType == DocumentTypeEnum.IMAGE
                 ? $"{folder}/_thumbnail/{fileUploadName}"
                 : $"{folder}/_thumbnail/{fileType}.png",
             CreatedById = _userSession.UserId
@@ -171,19 +171,19 @@ public class FileService : IFileService
     {
         if (extension == ".jpg" || extension == ".jpeg" || extension == ".png")
         {
-            return DocumentTypes.IMAGE;
+            return DocumentTypeEnum.IMAGE;
         }
         else if (extension == ".pdf")
         {
-            return DocumentTypes.PDF;
+            return DocumentTypeEnum.PDF;
         }
         else if (extension == ".doc" || extension == ".docx")
         {
-            return DocumentTypes.WORD_DOCUMENT;
+            return DocumentTypeEnum.WORD_DOCUMENT;
         }
         else
         {
-            return DocumentTypes.UNKNWON;
+            return DocumentTypeEnum.UNKNWON;
         }
     }
 }

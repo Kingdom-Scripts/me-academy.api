@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using iText.Layout.Element;
 using me_academy.core.Interfaces;
 
 namespace me_academy.core.Models.App;
@@ -37,4 +38,5 @@ public class Course : BaseAppModel, ISoftDeletable
     public User? DeletedBy { get; set; }
     public List<CourseLink> UsefulLinks { get; set; } = new();
     public List<CourseAuditLog> CourseAuditLogs { get; set; } = new();
+    public List<CoursePrice> CoursePrices { get; set; } = new();
 }
