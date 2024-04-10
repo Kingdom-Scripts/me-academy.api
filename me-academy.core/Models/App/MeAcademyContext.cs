@@ -19,6 +19,7 @@ public class MeAcademyContext : DbContext
     public required DbSet<CoursePrice> CoursePrices { get; set; }
     public required DbSet<CourseDocument> CourseDocuments { get; set; }
     public required DbSet<Document> Documents { get; set; }
+    public required DbSet<CourseLink> CourseLinks { get; set; }
     public required DbSet<CourseViewCount> CourseViewCounts { get; set; }
     public required DbSet<CourseAuditLog> CourseAuditLogs { get; set; }
 
@@ -46,7 +47,10 @@ public class MeAcademyContext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<CourseDocument>()
-            .HasKey(cd => new { cd.CourseId, cd.DocumentId });
+            .HasOne(cd => cd.CreatedBy)
+            .WithMany()
+            .HasForeignKey(cd => cd.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<CourseAuditLog>()
             .HasOne(cal => cal.Course)

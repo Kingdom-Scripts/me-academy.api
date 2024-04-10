@@ -88,7 +88,7 @@ public class FileService : IFileService
         string fileType = GetDocumentType(ext);
         string fileUploadName = $"{Guid.NewGuid()}{ext}";
         string filePath = Path.Combine(folderPath, fileUploadName);
-        if (filePath != DocumentTypeEnum.IMAGE)
+        if (fileType != DocumentTypeEnum.IMAGE)
         {
             await using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -97,7 +97,11 @@ public class FileService : IFileService
         }
         else
         {
-            await SaveImageAsync(filePath, file);
+            string thumbNailFolder = Path.Combine(folderPath, "_thumbnails");
+            if (!Directory.Exists(thumbNailFolder))
+                Directory.CreateDirectory(thumbNailFolder);
+            string thumbNailPath = Path.Combine(thumbNailFolder, fileUploadName);
+            await SaveImageAsync(filePath, thumbNailPath, file);
         }
 
         // save file info to database
@@ -107,15 +111,15 @@ public class FileService : IFileService
             Type = fileType,
             Url = $"{folder}/{fileUploadName}",
             ThumbnailUrl = fileType == DocumentTypeEnum.IMAGE
-                ? $"{folder}/_thumbnail/{fileUploadName}"
-                : $"{folder}/_thumbnail/{fileType}.png",
+                ? $"{folder}/_thumbnails/{fileUploadName}"
+                : $"_thumbnails/{fileType}.png",
             CreatedById = _userSession.UserId
         };
 
         return new SuccessResult<Document>(document);
     }
 
-    private static async Task SaveImageAsync(string filePath, IFormFile image)
+    private static async Task SaveImageAsync(string filePath, string thumbnailPath, IFormFile image)
     {
         await using (var stream = new MemoryStream())
         {
@@ -142,7 +146,7 @@ public class FileService : IFileService
 
             // save files
             await File.WriteAllBytesAsync(filePath, optimized);
-            await File.WriteAllBytesAsync(filePath + "_thumbnail", thumbnail);
+            await File.WriteAllBytesAsync(thumbnailPath, thumbnail);
         }
     }
 
@@ -156,6 +160,15 @@ public class FileService : IFileService
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
+
+            // remove thumbnail if type is an image
+            if (document.Type == DocumentTypeEnum.IMAGE)
+            {
+                string thumbNailPath = Path.Combine(_hostEnvironment.ContentRootPath, _fileSettings.BaseFolder,
+                    document.ThumbnailUrl);
+                if (File.Exists(thumbNailPath))
+                    File.Delete(thumbNailPath);
+            }
         }
         else
         {

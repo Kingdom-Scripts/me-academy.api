@@ -1,4 +1,5 @@
-﻿using me_academy.core.Models.Input.Auth;
+﻿using System.Security.Claims;
+using me_academy.core.Models.Input.Auth;
 using Microsoft.AspNetCore.Http;
 
 namespace me_academy.core.Middlewares;
@@ -20,6 +21,10 @@ public class UserSessionMiddleware
 
             session.UserId = UserId;
             session.Uid = context.User.Claims.SingleOrDefault(c => c.Type == "uid")?.Value;
+            session.Name = context.User.Claims.SingleOrDefault(c => c.Type == "name")?.Value;
+            session.Roles = context.User.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(x => x.Value).ToList();
         }
 
         // Call the next delegate/middleware in the pipeline

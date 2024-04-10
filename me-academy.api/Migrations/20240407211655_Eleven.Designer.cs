@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240407211655_Eleven")]
+    partial class Eleven
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,31 +170,15 @@ namespace me_academy.api.Migrations
 
             modelBuilder.Entity("me_academy.core.Models.App.CourseDocument", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
                     b.Property<int>("DocumentId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
+                    b.HasKey("CourseId", "DocumentId");
 
                     b.HasIndex("DocumentId");
-
-                    b.HasIndex("CourseId", "DocumentId");
 
                     b.ToTable("CourseDocuments", "dbo");
                 });
@@ -546,12 +533,6 @@ namespace me_academy.api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("me_academy.core.Models.App.Document", "Document")
                         .WithMany()
                         .HasForeignKey("DocumentId")
@@ -559,8 +540,6 @@ namespace me_academy.api.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
-
-                    b.Navigation("CreatedBy");
 
                     b.Navigation("Document");
                 });

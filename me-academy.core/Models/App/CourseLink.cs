@@ -10,6 +10,4 @@ public class CourseLink
     public required string Title { get; set; }
     [MaxLength(225)]
     public required string Link { get; set; }
-
-    public Course? Course { get; set; }
 }
