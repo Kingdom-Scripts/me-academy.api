@@ -13,4 +13,5 @@ public interface IFileService
     FileStreamResult? GetFile(string folder, string fileName);
     Task<Result> DeleteFile(int documentId);
     Task<Result> DeleteFileInternal(int documentId);
+    Task<Result> GetVideoUploadToken();
 }

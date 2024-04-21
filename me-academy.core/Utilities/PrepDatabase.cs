@@ -1,4 +1,5 @@
-﻿using me_academy.core.Models.App;
+﻿using me_academy.core.Interfaces;
+using me_academy.core.Models.App;
 using me_academy.core.Models.App.Constants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +10,14 @@ namespace me_academy.core.Utilities;
 
 public static class PrepDatabase
 {
-    public static void PrepPopulation(IApplicationBuilder app, bool isProd)
+    public static async void PrepPopulation(IApplicationBuilder app, bool isProd)
     {
         using (var serviceScope = app.ApplicationServices.CreateScope())
         {
+            var fileService = serviceScope.ServiceProvider.GetService<IFileService>();
+
+            var res = await fileService.GetVideoUploadToken();
+
             SeedData(serviceScope.ServiceProvider.GetService<MeAcademyContext>(), isProd);
         }
     }

@@ -5,6 +5,7 @@ using Azure.Identity;
 using FluentValidation;
 using Mapster;
 using me_academy.core.Interfaces;
+using me_academy.core.Middlewares;
 using me_academy.core.Models.App;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
@@ -19,7 +20,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using TinifyAPI;
 
 namespace me_academy.core.Extensions;
 
@@ -89,6 +92,27 @@ public static class ServiceExtensions
                 .Build();
         });
 
+        // Add HTTP clients
+        services.AddHttpClient("ApiVideoClient", async client =>
+        {
+            // get cache service
+            var cacheService = services.BuildServiceProvider().GetService<ICacheService>();
+
+            string baseAddress = configuration["AppConfig:BaseURLs:ApiVideo"];
+
+            client.BaseAddress = new Uri(baseAddress);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        })
+        .AddHttpMessageHandler<ApiVideoHttpHandler>()
+            .ConfigurePrimaryHttpMessageHandler(() =>
+             {
+                 return new HttpClientHandler()
+                 {
+                     AllowAutoRedirect = false,
+                     UseDefaultCredentials = true
+                 };
+             });
+
         //Mapster global Setting. This can also be overwritten per transform
         TypeAdapterConfig.GlobalSettings.Default
                         .NameMatchingStrategy(NameMatchingStrategy.IgnoreCase)
@@ -128,6 +152,7 @@ public static class ServiceExtensions
         services.TryAddTransient<IAuthService, AuthService>();
         services.TryAddTransient<ICourseService, CourseService>();
         services.TryAddTransient<IConfigService, ConfigService>();
+        services.TryAddTransient<ApiVideoHttpHandler>();
 
         return services;
     }

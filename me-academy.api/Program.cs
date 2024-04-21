@@ -121,6 +121,7 @@ app.UseMiddleware<UserSessionMiddleware>();
 
 app.MapControllers();
 
+await InitializeApiVideoToken.InitializeToken(app);
 PrepDatabase.PrepPopulation(app, app.Environment.IsProduction());
 
 app.Run();
