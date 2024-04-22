@@ -1,6 +1,7 @@
 using Mapster;
 using me_academy.core.Extensions;
 using me_academy.core.Interfaces;
+using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.App;
 using me_academy.core.Models.App.Constants;
 using me_academy.core.Models.Input;
@@ -346,9 +347,40 @@ public class CourseService : ICourseService
 
     #region Resourses
 
-     public async Task<Result> AddCourseVideo()
+    public async Task<Result> AddCourseVideo()
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<Result> GetVideoUploadData(string courseUid)
+    {
+        var uploadToken = _context.CourseVideos
+            .Where(cv => cv.Course!.Uid == courseUid)
+            .Select(cv => new ApiVideoToken { Token = cv.UploadToken})
+            .FirstOrDefault();
+
+        if (uploadToken is null)
+        {
+            var newUploadTokenRes = await _fileService.GetVideoUploadToken();
+            if (!newUploadTokenRes.Success) 
+                return new ErrorResult("Unable to retrieve video upload token. Please try again.");
+
+            int courseId = await _context.Courses
+                .Where(c => c.Uid == courseUid)
+                .Select(c => c.Id)
+                .FirstOrDefaultAsync();
+
+            uploadToken = (ApiVideoToken)newUploadTokenRes.Content;
+            var newUploadData = new CourseVideo
+            {
+                CourseId = courseId,
+                UploadToken = uploadToken.Token
+            };
+            await _context.AddAsync(newUploadData);
+            await _context.SaveChangesAsync();            
+        }
+
+        return new SuccessResult(uploadToken);
     }
 
     public async Task<Result> AddResourceToCourse(string courseUid, FileUploadModel model)

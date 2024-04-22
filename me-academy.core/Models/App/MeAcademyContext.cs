@@ -22,6 +22,7 @@ public class MeAcademyContext : DbContext
     public required DbSet<CourseLink> CourseLinks { get; set; }
     public required DbSet<CourseViewCount> CourseViewCounts { get; set; }
     public required DbSet<CourseAuditLog> CourseAuditLogs { get; set; }
+    public required DbSet<CourseVideo> CourseVideos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
