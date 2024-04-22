@@ -109,7 +109,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [AllowAnonymous] // TODO: remove this line
+    [AllowAnonymous]
     [HttpGet("{courseUid}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseDetailView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]

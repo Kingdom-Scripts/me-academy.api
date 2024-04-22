@@ -10,14 +10,10 @@ namespace me_academy.core.Utilities;
 
 public static class PrepDatabase
 {
-    public static async void PrepPopulation(IApplicationBuilder app, bool isProd)
+    public static void PrepPopulation(IApplicationBuilder app, bool isProd)
     {
         using (var serviceScope = app.ApplicationServices.CreateScope())
         {
-            var fileService = serviceScope.ServiceProvider.GetService<IFileService>();
-
-            var res = await fileService.GetVideoUploadToken();
-
             SeedData(serviceScope.ServiceProvider.GetService<MeAcademyContext>(), isProd);
         }
     }

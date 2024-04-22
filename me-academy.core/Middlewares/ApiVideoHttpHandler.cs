@@ -58,7 +58,7 @@ namespace me_academy.core.Middlewares
             if (!requestedUrl.Contains("api-key"))
             {
                 var bearerToken = await CreateBearerToken();
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken ?? "");
             }
 
             var response = await base.SendAsync(request, cancellationToken);
@@ -82,7 +82,7 @@ namespace me_academy.core.Middlewares
 
             var request = new { refreshToken = refreshToken };
             var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-            var response = await httpClient.PutAsync("auth/refresh", content);
+            var response = await httpClient.PostAsync("auth/refresh", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -100,7 +100,7 @@ namespace me_academy.core.Middlewares
                 _logger.Information($"--> Api.Video Token refreshed on {now}");
             }
 
-            return string.Empty;
+            return token;
         }
     }
 }

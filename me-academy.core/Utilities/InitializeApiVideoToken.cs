@@ -1,8 +1,6 @@
 ﻿using LazyCache;
 using me_academy.core.Constants;
-using me_academy.core.Interfaces;
 using me_academy.core.Models.Configurations;
-using me_academy.core.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
