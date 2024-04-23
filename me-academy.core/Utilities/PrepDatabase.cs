@@ -1,5 +1,4 @@
-﻿using me_academy.core.Interfaces;
-using me_academy.core.Models.App;
+﻿using me_academy.core.Models.App;
 using me_academy.core.Models.App.Constants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;

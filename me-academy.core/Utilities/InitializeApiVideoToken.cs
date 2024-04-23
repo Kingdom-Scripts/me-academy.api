@@ -22,7 +22,7 @@ namespace me_academy.core.Utilities
                 var httpClientFactory = serviceScope.ServiceProvider.GetService<IHttpClientFactory>();
                 if (httpClientFactory == null) throw new ArgumentNullException(nameof(httpClientFactory));
 
-                var httpClient = httpClientFactory.CreateClient("ApiVideoClient");
+                var httpClient = httpClientFactory.CreateClient(HttpClientKeys.ApiVideo);
 
                 var appConfig = serviceScope.ServiceProvider.GetService<IOptions<AppConfig>>();
                 var apiVideoKey = appConfig.Value.ApiVideoKey;

@@ -4,14 +4,14 @@ namespace me_academy.core.Models.App
 {
     public class CourseVideo
     {
-        [Key]
+        public int Id { get; set; }
         public int CourseId { get; set; }
 
-        public string VideoId { get; set; } = null!;
+        [MaxLength(255)] public string? VideoId { get; set; }
 
-        public string UploadToken { get; set; } = null!;
+        [MaxLength(50)] public string UploadToken { get; set; } = null!;
 
-        public bool IsUploaded { get; set; } = false;
+        public bool IsUploaded { get; set; }
 
         public Course? Course { get; set; }
     }

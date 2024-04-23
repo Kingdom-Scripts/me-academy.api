@@ -80,18 +80,6 @@ public class FileService : IFileService
 
     public async Task<Result> DeleteFileInternal (int documentId) => await Delete(documentId);
 
-    public async Task<Result> GetVideoUploadToken()
-    {
-        var response = await _apiVideoClient.PostAsync("upload-tokens", null);
-        if (!response.IsSuccessStatusCode)
-            return new ErrorResult("Failed to get video upload token");
-
-        var content = await response.Content.ReadAsStringAsync();
-        var token = JsonConvert.DeserializeObject<ApiVideoToken>(content);
-
-        return new SuccessResult(token);
-    }
-
     private async Task<Result<Document>> Upload(string folder, IFormFile file)
     {
         string ext = Path.GetExtension(file.FileName).ToLowerInvariant();
@@ -218,5 +206,5 @@ public class FileService : IFileService
         }
     }
 
-        
+
 }

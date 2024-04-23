@@ -4,6 +4,7 @@ using System.Text;
 using Azure.Identity;
 using FluentValidation;
 using Mapster;
+using me_academy.core.Constants;
 using me_academy.core.Interfaces;
 using me_academy.core.Middlewares;
 using me_academy.core.Models.App;
@@ -20,9 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
-using TinifyAPI;
 
 namespace me_academy.core.Extensions;
 
@@ -93,7 +92,7 @@ public static class ServiceExtensions
         });
 
         // Add HTTP clients
-        services.AddHttpClient("ApiVideoClient", async client =>
+        services.AddHttpClient(HttpClientKeys.ApiVideo, async client =>
         {
             // get cache service
             var cacheService = services.BuildServiceProvider().GetService<ICacheService>();
@@ -153,6 +152,7 @@ public static class ServiceExtensions
         services.TryAddTransient<ICourseService, CourseService>();
         services.TryAddTransient<IConfigService, ConfigService>();
         services.TryAddTransient<ApiVideoHttpHandler>();
+        services.TryAddTransient<IVideoService, VideoService>();
 
         return services;
     }

@@ -22,16 +22,18 @@ public class CourseService : ICourseService
     private readonly UserSession _userSession;
     private readonly IFileService _fileService;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IVideoService _videoService;
     private readonly ILogger<CourseService> _logger;
 
     public CourseService(MeAcademyContext context, UserSession userSession, IFileService fileService,
-        IHttpContextAccessor httpContextAccessor, ILogger<CourseService> logger)
+        IHttpContextAccessor httpContextAccessor, ILogger<CourseService> logger, IVideoService videoService)
     {
         _context = context ?? throw new ArgumentException(nameof(context));
         _userSession = userSession ?? throw new ArgumentException(nameof(userSession));
         _fileService = fileService ?? throw new ArgumentException(nameof(fileService));
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentException(nameof(httpContextAccessor));
         _logger = logger ?? throw new ArgumentException(nameof(logger));
+        _videoService = videoService ?? throw new ArgumentException(nameof(videoService));
     }
 
     #region Courses
@@ -347,11 +349,6 @@ public class CourseService : ICourseService
 
     #region Resourses
 
-    public async Task<Result> AddCourseVideo()
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<Result> GetVideoUploadData(string courseUid)
     {
         var uploadToken = _context.CourseVideos
@@ -361,8 +358,8 @@ public class CourseService : ICourseService
 
         if (uploadToken is null)
         {
-            var newUploadTokenRes = await _fileService.GetVideoUploadToken();
-            if (!newUploadTokenRes.Success) 
+            var newUploadTokenRes = await _videoService.CreateUploadObject();
+            if (!newUploadTokenRes.Success)
                 return new ErrorResult("Unable to retrieve video upload token. Please try again.");
 
             int courseId = await _context.Courses
@@ -370,17 +367,22 @@ public class CourseService : ICourseService
                 .Select(c => c.Id)
                 .FirstOrDefaultAsync();
 
-            uploadToken = (ApiVideoToken)newUploadTokenRes.Content;
+            uploadToken = newUploadTokenRes.Content;
             var newUploadData = new CourseVideo
             {
                 CourseId = courseId,
                 UploadToken = uploadToken.Token
             };
             await _context.AddAsync(newUploadData);
-            await _context.SaveChangesAsync();            
+            await _context.SaveChangesAsync();
         }
 
         return new SuccessResult(uploadToken);
+    }
+
+    public async Task<Result> AddCourseVideo()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<Result> AddResourceToCourse(string courseUid, FileUploadModel model)
