@@ -2,6 +2,7 @@ using me_academy.core.Interfaces;
 using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Courses;
+using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Courses;
 using Microsoft.AspNetCore.Authorization;
@@ -14,9 +15,13 @@ namespace me_academy.api.Controllers;
 public class CoursesController : BaseController
 {
     private readonly ICourseService _courseService;
+    private readonly IVideoService _videoService;
 
-    public CoursesController(ICourseService courseService) =>
+    public CoursesController(ICourseService courseService, IVideoService videoService)
+    {
         _courseService = courseService ?? throw new ArgumentNullException(nameof(courseService));
+        _videoService = videoService ?? throw new ArgumentNullException(nameof(videoService));
+    }
 
     /// <summary>
     /// Create a new course
@@ -201,6 +206,21 @@ public class CoursesController : BaseController
     public async Task<IActionResult> GetVideoUploadData(string courseUid)
     {
         var res = await _courseService.GetVideoUploadData(courseUid);
+        return ProcessResponse(res);
+    }
+
+    /// <summary>
+    /// Update the details of the video after successful upload to Api.Video
+    /// </summary>
+    /// <param name="courseUid"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPatch("{courseUid}/video-details")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> SetVideoDetails(string courseUid, VideoDetailModel model)
+    {
+        var res = await _videoService.SetVideoDetails(courseUid, model);
         return ProcessResponse(res);
     }
 }

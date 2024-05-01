@@ -7,6 +7,7 @@ using me_academy.core.Models.App.Constants;
 using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
+using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Courses;
 using Microsoft.AspNetCore.Http;
@@ -355,7 +356,7 @@ public class CourseService : ICourseService
     {
         var uploadToken = _context.CourseVideos
             .Where(cv => cv.Course!.Uid == courseUid)
-            .Select(cv => new ApiVideoToken { Token = cv.UploadToken})
+            .Select(cv => new ApiVideoToken { Token = cv.UploadToken })
             .FirstOrDefault();
 
         if (uploadToken is null)
@@ -380,11 +381,6 @@ public class CourseService : ICourseService
         }
 
         return new SuccessResult(uploadToken);
-    }
-
-    public async Task<Result> AddCourseVideo()
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<Result> AddResourceToCourse(string courseUid, FileUploadModel model)

@@ -11,7 +11,7 @@ namespace me_academy.core.Models.App
 
         [MaxLength(50)] public string UploadToken { get; set; } = null!;
 
-        public bool IsUploaded { get; set; }
+        public bool IsUploaded { get; set; } = false;
 
         public Course? Course { get; set; }
     }

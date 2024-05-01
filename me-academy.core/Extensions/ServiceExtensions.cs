@@ -30,7 +30,7 @@ public static class ServiceExtensions
     public static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration configuration, bool isProduction)
     {
         // set up database
-        string connectionString = configuration.GetConnectionString("MeAcademy");
+        string connectionString = configuration.GetConnectionString("MeAcademy")!;
         services.AddDbContext<MeAcademyContext>(
             (sp, options) => options
                 .UseSqlServer(connectionString, b => b.MigrationsAssembly("me-academy.api"))
@@ -40,22 +40,22 @@ public static class ServiceExtensions
 
         // Add fluent validation.
         services.AddValidatorsFromAssembly(Assembly.Load("me-academy.core"));
-        services.AddFluentValidationAutoValidation(configuration =>
+        services.AddFluentValidationAutoValidation(fluentConfig =>
         {
             // Disable the built-in .NET model (data annotations) validation.
-            configuration.DisableBuiltInModelValidation = true;
+            fluentConfig.DisableBuiltInModelValidation = true;
 
             // Enable validation for parameters bound from `BindingSource.Form` binding sources.
-            configuration.EnableFormBindingSourceAutomaticValidation = true;
+            fluentConfig.EnableFormBindingSourceAutomaticValidation = true;
 
             // Enable validation for parameters bound from `BindingSource.Path` binding sources.
-            configuration.EnablePathBindingSourceAutomaticValidation = true;
+            fluentConfig.EnablePathBindingSourceAutomaticValidation = true;
 
             // Enable validation for parameters bound from 'BindingSource.Custom' binding sources.
-            configuration.EnableCustomBindingSourceAutomaticValidation = true;
+            fluentConfig.EnableCustomBindingSourceAutomaticValidation = true;
 
             // Replace the default result factory with a custom implementation.
-            configuration.OverrideDefaultResultFactoryWith<CustomResultFactory>();
+            fluentConfig.OverrideDefaultResultFactoryWith<CustomResultFactory>();
         });
 
         services.AddHttpContextAccessor();
@@ -78,7 +78,7 @@ public static class ServiceExtensions
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = configuration["JwtConfig:Issuer"],
                 ValidAudience = configuration["JwtConfig:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Secret"])),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Secret"]!)),
                 ClockSkew = TimeSpan.Zero
             };
         });
@@ -94,25 +94,19 @@ public static class ServiceExtensions
         // Add HTTP clients
         services.AddHttpClient(HttpClientKeys.ApiVideo, async client =>
         {
-            // get cache service
-            var cacheService = services.BuildServiceProvider().GetService<ICacheService>();
-
-            string baseAddress = configuration["AppConfig:BaseURLs:ApiVideo"];
+            string baseAddress = configuration["AppConfig:ApiVideo:BaseUrl"]!;
 
             client.BaseAddress = new Uri(baseAddress);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         })
         .AddHttpMessageHandler<ApiVideoHttpHandler>()
-            .ConfigurePrimaryHttpMessageHandler(() =>
-             {
-                 return new HttpClientHandler()
-                 {
-                     AllowAutoRedirect = false,
-                     UseDefaultCredentials = true
-                 };
-             });
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+            {
+                AllowAutoRedirect = false,
+                UseDefaultCredentials = true
+            });
 
-        //Mapster global Setting. This can also be overwritten per transform
+        // Mapster global Setting. This can also be overwritten per transform
         TypeAdapterConfig.GlobalSettings.Default
                         .NameMatchingStrategy(NameMatchingStrategy.IgnoreCase)
                         .IgnoreNullValues(true)
