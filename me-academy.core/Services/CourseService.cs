@@ -496,7 +496,7 @@ public class CourseService : ICourseService
     {
         var newLog = new CourseAuditLog
         {
-            CourseId = course.Id,
+            Course = course,
             Description = description,
             CreatedById = _userSession.UserId
         };

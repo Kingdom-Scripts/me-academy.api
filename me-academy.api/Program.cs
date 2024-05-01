@@ -1,3 +1,4 @@
+
 using me_academy.core.Extensions;
 using me_academy.core.Middlewares;
 using me_academy.core.Models.Configurations;
