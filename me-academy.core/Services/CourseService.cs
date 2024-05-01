@@ -183,7 +183,7 @@ public class CourseService : ICourseService
 
         // include deleted ones if user is admin
         if (!_userSession.IsAnyAdmin)
-            course = course.Where(c => !c.IsDeleted && c.IsActive);
+            course = course.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         var result = await course
             .Where(c => c.Uid == courseUid)
@@ -259,7 +259,7 @@ public class CourseService : ICourseService
         if (_userSession.IsAnyAdmin && request.WithDeleted)
             courses = courses.Where(c => c.IsDeleted == request.WithDeleted && c.IsActive == request.IsActive);
         else
-            courses = courses.Where(c => !c.IsDeleted && c.IsActive);
+            courses = courses.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         // TODO: implement Full text search for description and title
         var result = await courses
@@ -283,7 +283,9 @@ public class CourseService : ICourseService
         if (course is { IsActive: true, PublishedOnUtc: not null })
             return new ErrorResult("Course is already published.");
 
-        course.IsActive = true;
+        // TODO: validate the course has video already before publishing
+
+        course.IsPublished = true;
         course.PublishedOnUtc = DateTime.UtcNow;
         course.PublishedById = _userSession.UserId;
 

@@ -23,6 +23,9 @@ public class MeAcademyContext : DbContext
     public required DbSet<CourseViewCount> CourseViewCounts { get; set; }
     public required DbSet<CourseAuditLog> CourseAuditLogs { get; set; }
     public required DbSet<CourseVideo> CourseVideos { get; set; }
+    public required DbSet<QuestionAndAnswer> QuestionAndAnswers  { get; set; }
+    public required DbSet<QaOption> QaOptions { get; set; }
+    public required DbSet<QaResponse> QaResponses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -60,6 +63,18 @@ public class MeAcademyContext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<CourseAuditLog>()
+            .HasOne(cal => cal.CreatedBy)
+            .WithMany()
+            .HasForeignKey(cal => cal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<QuestionAndAnswer>()
+            .HasOne(cal => cal.CreatedBy)
+            .WithMany()
+            .HasForeignKey(cal => cal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<QaResponse>()
             .HasOne(cal => cal.CreatedBy)
             .WithMany()
             .HasForeignKey(cal => cal.CreatedById)

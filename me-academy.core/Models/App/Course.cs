@@ -24,8 +24,9 @@ public class Course : BaseAppModel, ISoftDeletable
 
     public int CreatedById { get; set; }
     public int? UpdatedById { get; set; }
-    public int? PublishedById { get; set; }
     public DateTime? UpdatedOnUtc { get; set; }
+    public bool IsPublished { get; set; } = false;
+    public int? PublishedById { get; set; }
     public DateTime? PublishedOnUtc { get; set; }
     public int ViewCount { get; set; } = 0;
 
@@ -41,4 +42,5 @@ public class Course : BaseAppModel, ISoftDeletable
     public List<CourseLink> UsefulLinks { get; set; } = new();
     public List<CourseAuditLog> CourseAuditLogs { get; set; } = new();
     public List<CoursePrice> CoursePrices { get; set; } = new();
+    public IQueryable<QuestionAndAnswer> QuestionAndAnswers { get; set; } = new List<QuestionAndAnswer>().AsQueryable();
 }
