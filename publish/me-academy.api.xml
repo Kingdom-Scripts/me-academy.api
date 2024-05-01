@@ -175,6 +175,13 @@
             <param name="courseUid"></param>
             <returns></returns>
         </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.GetVideoUploadData(System.String)">
+            <summary>
+            Get video upload data
+            </summary>
+            <param name="courseUid"></param>
+            <returns></returns>
+        </member>
         <member name="T:me_academy.api.Migrations.InitialCreate">
             <inheritdoc />
         </member>
@@ -329,6 +336,30 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.Twelve.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Thirteen">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Thirteen.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Thirteen.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Thirteen.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Fourteen">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Fourteen.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Fourteen.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Fourteen.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
