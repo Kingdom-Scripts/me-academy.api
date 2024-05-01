@@ -1,7 +1,9 @@
 using me_academy.core.Interfaces;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Config;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace me_academy.api.Controllers;
 
@@ -26,4 +28,39 @@ public class ConfigsController : BaseController
         var res = await _configService.ListDurations();
         return ProcessResponse(res);
     }
+
+    [HttpPost("notify-me")]
+    [AllowAnonymous]
+    public IActionResult NotifyMeOfLunch(NotifyMeOfLunchModel model)
+    {
+        try
+        {
+            // get the file
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "notification-emails.txt");
+
+            // Append the email to the file
+            using (StreamWriter sw = System.IO.File.AppendText(path))
+            {
+                sw.WriteLine(model.Email);
+            }
+
+            var res = new {
+                success = true,
+                message = "Thank you for subscribing, we will notify you once we're up and running"
+            };
+
+            var result = new SuccessResult(res);
+            return ProcessResponse(result);
+        }
+        catch (Exception ex)
+        {
+            var result = new ErrorResult(ex.Message);
+            return ProcessResponse(result);
+        }
+    }
+}
+
+public class NotifyMeOfLunchModel
+{
+    public string Email { get; set; }
 }

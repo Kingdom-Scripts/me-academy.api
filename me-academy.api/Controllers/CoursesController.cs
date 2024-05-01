@@ -1,4 +1,5 @@
 using me_academy.core.Interfaces;
+using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Utilities;
@@ -109,7 +110,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [AllowAnonymous] // TODO: remove this line
+    [AllowAnonymous]
     [HttpGet("{courseUid}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseDetailView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
@@ -186,6 +187,20 @@ public class CoursesController : BaseController
     public async Task<IActionResult> DeactivateCourse(string courseUid)
     {
         var res = await _courseService.DeactivateCourse(courseUid);
+        return ProcessResponse(res);
+    }
+
+    /// <summary>
+    /// Get video upload data
+    /// </summary>
+    /// <param name="courseUid"></param>
+    /// <returns></returns>
+    [HttpGet("{courseUid}/upload-token")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<ApiVideoToken>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> GetVideoUploadData(string courseUid)
+    {
+        var res = await _courseService.GetVideoUploadData(courseUid);
         return ProcessResponse(res);
     }
 }

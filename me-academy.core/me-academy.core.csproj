@@ -45,4 +45,8 @@
     <PackageReference Include="Tinify" Version="1.6.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\ApiVideo\Request\" />
+  </ItemGroup>
+
 </Project>

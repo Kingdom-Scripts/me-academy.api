@@ -1,3 +1,4 @@
+
 using me_academy.core.Extensions;
 using me_academy.core.Middlewares;
 using me_academy.core.Models.Configurations;
@@ -121,6 +122,7 @@ app.UseMiddleware<UserSessionMiddleware>();
 
 app.MapControllers();
 
+await InitializeApiVideoToken.InitializeToken(app);
 PrepDatabase.PrepPopulation(app, app.Environment.IsProduction());
 
 app.Run();

@@ -1,5 +1,7 @@
 using Mapster;
 using me_academy.core.Interfaces;
+using me_academy.core.Middlewares;
+using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.App;
 using me_academy.core.Models.App.Constants;
 using me_academy.core.Models.Configurations;
@@ -9,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace me_academy.core.Services;
 
@@ -18,9 +21,10 @@ public class FileService : IFileService
     private readonly IHostEnvironment _hostEnvironment;
     private readonly MeAcademyContext _context;
     private readonly UserSession _userSession;
+    private readonly HttpClient _apiVideoClient;
 
     public FileService(IOptions<AppConfig> appConfig, IHostEnvironment hostEnvironment, MeAcademyContext context,
-        UserSession userSession)
+        UserSession userSession, IHttpClientFactory clientFactory)
     {
         if (appConfig == null) throw new ArgumentNullException(nameof(appConfig));
         _hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
@@ -31,6 +35,8 @@ public class FileService : IFileService
 
         // set up tinify
         TinifyAPI.Tinify.Key = appConfig.Value.TinifyKey;
+
+        _apiVideoClient = clientFactory.CreateClient("ApiVideoClient");
     }
 
     public async Task<Result<DocumentView>> UploadFile(string folder, IFormFile file)
@@ -199,4 +205,6 @@ public class FileService : IFileService
             return DocumentTypeEnum.UNKNWON;
         }
     }
+
+
 }

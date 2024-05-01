@@ -7,9 +7,9 @@ namespace me_academy.core.Models.App;
 
 public class Course : BaseAppModel, ISoftDeletable
 {
-    [Required] [MaxLength(200)] public string Uid { get; set; } = null!;
+    [Required][MaxLength(200)] public string Uid { get; set; } = null!;
 
-    [Required] [MaxLength(100)] public string Title { get; set; } = null!;
+    [Required][MaxLength(100)] public string Title { get; set; } = null!;
 
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     [Required]
@@ -28,6 +28,8 @@ public class Course : BaseAppModel, ISoftDeletable
     public DateTime? UpdatedOnUtc { get; set; }
     public DateTime? PublishedOnUtc { get; set; }
     public int ViewCount { get; set; } = 0;
+
+    public bool VideoIsUploaded { get; set; } = false;
 
     [Required] public bool IsDeleted { get; set; } = false;
     public int? DeletedById { get; set; }
