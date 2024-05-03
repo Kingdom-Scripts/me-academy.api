@@ -7,7 +7,6 @@ using me_academy.core.Models.App.Constants;
 using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
-using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Courses;
 using Microsoft.AspNetCore.Http;
@@ -350,38 +349,7 @@ public class CourseService : ICourseService
 
     #endregion
 
-    #region Resourses
-
-    public async Task<Result> GetVideoUploadData(string courseUid)
-    {
-        var uploadToken = _context.CourseVideos
-            .Where(cv => cv.Course!.Uid == courseUid)
-            .Select(cv => new ApiVideoToken { Token = cv.UploadToken })
-            .FirstOrDefault();
-
-        if (uploadToken is null)
-        {
-            var newUploadTokenRes = await _videoService.CreateUploadObject();
-            if (!newUploadTokenRes.Success)
-                return new ErrorResult("Unable to retrieve video upload token. Please try again.");
-
-            int courseId = await _context.Courses
-                .Where(c => c.Uid == courseUid)
-                .Select(c => c.Id)
-                .FirstOrDefaultAsync();
-
-            uploadToken = newUploadTokenRes.Content;
-            var newUploadData = new CourseVideo
-            {
-                CourseId = courseId,
-                UploadToken = uploadToken.Token
-            };
-            await _context.AddAsync(newUploadData);
-            await _context.SaveChangesAsync();
-        }
-
-        return new SuccessResult(uploadToken);
-    }
+    #region Resources
 
     public async Task<Result> AddResourceToCourse(string courseUid, FileUploadModel model)
     {
@@ -426,23 +394,6 @@ public class CourseService : ICourseService
 
     public async Task<Result> RemoveResourceFromCourse(string courseUid, int documentId)
     {
-        // // validate course
-        // var course = await _context.Courses
-        //     .Where(c => c.Uid == courseUid)
-        //     .Select(c => new Course
-        //     {
-        //         Id = c.Id,
-        //         Title = c.Title
-        //     })
-        //     .FirstOrDefaultAsync();
-        //
-        // if (course is null)
-        //     return new ErrorResult("Invalid course selected.");
-
-        Console.WriteLine("==============================================================");
-        Console.WriteLine("--> Starting Removal process");
-        Console.WriteLine("==============================================================");
-
         // validate document
         var courseDoc = await _context.CourseDocuments
             .Where(cd => cd.Course!.Uid == courseUid && cd.DocumentId == documentId)
@@ -476,10 +427,11 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListResources(string courseUid)
     {
-        var resources = _context.CourseDocuments
+        var resources = await _context.CourseDocuments
             .Where(cd => cd.Course!.Uid == courseUid)
             .Select(cd => cd.Document)
-            .ProjectToType<DocumentView>();
+            .ProjectToType<DocumentView>()
+            .ToListAsync();
 
         return new SuccessResult(resources);
     }

@@ -194,33 +194,4 @@ public class CoursesController : BaseController
         var res = await _courseService.DeactivateCourse(courseUid);
         return ProcessResponse(res);
     }
-
-    /// <summary>
-    /// Get video upload data
-    /// </summary>
-    /// <param name="courseUid"></param>
-    /// <returns></returns>
-    [HttpGet("{courseUid}/upload-token")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<ApiVideoToken>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> GetVideoUploadData(string courseUid)
-    {
-        var res = await _courseService.GetVideoUploadData(courseUid);
-        return ProcessResponse(res);
-    }
-
-    /// <summary>
-    /// Update the details of the video after successful upload to Api.Video
-    /// </summary>
-    /// <param name="courseUid"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    [HttpPatch("{courseUid}/video-details")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> SetVideoDetails(string courseUid, VideoDetailModel model)
-    {
-        var res = await _videoService.SetVideoDetails(courseUid, model);
-        return ProcessResponse(res);
-    }
 }

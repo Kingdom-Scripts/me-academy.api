@@ -4,17 +4,19 @@ namespace me_academy.core.Models.Input.Videos;
 
 public class VideoDetailModel
 {
-    public string VideoId { get; set; } = null!;
-    public string Title { get; set; } = null!;
-    public string? PlayerId { get; set; }
-    public bool Mp4Support { get; set; } = false;
+    public string videoId { get; set; } = null!;
+    public string title { get; set; } = null!;
+    public string? playerId { get; set; }
+    public bool mp4Support { get; set; } = false;
+    public bool @public { get; set; } = false;
+    public int Duration { get; set; }
 }
 
 public class VideoDetailValidator : AbstractValidator<VideoDetailModel>
 {
     public VideoDetailValidator()
     {
-        RuleFor(x => x.VideoId).NotEmpty();
-        RuleFor(x => x.Title).NotEmpty();
+        RuleFor(x => x.videoId).NotEmpty();
+        RuleFor(x => x.title).NotEmpty();
     }
 }
