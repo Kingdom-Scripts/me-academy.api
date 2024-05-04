@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace me_academy.core.Services;
 
@@ -21,12 +22,14 @@ public class VideoService : IVideoService
     private readonly HttpClient _client;
     private readonly ApiVideoConfig _apiVideoConfig;
     private readonly MeAcademyContext _context;
+    private readonly ILogger _logger;
 
-    public VideoService(IHttpClientFactory factory, IOptions<AppConfig> appConfig, MeAcademyContext context)
+    public VideoService(IHttpClientFactory factory, IOptions<AppConfig> appConfig, MeAcademyContext context, ILogger logger)
     {
         if (appConfig is null) throw new ArgumentNullException(nameof(appConfig));
         if (factory is null) throw new ArgumentNullException(nameof(factory));
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _apiVideoConfig = appConfig.Value.ApiVideo;
         _client = factory.CreateClient(HttpClientKeys.ApiVideo);
@@ -85,7 +88,12 @@ public class VideoService : IVideoService
 
         var response = await _client.PatchAsync($"videos/{model.videoId}", content);
         if (!response.IsSuccessStatusCode)
+        {
+            string contentString = await response.Content.ReadAsStringAsync();
+            object? error = JsonConvert.DeserializeObject<object>(contentString);
+            _logger.Error("Failed to set video details. {@Error}", error);
             return new ErrorResult("Failed to set video details.");
+        }
 
         course.CourseVideo!.VideoId = model.videoId;
         course.CourseVideo.IsUploaded = true;
@@ -111,14 +119,14 @@ public class VideoService : IVideoService
         var request = new
         {
             source = courseVideo.VideoId!,
-            title = courseVideo.Course!.Title,
+            title = courseVideo.Course!.Title + "- (Preview)",
             @public = true,
             mp4Support = false,
             playerId = _apiVideoConfig.PlayerId,
             clip = new
             {
-                startTimecode = model.startTimeCode,
-                endTimecode = model.endTimeCode
+                startTimecode = model.startTimecode.ToString(),
+                endTimecode = model.endTimecode.ToString()
             }
         };
 
@@ -127,8 +135,9 @@ public class VideoService : IVideoService
         var response = await _client.PostAsync("videos", content);
         if (!response.IsSuccessStatusCode)
         {
-            var contentString = await response.Content.ReadAsStringAsync();
-            var error = JsonConvert.DeserializeObject<object>(contentString);
+            string contentString = await response.Content.ReadAsStringAsync();
+            object? error = JsonConvert.DeserializeObject<object>(contentString);
+            _logger.Error("Failed to set video preview. {@Error}", error);
             return new ErrorResult("Failed to set video thumbnail.");
         }
 
