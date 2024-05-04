@@ -1,5 +1,4 @@
 using me_academy.core.Models.Utilities;
-using me_academy.core.Models.View.UtilityView;
 
 namespace me_academy.core.Models.View.Courses;
 

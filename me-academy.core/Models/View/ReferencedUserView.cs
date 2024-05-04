@@ -1,4 +1,4 @@
-namespace me_academy.core.Models.View.UtilityView;
+namespace me_academy.core.Models.View;
 
 public class ReferencedUserView
 {

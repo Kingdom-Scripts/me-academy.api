@@ -25,7 +25,7 @@ namespace me_academy.core.Utilities
                 var httpClient = httpClientFactory.CreateClient(HttpClientKeys.ApiVideo);
 
                 var appConfig = serviceScope.ServiceProvider.GetService<IOptions<AppConfig>>();
-                var apiVideoKey = appConfig.Value.ApiVideoKey;
+                string apiVideoKey = appConfig!.Value.ApiVideo.Key;
 
                 var request = new { apiKey = apiVideoKey };
                 var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");

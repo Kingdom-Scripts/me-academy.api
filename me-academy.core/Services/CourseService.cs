@@ -183,7 +183,7 @@ public class CourseService : ICourseService
 
         // include deleted ones if user is admin
         if (!_userSession.IsAnyAdmin)
-            course = course.Where(c => !c.IsDeleted && c.IsActive);
+            course = course.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         var result = await course
             .Where(c => c.Uid == courseUid)
@@ -259,7 +259,7 @@ public class CourseService : ICourseService
         if (_userSession.IsAnyAdmin && request.WithDeleted)
             courses = courses.Where(c => c.IsDeleted == request.WithDeleted && c.IsActive == request.IsActive);
         else
-            courses = courses.Where(c => !c.IsDeleted && c.IsActive);
+            courses = courses.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         // TODO: implement Full text search for description and title
         var result = await courses
@@ -283,7 +283,9 @@ public class CourseService : ICourseService
         if (course is { IsActive: true, PublishedOnUtc: not null })
             return new ErrorResult("Course is already published.");
 
-        course.IsActive = true;
+        // TODO: validate the course has video already before publishing
+
+        course.IsPublished = true;
         course.PublishedOnUtc = DateTime.UtcNow;
         course.PublishedById = _userSession.UserId;
 
@@ -347,43 +349,7 @@ public class CourseService : ICourseService
 
     #endregion
 
-    #region Resourses
-
-    public async Task<Result> GetVideoUploadData(string courseUid)
-    {
-        var uploadToken = _context.CourseVideos
-            .Where(cv => cv.Course!.Uid == courseUid)
-            .Select(cv => new ApiVideoToken { Token = cv.UploadToken})
-            .FirstOrDefault();
-
-        if (uploadToken is null)
-        {
-            var newUploadTokenRes = await _videoService.CreateUploadObject();
-            if (!newUploadTokenRes.Success)
-                return new ErrorResult("Unable to retrieve video upload token. Please try again.");
-
-            int courseId = await _context.Courses
-                .Where(c => c.Uid == courseUid)
-                .Select(c => c.Id)
-                .FirstOrDefaultAsync();
-
-            uploadToken = newUploadTokenRes.Content;
-            var newUploadData = new CourseVideo
-            {
-                CourseId = courseId,
-                UploadToken = uploadToken.Token
-            };
-            await _context.AddAsync(newUploadData);
-            await _context.SaveChangesAsync();
-        }
-
-        return new SuccessResult(uploadToken);
-    }
-
-    public async Task<Result> AddCourseVideo()
-    {
-        throw new NotImplementedException();
-    }
+    #region Resources
 
     public async Task<Result> AddResourceToCourse(string courseUid, FileUploadModel model)
     {
@@ -428,23 +394,6 @@ public class CourseService : ICourseService
 
     public async Task<Result> RemoveResourceFromCourse(string courseUid, int documentId)
     {
-        // // validate course
-        // var course = await _context.Courses
-        //     .Where(c => c.Uid == courseUid)
-        //     .Select(c => new Course
-        //     {
-        //         Id = c.Id,
-        //         Title = c.Title
-        //     })
-        //     .FirstOrDefaultAsync();
-        //
-        // if (course is null)
-        //     return new ErrorResult("Invalid course selected.");
-
-        Console.WriteLine("==============================================================");
-        Console.WriteLine("--> Starting Removal process");
-        Console.WriteLine("==============================================================");
-
         // validate document
         var courseDoc = await _context.CourseDocuments
             .Where(cd => cd.Course!.Uid == courseUid && cd.DocumentId == documentId)
@@ -478,10 +427,11 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListResources(string courseUid)
     {
-        var resources = _context.CourseDocuments
+        var resources = await _context.CourseDocuments
             .Where(cd => cd.Course!.Uid == courseUid)
             .Select(cd => cd.Document)
-            .ProjectToType<DocumentView>();
+            .ProjectToType<DocumentView>()
+            .ToListAsync();
 
         return new SuccessResult(resources);
     }
