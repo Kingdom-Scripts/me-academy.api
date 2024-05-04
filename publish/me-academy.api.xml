@@ -175,11 +175,50 @@
             <param name="courseUid"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.CoursesController.GetVideoUploadData(System.String)">
+        <member name="M:me_academy.api.Controllers.QaController.CreateQuestion(System.String,System.Collections.Generic.List{me_academy.core.Models.Input.Questions.QuestionAndAnswerModel})">
+            <summary>
+            Create a new question for a course
+            </summary>
+            <param name="courseUid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.QaController.ListQuestions(System.String,me_academy.core.Models.Input.PagingOptionModel)">
+            <summary>
+            List questions for a course
+            </summary>
+            <param name="courseUid"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.QaController.AddAnswers(System.Collections.Generic.List{me_academy.core.Models.Input.Questions.QaResponseModel})">
+            <summary>
+            Submit answers to a question
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.VideosController.GetVideoUploadData(System.String)">
             <summary>
             Get video upload data
             </summary>
             <param name="courseUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.VideosController.SetVideoDetails(System.String,me_academy.core.Models.Input.Videos.VideoDetailModel)">
+            <summary>
+            Update the details of the video after successful upload to Api.Video
+            </summary>
+            <param name="courseUid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.VideosController.SetVideoPreview(System.String,me_academy.core.Models.Input.Videos.ApiVideoClipModel)">
+            <summary>
+            Set the preview video for a course
+            </summary>
+            <param name="courseUid"></param>
+            <param name="model"></param>
             <returns></returns>
         </member>
         <member name="T:me_academy.api.Migrations.InitialCreate">
@@ -360,6 +399,66 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.Fourteen.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Fifteen">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Fifteen.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Fifteen.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Fifteen.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Sixteen">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Sixteen.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Sixteen.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Sixteen.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Seventeen">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Seventeen.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Seventeen.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Seventeen.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Eighteen">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Eighteen.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Eighteen.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Eighteen.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Nineteen">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Nineteen.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Nineteen.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Nineteen.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
