@@ -9,13 +9,13 @@ using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Courses;
+using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using CourseView = me_academy.core.Models.View.Courses.CourseView;
 
 namespace me_academy.core.Services;
-
 public class CourseService : ICourseService
 {
     private readonly MeAcademyContext _context;
@@ -51,7 +51,7 @@ public class CourseService : ICourseService
         // create course object
         var course = model.Adapt<Course>();
         course.CreatedById = _userSession.UserId;
-        course.Uid = course.Title.Trim().ToLower().Replace(" ", "-", StringComparison.OrdinalIgnoreCase);
+        course.Uid = await GetCourseUid(model.Title);
 
         // add prices
         if (model.Prices.Any())
@@ -97,6 +97,7 @@ public class CourseService : ICourseService
 
         // update the course object
         course = model.Adapt(course);
+        course.Uid = await GetCourseUid(model.Title);
         course.UpdatedById = _userSession.UserId;
         course.UpdatedOnUtc = DateTime.UtcNow;
         course.UsefulLinks = new();
@@ -489,6 +490,17 @@ public class CourseService : ICourseService
     #endregion
 
     #region Private Methods
+
+    private async Task<string> GetCourseUid(string title)
+    {
+        var trimmedTitle = title.Trim()  // trim
+            .ToLower().Replace("-", "", StringComparison.OrdinalIgnoreCase) // remove hyphens
+            .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
+
+        // get the next course number from sequence
+        var nextCourseNumber = await _context.GetNextCourseNumber();
+        return $"{trimmedTitle}-{nextCourseNumber}";
+    }
 
     private async void AddCourseAuditLog(Course course, string description)
     {

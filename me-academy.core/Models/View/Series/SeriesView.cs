@@ -1,8 +1,8 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace me_academy.core.Models.View.Courses;
+namespace me_academy.core.Models.View.Series;
 
-public class CourseView
+public class SeriesView
 {
     [JsonIgnore]
     public int Id { get; set; }

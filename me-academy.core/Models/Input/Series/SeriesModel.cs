@@ -1,19 +1,20 @@
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace me_academy.core.Models.Input.Courses;
+namespace me_academy.core.Models.Input.Series;
 
-public class CourseModel
+public class SeriesModel
 {
-    public required string Title { get; set; }
-    public required string Description { get; set; }
+    public string Title { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public string Summary { get; set; } = null!;
+    public List<string> Tags { get; set; } = new();
     public List<PriceModel> Prices { get; set; } = new();
     public List<LinkModel> UsefulLinks { get; set; } = new();
-    public List<string> Tags { get; set; } = new();
 }
 
-public class NewCourseValidation : AbstractValidator<CourseModel>
+public class SeriesModelValidator : AbstractValidator<SeriesModel>
 {
-    public NewCourseValidation()
+    public SeriesModelValidator()
     {
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title cannot be empty.")
