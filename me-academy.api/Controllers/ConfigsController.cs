@@ -4,6 +4,7 @@ using me_academy.core.Models.View.Config;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace me_academy.api.Controllers;
 
@@ -54,6 +55,7 @@ public class ConfigsController : BaseController
         }
         catch (Exception ex)
         {
+            Log.Error("Unable to add email for {@Model}", model);
             var result = new ErrorResult(ex.Message);
             return ProcessResponse(result);
         }
