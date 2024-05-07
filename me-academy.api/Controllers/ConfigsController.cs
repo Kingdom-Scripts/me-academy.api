@@ -55,7 +55,7 @@ public class ConfigsController : BaseController
         }
         catch (Exception ex)
         {
-            Log.Error("Unable to add email for {@Model}", model);
+            Log.Error(ex, "Unable to add email for {@Model}", model);
             var result = new ErrorResult(ex.Message);
             return ProcessResponse(result);
         }
