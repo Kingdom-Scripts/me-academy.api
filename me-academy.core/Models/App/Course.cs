@@ -11,11 +11,14 @@ public class Course : BaseAppModel, ISoftDeletable
 
     [Required][MaxLength(100)] public string Title { get; set; } = null!;
 
+    [Required][MaxLength(255)] public string Summary { get; set; } = "null!";
+
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     [Required]
     [Column(TypeName = "nvarchar(MAX)")]
     public string Description { get; set; } = null!;
 
+    // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string? Tags { get; set; }
 
     [Required] public bool IsDraft { get; set; } = true;
@@ -38,7 +41,7 @@ public class Course : BaseAppModel, ISoftDeletable
     public User? CreatedBy { get; set; }
     public User? UpdatedBy { get; set; }
     public User? DeletedBy { get; set; }
-    public CourseVideo? CourseVideo { get; set; } = new();
+    public CourseVideo? CourseVideo { get; set; }
     public List<CourseLink> UsefulLinks { get; set; } = new();
     public List<CourseAuditLog> CourseAuditLogs { get; set; } = new();
     public List<CoursePrice> CoursePrices { get; set; } = new();

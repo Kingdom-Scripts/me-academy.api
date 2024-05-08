@@ -4,6 +4,7 @@ using me_academy.core.Models.View.Config;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace me_academy.api.Controllers;
 
@@ -36,7 +37,7 @@ public class ConfigsController : BaseController
         try
         {
             // get the file
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "notification-emails.txt");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "notification-emails.txt");
 
             // Append the email to the file
             using (StreamWriter sw = System.IO.File.AppendText(path))
@@ -54,6 +55,7 @@ public class ConfigsController : BaseController
         }
         catch (Exception ex)
         {
+            Log.Error(ex, "Unable to add email for {@Model}", model);
             var result = new ErrorResult(ex.Message);
             return ProcessResponse(result);
         }
