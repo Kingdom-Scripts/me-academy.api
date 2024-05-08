@@ -37,7 +37,7 @@ public class ConfigsController : BaseController
         try
         {
             // get the file
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "notification-emails.txt");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "notification-emails.txt");
 
             // Append the email to the file
             using (StreamWriter sw = System.IO.File.AppendText(path))
