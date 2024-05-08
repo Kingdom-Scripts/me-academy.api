@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240501060836_Sixteen")]
+    partial class Sixteen
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,19 +96,11 @@ namespace me_academy.api.Migrations
                     b.Property<bool>("IsDraft")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("PublishedById")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("PublishedOnUtc")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Tags")
                         .HasColumnType("nvarchar(max)");
@@ -125,6 +120,9 @@ namespace me_academy.api.Migrations
 
                     b.Property<DateTime?>("UpdatedOnUtc")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("VideoIsUploaded")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ViewCount")
                         .HasColumnType("int");
@@ -285,21 +283,10 @@ namespace me_academy.api.Migrations
                     b.Property<bool>("IsUploaded")
                         .HasColumnType("bit");
 
-                    b.Property<string>("PreviewThumbnailUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("PreviewVideoId")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("UploadToken")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("VideoDuration")
-                        .HasColumnType("int");
 
                     b.Property<string>("VideoId")
                         .HasMaxLength(255)
@@ -307,8 +294,7 @@ namespace me_academy.api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId")
-                        .IsUnique();
+                    b.HasIndex("CourseId");
 
                     b.ToTable("CourseVideos", "dbo");
                 });
@@ -429,6 +415,9 @@ namespace me_academy.api.Migrations
                     b.Property<int>("QaId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("QuestionAndAnswerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -436,7 +425,7 @@ namespace me_academy.api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QaId");
+                    b.HasIndex("QuestionAndAnswerId");
 
                     b.ToTable("QaOptions", "dbo");
                 });
@@ -608,43 +597,6 @@ namespace me_academy.api.Migrations
                     b.ToTable("Users", "dbo");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.UserCourse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CompletedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpiresAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Progress")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PurchasedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserCourses", "dbo");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.UserRole", b =>
                 {
                     b.Property<int>("RoleId")
@@ -783,8 +735,8 @@ namespace me_academy.api.Migrations
             modelBuilder.Entity("me_academy.core.Models.App.CourseVideo", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.Course", "Course")
-                        .WithOne("CourseVideo")
-                        .HasForeignKey("me_academy.core.Models.App.CourseVideo", "CourseId")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -821,13 +773,9 @@ namespace me_academy.api.Migrations
 
             modelBuilder.Entity("me_academy.core.Models.App.QaOption", b =>
                 {
-                    b.HasOne("me_academy.core.Models.App.QuestionAndAnswer", "Qa")
+                    b.HasOne("me_academy.core.Models.App.QuestionAndAnswer", null)
                         .WithMany("Options")
-                        .HasForeignKey("QaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Qa");
+                        .HasForeignKey("QuestionAndAnswerId");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.QaResponse", b =>
@@ -907,8 +855,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("CourseAuditLogs");
 
                     b.Navigation("CoursePrices");
-
-                    b.Navigation("CourseVideo");
 
                     b.Navigation("QuestionAndAnswers");
 

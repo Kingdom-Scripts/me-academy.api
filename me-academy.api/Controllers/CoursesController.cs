@@ -2,6 +2,7 @@ using me_academy.core.Interfaces;
 using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Courses;
+using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Courses;
 using Microsoft.AspNetCore.Authorization;
@@ -14,9 +15,13 @@ namespace me_academy.api.Controllers;
 public class CoursesController : BaseController
 {
     private readonly ICourseService _courseService;
+    private readonly IVideoService _videoService;
 
-    public CoursesController(ICourseService courseService) =>
+    public CoursesController(ICourseService courseService, IVideoService videoService)
+    {
         _courseService = courseService ?? throw new ArgumentNullException(nameof(courseService));
+        _videoService = videoService ?? throw new ArgumentNullException(nameof(videoService));
+    }
 
     /// <summary>
     /// Create a new course
@@ -153,7 +158,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpPost("{courseUid}/publish")]
+    [HttpPut("{courseUid}/publish")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> PublishCourse(string courseUid)
@@ -187,20 +192,6 @@ public class CoursesController : BaseController
     public async Task<IActionResult> DeactivateCourse(string courseUid)
     {
         var res = await _courseService.DeactivateCourse(courseUid);
-        return ProcessResponse(res);
-    }
-
-    /// <summary>
-    /// Get video upload data
-    /// </summary>
-    /// <param name="courseUid"></param>
-    /// <returns></returns>
-    [HttpGet("{courseUid}/upload-token")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<ApiVideoToken>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> GetVideoUploadData(string courseUid)
-    {
-        var res = await _courseService.GetVideoUploadData(courseUid);
         return ProcessResponse(res);
     }
 }
