@@ -40,7 +40,6 @@ public class CourseService : ICourseService
 
     public async Task<Result> CreateCourse(CourseModel model)
     {
-        // TODO: set up a mechanism to generate a unique UID
         // validate that course with title doesn't exist
         bool courseExist = await _context.Courses
             .AnyAsync(c => c.Title.ToLower().Trim() == model.Title.ToLower().Trim());

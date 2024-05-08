@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using me_academy.core.Interfaces;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace me_academy.core.Models.App;
 
-public class Series : BaseAppModel
+public class Series : BaseAppModel, ISoftDeletable
 {
     [Required][MaxLength(200)] public string Uid { get; set; } = null!;
     [Required][MaxLength(100)] public string Title { get; set; } = null!;
@@ -33,4 +34,7 @@ public class Series : BaseAppModel
     public User? UpdatedBy { get; set; }
     public User? PublishedBy { get; set; }
     public User? DeletedBy { get; set; }
+
+    public List<CourseLink> UsefulLinks { get; set; } = new();
+    public List<SeriesPrice> SeriesPrices { get; set; } = new();
 }
