@@ -16,6 +16,7 @@ public interface ICourseService
     Task<Result> PublishCourse(string courseUid);
     Task<Result> ActivateCourse(string courseUid);
     Task<Result> DeactivateCourse(string courseUid);
+    Task<Result> SetCourseVideoDetails(string courseUid, VideoDetailModel model);
     Task<Result> AddResourceToCourse(string courseUid, FileUploadModel file);
     Task<Result> RemoveResourceFromCourse(string courseUid, int documentId);
     Task<Result> ListResources(string courseUid);

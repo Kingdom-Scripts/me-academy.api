@@ -11,7 +11,9 @@ using me_academy.core.Models.App;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
+using me_academy.core.Models.View.Series;
 using me_academy.core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -123,7 +125,7 @@ public static class ServiceExtensions
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList());
 
-        TypeAdapterConfig<CoursePrice, CoursePriceView>
+        TypeAdapterConfig<CoursePrice, PriceView>
             .NewConfig()
             .Map(dest => dest.Name, src => src.Duration!.Name);
 

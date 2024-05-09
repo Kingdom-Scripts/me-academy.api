@@ -1,8 +1,6 @@
-using me_academy.core.Models.Utilities;
+namespace me_academy.core.Models.View.Series;
 
-namespace me_academy.core.Models.View.Courses;
-
-public class CourseDetailView : CourseView
+public class SeriesDetailView : SeriesView
 {
     public required string Description { get; set; }
     public List<string> Tags { get; set; } = new();
@@ -11,10 +9,8 @@ public class CourseDetailView : CourseView
     public bool IsDeleted { get; set; }
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
-    public List<CourseLinkView> UsefulLinks { get; set; } = new();
-    public IEnumerable<DocumentView> Resources { get; set; } = new List<DocumentView>();
     public ReferencedUserView? CreatedBy { get; set; }
     public ReferencedUserView? UpdatedBy { get; set; }
     public ReferencedUserView? DeletedBy { get; set; }
-    public List<PriceView> CoursePrices { get; set; } = new();
+    public List<PriceView> SeriesPrices { get; set; } = new();
 }

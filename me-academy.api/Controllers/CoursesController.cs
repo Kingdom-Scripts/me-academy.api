@@ -1,5 +1,4 @@
 using me_academy.core.Interfaces;
-using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Videos;
@@ -34,6 +33,21 @@ public class CoursesController : BaseController
     public async Task<IActionResult> CreateCourse(CourseModel model)
     {
         var res = await _courseService.CreateCourse(model);
+        return ProcessResponse(res);
+    }
+
+    /// <summary>
+    /// Update the details of the video after successful upload to Api.Video
+    /// </summary>
+    /// <param name="courseUid"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPatch("{courseUid}/video-details")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> SetVideoDetails(string courseUid, VideoDetailModel model)
+    {
+        var res = await _courseService.SetCourseVideoDetails(courseUid, model);
         return ProcessResponse(res);
     }
 

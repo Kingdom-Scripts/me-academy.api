@@ -13,11 +13,8 @@ public class Course : BaseAppModel, ISoftDeletable
     [Required][MaxLength(255)] public string Summary { get; set; } = "null!";
 
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
-    [Required]
     [Column(TypeName = "nvarchar(MAX)")]
-    public string Description { get; set; } = null!;
-    [StringLength(255)]
-    public string? Summary { get; set; }
+    public string? Description { get; set; }
 
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string? Tags { get; set; }
@@ -38,6 +35,8 @@ public class Course : BaseAppModel, ISoftDeletable
     [Required] public bool IsDeleted { get; set; } = false;
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
+
+    public bool ForSeriesOnly { get; set; } = false;
 
     public User? CreatedBy { get; set; }
     public User? UpdatedBy { get; set; }

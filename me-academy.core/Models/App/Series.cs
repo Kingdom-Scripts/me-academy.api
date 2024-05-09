@@ -13,6 +13,7 @@ public class Series : BaseAppModel, ISoftDeletable
     [Required]
     [Column(TypeName = "nvarchar(MAX)")]
     public string Description { get; set; } = null!;
+
     [StringLength(255)]
     public string Summary { get; set; } = null!;
     [Required] public bool IsDraft { get; set; } = true;
@@ -21,8 +22,9 @@ public class Series : BaseAppModel, ISoftDeletable
 
     public int CreatedById { get; set; }
     public int? UpdatedById { get; set; }
-    public int? PublishedById { get; set; }
     public DateTime? UpdatedOnUtc { get; set; }
+    public bool IsPublished { get; set; } = false;
+    public int? PublishedById { get; set; }
     public DateTime? PublishedOnUtc { get; set; }
     public int ViewCount { get; set; } = 0;
 
@@ -35,6 +37,6 @@ public class Series : BaseAppModel, ISoftDeletable
     public User? PublishedBy { get; set; }
     public User? DeletedBy { get; set; }
 
-    public List<CourseLink> UsefulLinks { get; set; } = new();
+    public SeriesPreview? SeriesPreview { get; set; }
     public List<SeriesPrice> SeriesPrices { get; set; } = new();
 }

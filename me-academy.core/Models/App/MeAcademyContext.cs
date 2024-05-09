@@ -24,6 +24,11 @@ public class MeAcademyContext : DbContext
     public required DbSet<QuestionAndAnswer> QuestionAndAnswers  { get; set; }
     public required DbSet<RefreshToken> RefreshTokens { get; set; }
     public required DbSet<Role> Roles { get; set; }
+    public required DbSet<Series> Series { get; set; }
+    public required DbSet<SeriesAuditLog> SeriesAuditLogs { get; set; }
+    public required DbSet<SeriesCourse> SeriesCourses { get; set; }
+    public required DbSet<SeriesPreview> SeriesPreviews { get; set; }
+    public required DbSet<SeriesPrice> SeriesPrices { get; set; }
     public required DbSet<User> Users { get; set; }
     public required DbSet<UserCourse> UserCourses { get; set; }
     public required DbSet<UserRole> UserRoles { get; set; }
