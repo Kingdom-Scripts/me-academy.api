@@ -8,6 +8,6 @@ public interface IVideoService
 {
     Task<Result<ApiVideoToken>> GetUploadToken();
     Task<Result> GetVideoUploadData(string courseUid);
-    Task<Result> SetVideoDetails(VideoDetailModel model)
+    Task<Result> SetVideoDetails(VideoDetailModel model);
     Task<Result> SetVideoPreview(string courseUid, ApiVideoClipModel model);
 }

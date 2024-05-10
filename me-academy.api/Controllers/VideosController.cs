@@ -35,7 +35,7 @@ public class VideosController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpGet("{courseUid}/upload-data")]`
+    [HttpGet("{courseUid}/upload-data")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<ApiVideoToken>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> GetVideoUploadData(string courseUid)
