@@ -45,6 +45,7 @@ public class ApiVideoHttpHandler : DelegatingHandler
         string token = await _cacheService.GetAsync<string>(AuthKeys.ApiVideoToken);
         if (!string.IsNullOrEmpty(token)) return token;
 
+        // TODO: implement a scenario where the refresh token itself fails or is expired
         // get refresh token
         string refreshToken = await _cacheService.GetAsync<string>(AuthKeys.ApiVideoRefreshToken);
         if (string.IsNullOrEmpty(refreshToken)) throw new Exception("Api.Video Refresh Token not found");
@@ -60,8 +61,8 @@ public class ApiVideoHttpHandler : DelegatingHandler
 
         if (response.IsSuccessStatusCode)
         {
-            var resStri = await response.Content.ReadAsStringAsync();
-            dynamic tokenObj = JsonConvert.DeserializeObject(resStri);
+            string resStri = await response.Content.ReadAsStringAsync();
+            dynamic tokenObj = JsonConvert.DeserializeObject(resStri) ?? "";
             token = tokenObj!.access_token;
             refreshToken = tokenObj.refresh_token;
 

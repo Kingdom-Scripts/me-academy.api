@@ -14,5 +14,4 @@ public class SeriesView
     public bool IsActive { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? PublishedOnUtc { get; set; }
-    public string? UploadToken { get; set; }
 }

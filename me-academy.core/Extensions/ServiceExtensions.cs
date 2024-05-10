@@ -150,6 +150,7 @@ public static class ServiceExtensions
         services.TryAddTransient<ApiVideoHttpHandler>();
         services.TryAddTransient<IVideoService, VideoService>();
         services.TryAddTransient<IQaService, QaService>();
+        services.TryAddTransient<ISeriesService, SeriesService>();
 
         return services;
     }

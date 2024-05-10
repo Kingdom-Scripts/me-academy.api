@@ -85,5 +85,28 @@ public class MeAcademyContext : DbContext
             .WithMany()
             .HasForeignKey(cal => cal.CreatedById)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesAuditLog>()
+            .HasOne(sal => sal.CreatedBy)
+            .WithMany()
+            .HasForeignKey(sal => sal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesCourse>()
+            .HasOne(sal => sal.Series)
+            .WithMany()
+            .HasForeignKey(sal => sal.SeriesId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesCourse>()
+            .HasOne(sal => sal.CreatedBy)
+            .WithMany()
+            .HasForeignKey(sal => sal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesPreview>()
+            .HasOne(sal => sal.Series)
+            .WithOne(sal => sal.SeriesPreview)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
