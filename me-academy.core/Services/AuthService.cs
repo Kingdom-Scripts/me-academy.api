@@ -202,11 +202,13 @@ public class AuthService : IAuthService
             .FirstOrDefaultAsync(c => c.OwnerId == user.Id
                 && c.Purpose == CodePurposes.ResetPassword
                 && c.Token == model.Token
-                && c.ExpiryDate > today
                 && c.Used == false);
 
         if (code == null)
             return new ErrorResult("Invalid request, kindly request a new password reset email.");
+
+        if (code.ExpiryDate < today)
+            return new ErrorResult("Password reset token has expired. Kindly request a new one.");
 
         // update user and token
         user.HashedPassword = model.NewPassword.HashPassword();
