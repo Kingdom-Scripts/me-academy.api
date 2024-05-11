@@ -100,32 +100,49 @@ namespace me_academy.core.Services
             return SendMessage(to, "Confirm Your Email Address", output);
         }
 
-        public bool TestAnother()
+    public async Task<Result> SendPasswordResetEmail(string email, string token)
+    {
+        // get template file
+        string templatePath = Path.Combine(_hostingEnvironment.ContentRootPath, "EmailTemplates", "password-reset.html");
+
+        // validate file
+        if (!File.Exists(templatePath))
         {
-            try
-            {
-                MailMessage mail = new MailMessage();
-                SmtpClient SmtpServer = new SmtpClient("plesk6700.is.cc");
-
-                mail.From = new MailAddress(
-                    "test@kingdomscripts.com"); //you have to provide your gmail address as from address
-                mail.To.Add("mordecai@kingdomscripts.com");
-                mail.Subject = "Test Subject";
-                mail.Body = "Test Email Body";
-
-                SmtpServer.Port = 587;
-                SmtpServer.Credentials =
-                    new System.Net.NetworkCredential("test@kingdomscripts.com",
-                        "p6kIv33^4"); //you have to provide you gamil username and password
-                SmtpServer.EnableSsl = false;
-
-                SmtpServer.Send(mail);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            _logger.LogError("Email template file not found");
+            return new ErrorResult("Email template file not found");
         }
-    }
+
+        // read template file as string
+        string sourceString = await File.ReadAllTextAsync(templatePath);
+
+        var fluidParser = new FluidParser();
+        // return error on failure to parse input
+        if (!fluidParser.TryParse(sourceString, out var fluidTemplate, out string? fluidError))
+        {
+            _logger.LogError("Error in parsing template: {FluidError}", fluidError);
+            return new ErrorResult($"Error in parsing template: {fluidError}");
+        }
+
+        // get and encode the url with token
+        string url =
+            $"{_appConfig.BaseURLs.Client}/auth/reset-password?email={email}&token={HttpUtility.UrlEncode(token)}";
+
+        // parse template using Fluid
+        var context = new TemplateContext
+        {
+            Options =
+            {
+                MemberAccessStrategy = new UnsafeMemberAccessStrategy()
+            }
+        };
+
+        context.Options.Filters.AddFilter("to_comma_separated", (input, arguments, ctx) => new StringValue($"{input.ToObjectValue():n}"));
+        context.SetValue("url", url);
+
+        // compute output
+        string output = await fluidTemplate.RenderAsync(context);
+
+        // send email
+        return SendMessage(email, "Reset Your Password", output);
+    }   
 }
