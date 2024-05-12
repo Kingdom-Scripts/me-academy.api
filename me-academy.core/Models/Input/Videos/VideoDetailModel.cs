@@ -10,6 +10,7 @@ public class VideoDetailModel
     public bool mp4Support { get; set; } = false;
     public bool @public { get; set; } = false;
     public int Duration { get; set; }
+    public string? ThumbnailUrl { get; set; }
 }
 
 public class VideoDetailValidator : AbstractValidator<VideoDetailModel>

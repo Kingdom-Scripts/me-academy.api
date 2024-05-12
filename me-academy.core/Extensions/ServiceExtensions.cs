@@ -10,6 +10,7 @@ using me_academy.core.Middlewares;
 using me_academy.core.Models.App;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
+using me_academy.core.Models.Input.Series;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
@@ -135,6 +136,15 @@ public static class ServiceExtensions
             .Map(dest => dest.Type, src => src.Document!.Type)
             .Map(dest => dest.Url, src => src.Document!.Url)
             .Map(dest => dest.ThumbnailUrl, src => src.Document!.ThumbnailUrl);
+
+        // map series models
+        TypeAdapterConfig<SeriesModel, Series>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
+
+        TypeAdapterConfig<Series, SeriesDetailView>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList());
 
         services.AddSingleton<ICacheService, CacheService>();
 

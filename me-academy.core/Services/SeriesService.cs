@@ -8,7 +8,9 @@ using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Series;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View;
 using me_academy.core.Models.View.Series;
+using me_academy.core.Models.View.Videos;
 using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +43,10 @@ public class SeriesService : ISeriesService
         var series = model.Adapt<Series>();
         series.CreatedById = _userSession.UserId;
         series.Uid = await GetSeriesUid(model.Title);
+        series.SeriesPreview = new()
+        {
+            UploadToken = ""
+        };
 
         // add prices
         if (model.Prices.Any())
@@ -151,11 +157,12 @@ public class SeriesService : ISeriesService
 
         if (_userSession.IsAnyAdmin && request.WithDeleted)
             series = series.Where(s => s.IsDeleted == request.WithDeleted && s.IsActive == request.IsActive);
-        else 
+        else
             series = series.Where(s => !s.IsDeleted && s.IsActive && s.IsPublished);
 
         var result = await series
-            .Where(s => string.IsNullOrWhiteSpace(request.SearchQuery) || s.Title.ToLower().Contains(request.SearchQuery))
+            .Where(s => string.IsNullOrWhiteSpace(request.SearchQuery) ||
+                        s.Title.ToLower().Contains(request.SearchQuery))
             .ProjectToType<SeriesView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
@@ -199,7 +206,7 @@ public class SeriesService : ISeriesService
         if (saved < 1)
             Log.Error(
                 "An error occurred while updating series view count for series: {SeriesTitle}. Current view count before failure: {Count}",
-            series.Title, series.ViewCount - 1);
+                series.Title, series.ViewCount - 1);
 
         return saved > 0
             ? new SuccessResult(StatusCodes.Status200OK, "Series view count updated successfully.")
@@ -281,9 +288,9 @@ public class SeriesService : ISeriesService
         var uploadToken = _context.SeriesPreviews
             .Where(cv => cv.Series!.Uid == seriesUid)
             .Select(cv => new ApiVideoToken { Token = cv.UploadToken })
-        .FirstOrDefault();
+            .FirstOrDefault();
 
-        if (uploadToken is null)
+        if (uploadToken is null || string.IsNullOrEmpty(uploadToken.Token))
         {
             var uploadTokenRes = await _videoService.GetUploadToken();
             if (!uploadTokenRes.Success)
@@ -329,6 +336,7 @@ public class SeriesService : ISeriesService
             return detailsSet;
 
         series.SeriesPreview!.VideoId = model.videoId;
+        series.SeriesPreview.ThumbnailUrl = model.ThumbnailUrl;
         series.SeriesPreview.IsUploaded = true;
         series.SeriesPreview.VideoDuration = model.Duration;
 
@@ -339,7 +347,20 @@ public class SeriesService : ISeriesService
             : new ErrorResult("Failed to save video details to server.");
     }
 
-    public async Task<Result> AddExistingCourseToSeries(string seriesUid, string courseUid, SeriesCourseModel model)
+    public async Task<Result> GetPreviewDetails(string seriesUid)
+    {
+        var previewDetails = await _context.SeriesPreviews
+            .Where(cv => cv.Series!.Uid == seriesUid)
+            .ProjectToType<VideoView>()
+            .FirstOrDefaultAsync();
+
+        if (previewDetails is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "Preview details not found.");
+
+        return new SuccessResult(previewDetails);
+    }
+
+public async Task<Result> AddExistingCourseToSeries(string seriesUid, string courseUid, SeriesCourseModel model)
     {
         var series = await _context.Series
             .FirstOrDefaultAsync(x => x.Uid == seriesUid);

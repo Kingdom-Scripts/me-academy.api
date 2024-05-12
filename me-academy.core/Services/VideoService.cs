@@ -136,7 +136,7 @@ public class VideoService : IVideoService
         var apiResult = JsonConvert.DeserializeObject<ApiVideoDetail>(responseContent);
 
         courseVideo.PreviewVideoId = apiResult!.VideoId;
-        courseVideo.PreviewThumbnailUrl = apiResult!.Assets.Thumbnail;
+        courseVideo.ThumbnailUrl = apiResult!.Assets.Thumbnail;
 
         int saved = await _context.SaveChangesAsync();
 

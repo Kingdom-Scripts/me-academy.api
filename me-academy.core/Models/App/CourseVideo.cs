@@ -2,9 +2,8 @@
 
 namespace me_academy.core.Models.App;
 
-public class CourseVideo
+public class CourseVideo : BaseAppModel
 {
-    public int Id { get; set; }
     public int CourseId { get; set; }
 
     [MaxLength(50)] public string UploadToken { get; set; } = null!;
@@ -12,7 +11,7 @@ public class CourseVideo
     public int VideoDuration { get; set; }
 
     [MaxLength(255)] public string? PreviewVideoId { get; set; }
-    [MaxLength(255)] public string? PreviewThumbnailUrl { get; set; }
+    [MaxLength(255)] public string? ThumbnailUrl { get; set; }
     public bool IsUploaded { get; set; } = false;
 
     public Course? Course { get; set; }

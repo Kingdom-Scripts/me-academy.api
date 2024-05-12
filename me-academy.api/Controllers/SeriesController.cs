@@ -4,6 +4,7 @@ using me_academy.core.Models.App;
 using me_academy.core.Models.Input.Series;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View;
 using me_academy.core.Models.View.Series;
 using Microsoft.AspNetCore.Mvc;
 
@@ -108,12 +109,21 @@ namespace me_academy.api.Controllers
             return ProcessResponse(res);
         }
 
-        [HttpPost("{seriesUid}/preview")]
+        [HttpPatch("{seriesUid}/preview")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> SetPreview(string seriesUid, VideoDetailModel model)
         {
             var res = await _seriesService.SetPreviewDetails(seriesUid, model);
+            return ProcessResponse(res);
+        }
+
+        [HttpGet("{seriesUid}/preview")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<VideoView>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+        public async Task<IActionResult> GetPreview(string seriesUid)
+        {
+            var res = await _seriesService.GetPreviewDetails(seriesUid);
             return ProcessResponse(res);
         }
 
