@@ -19,6 +19,7 @@ public class MeAcademyContext : DbContext
     public required DbSet<CourseViewCount> CourseViewCounts { get; set; }
     public required DbSet<Document> Documents { get; set; }
     public required DbSet<Duration> Durations { get; set; }
+    public required DbSet<InvitedUser> InvitedUsers { get; set; }
     public required DbSet<QaOption> QaOptions { get; set; }
     public required DbSet<QaResponse> QaResponses { get; set; }
     public required DbSet<QuestionAndAnswer> QuestionAndAnswers  { get; set; }

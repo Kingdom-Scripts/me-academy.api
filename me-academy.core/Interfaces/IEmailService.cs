@@ -7,4 +7,5 @@ public interface IEmailService
 {
     public Result SendMessage(string to, string subject, string body, Attachment? attachment = null);
     Task<Result> SendConfirmEmail(string to, string token);
+    Task<Result> SendPasswordResetEmail(string email, string token);
 }

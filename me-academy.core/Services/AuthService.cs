@@ -2,12 +2,15 @@ using Mapster;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.App;
 using me_academy.core.Models.App.Constants;
+using me_academy.core.Models.Configurations;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Auth;
 using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Web;
 
 namespace me_academy.core.Services;
 
@@ -17,14 +20,19 @@ public class AuthService : IAuthService
     private readonly ITokenGenerator _tokenGenerator;
     private readonly UserSession _userSession;
     private readonly IEmailService _emailService;
+    private readonly BaseURLs _baseUrls;
 
     public AuthService(MeAcademyContext context, ITokenGenerator tokenGenerator, UserSession userSession,
-        IEmailService emailService)
+        IEmailService emailService, IOptions<AppConfig> options)
     {
+        if (options is null) throw new ArgumentNullException(nameof(options));
+
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _tokenGenerator = tokenGenerator ?? throw new ArgumentNullException(nameof(tokenGenerator));
         _userSession = userSession ?? throw new ArgumentNullException(nameof(userSession));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+
+        _baseUrls = options.Value.BaseURLs;
     }
 
     public async Task<Result> Register(RegisterModel model)
@@ -164,6 +172,91 @@ public class AuthService : IAuthService
         return new SuccessResult(userView);
     }
 
+    public async Task<Result> RequestForPasswordReset(string email)
+    {
+        string responseMessage = "If this email is associated with an account, you will receive a password reset email shortly.";
+
+        // validate user
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email.ToLower().Trim() == email.ToLower().Trim());
+        if (user is null)
+            return new SuccessResult(responseMessage);
+
+        string token = CodeGenerator.GenerateCode(100);
+
+        bool saved = await SaveNewCode(user.Id, token, CodePurposes.ResetPassword);
+
+        if (!saved)
+            return new ErrorResult("Unable to send password reset email at the moment. Please try again.");
+
+        var emailRes = await _emailService.SendPasswordResetEmail(user.Email, token);
+        if (!emailRes.Success)
+            return emailRes;
+
+        return new SuccessResult(responseMessage);
+    }
+
+    public async Task<Result> ResetPassword(ResetPasswordModel model)
+    {
+        // validate user
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email.ToLower().Trim() == model.Email.ToLower().Trim());
+        if (user is null)
+            return new ErrorResult("Invalid request: User does not exist");
+
+        // validate token
+        var today = DateTime.UtcNow;
+        var code = await _context.Codes
+            .FirstOrDefaultAsync(c => c.OwnerId == user.Id
+                && c.Purpose == CodePurposes.ResetPassword
+                && c.Token == model.Token
+                && c.Used == false);
+
+        if (code == null)
+            return new ErrorResult("Invalid request, kindly request a new password reset email.");
+
+        if (code.ExpiryDate < today)
+            return new ErrorResult("Password reset token has expired. Kindly request a new one.");
+
+        // update user and token
+        user.HashedPassword = model.NewPassword.HashPassword();
+        code.Used = true;
+
+        int saved = await _context.SaveChangesAsync();
+
+        if (saved < 1)
+            return new ErrorResult("Unable to reset password at the moment. Please try again.");
+
+        // send password reset notification Email TODO
+        // await _emailService.SendPasswordResetNotification(user.Email);
+        throw new NotImplementedException();
+    }
+
+    public async Task<Result> InviteUser(UserInvitationModel model)
+    {
+        // validate user
+        bool userExist = await _context.Users
+            .AnyAsync(u => u.Email.ToLower().Trim() == model.Email.ToLower().Trim());
+        if (userExist)
+            return new ErrorResult("User already exist in the system");
+
+        string token = ""; // TODO
+
+        // get and encode the url with token
+        string url =
+            $"{_baseUrls.Client}/auth/reset-password?email={model.Email}&token={HttpUtility.UrlEncode(token)}";
+
+        // validate invitation
+        bool invitationExist = await _context.InvitedUsers
+            .AnyAsync(i => i.Email.ToLower().Trim() == model.Email.Trim().ToLower());
+        if (invitationExist)
+        {
+
+        }
+
+        throw new NotImplementedException();
+    }
+
     #region Private Method
 
     private async Task<bool> SaveNewCode(int userId, string token, string purpose)
@@ -178,7 +271,7 @@ public class AuthService : IAuthService
             code.Used = true;
         }
 
-        Code newCode = new Code
+        Code newCode = new()
         {
             OwnerId = userId,
             Token = token,
