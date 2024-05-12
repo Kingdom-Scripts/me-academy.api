@@ -2,6 +2,7 @@ namespace me_academy.core.Models.App.Constants;
 
 public static class CodePurposes
 {
-    public static string ConfirmEmail = "ConfirmEmail";
-    public static string ResetPassword = "ResetPassword";
+    public const string ConfirmEmail = "ConfirmEmail";
+    public const string ResetPassword = "ResetPassword";
+    public const string Invitation = "Invitation";
 }

@@ -44,8 +44,28 @@ public static class PrepDatabase
             context.Roles.AddRange(
                 new Role { Name = nameof(Roles.SuperAdmin) },
                 new Role { Name = nameof(Roles.Admin) },
+                new Role { Name = nameof(Roles.ManageCourse) },
+                new Role { Name = nameof(Roles.ManageUser) },
                 new Role { Name = nameof(Roles.Customer) }
             );
+
+            // TODO: remove this
+            context.AddRange(
+                new UserRole { RoleId = 1, UserId = 6 },
+                new UserRole { RoleId = 2, UserId = 6 },
+                new UserRole { RoleId = 5, UserId = 6 },
+                new UserRole { RoleId = 1, UserId = 1 },
+                new UserRole { RoleId = 2, UserId = 1 },
+                new UserRole { RoleId = 3, UserId = 1 },
+                new UserRole { RoleId = 4, UserId = 1 },
+                new UserRole { RoleId = 5, UserId = 1 },
+
+                new UserRole { RoleId = 1, UserId = 2 },
+                new UserRole { RoleId = 2, UserId = 2 },
+                new UserRole { RoleId = 3, UserId = 2 },
+                new UserRole { RoleId = 4, UserId = 2 },
+                new UserRole { RoleId = 5, UserId = 2 }
+                );
         }
 
         context.SaveChanges();

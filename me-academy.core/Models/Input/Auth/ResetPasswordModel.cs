@@ -18,7 +18,6 @@ public class RestPasswordValidator : AbstractValidator<ResetPasswordModel>
         RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required");
         RuleFor(x => x.NewPassword).NotEmpty().WithMessage("New password is required");
         RuleFor(x => x.ConfirmPassword)
-            .NotEmpty().WithMessage("You need to confirm password")
             .Equal(x => x.NewPassword).WithMessage("Passwords do not match");
     }
 }

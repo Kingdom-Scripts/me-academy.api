@@ -28,6 +28,6 @@ public class UserRole : BaseAppModel
     [Required]
     public int CreatedById { get; set; }
 
-    public Role Role { get; set; }
-    public User User { get; set; }
+    public Role? Role { get; set; }
+    public User? User { get; set; }
 }
