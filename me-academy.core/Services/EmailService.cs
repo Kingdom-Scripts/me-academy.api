@@ -30,7 +30,7 @@ namespace me_academy.core.Services
             _smtpClient.EnableSsl = false;
         }
 
-        public Result SendMessage(string to, string subject, string body, Attachment? attachment = null)
+        private Result SendMessage(string to, string subject, string body, Attachment? attachment = null)
         {
             var mail = new MailMessage();
             try
@@ -146,7 +146,7 @@ namespace me_academy.core.Services
             return SendMessage(email, "Reset Your Password", output);
         }
 
-        public async Task<Result> SendEmail(string to, string template, List<KeyValuePair<string, string>> args)
+        public async Task<Result> SendEmail(string to, string template, Dictionary<string, string>? args = null)
         {
             // get template file
             string templatePath = Path.Combine(_hostingEnvironment.ContentRootPath, "EmailTemplates", );
@@ -178,6 +178,7 @@ namespace me_academy.core.Services
             context.Options.Filters.AddFilter("to_comma_separated", (input, arguments, ctx)
                 => new StringValue($"{input.ToObjectValue():n}"));
 
+            args ??= new Dictionary<string, string>();
             foreach (var arg in args)
             {
                 context.SetValue(arg.Key, arg.Value);

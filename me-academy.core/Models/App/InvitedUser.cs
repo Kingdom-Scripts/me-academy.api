@@ -23,7 +23,16 @@ public class InvitedUser : BaseAppModel
     public bool CanManageUsers { get; set; }
 
     public int EmailsSent { get; set; } = 1;
+    public bool IsAccepted { get; set; }
+    public DateTime? DateAccepted { get; set; }
     public int CreatedById { get; set; }
+
+    [Required]
+    [StringLength(255)]
+    public string Token { get; set; } = null!;
+
+    [Required]
+    public DateTime TokenExpiry { get; set; } = DateTime.UtcNow.AddDays(7);
     
     public User? CreatedBy { get; set; }
 }
