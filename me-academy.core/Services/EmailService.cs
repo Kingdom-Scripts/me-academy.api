@@ -31,16 +31,16 @@ public class EmailService : IEmailService
         _smtpClient.EnableSsl = false;
     }
 
-    public Result SendMessage(string to, string subject, string body, Attachment? attachment = null)
-    {
-        var mail = new MailMessage();
-        try
+        private Result SendMessage(string to, string subject, string body, Attachment? attachment = null)
         {
-            mail.From = new MailAddress("test@kingdomscripts.com");
-            mail.To.Add(to);
-            mail.Subject = subject;
-            mail.Body = body;
-            mail.IsBodyHtml = true;
+            var mail = new MailMessage();
+            try
+            {
+                mail.From = new MailAddress("test@kingdomscripts.com");
+                mail.To.Add(to);
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = true;
 
             _smtpClient.Send(mail);
             return new SuccessResult(true);
@@ -150,15 +150,17 @@ public class EmailService : IEmailService
         return SendMessage(email, "Reset Your Password", output);
     }
 
-    public async Task<Result> SendEmail(string to, string subjecg, string templatePath,
-        List<KeyValuePair<string, string>> args)
-    {
-        // validate file
-        if (!File.Exists(templatePath))
+        public async Task<Result> SendEmail(string to, string template, Dictionary<string, string>? args = null)
         {
-            _logger.LogError("Email template file not found");
-            return new ErrorResult("Email template file not found");
-        }
+            // get template file
+            string templatePath = Path.Combine(_hostingEnvironment.ContentRootPath, "EmailTemplates", );
+
+            // validate file
+            if (!File.Exists(templatePath))
+            {
+                _logger.LogError("Email template file not found");
+                return new ErrorResult("Email template file not found");
+            }
 
         // read template file as string
         string sourceString = await File.ReadAllTextAsync(templatePath);
@@ -180,10 +182,11 @@ public class EmailService : IEmailService
         context.Options.Filters.AddFilter("to_comma_separated", (input, arguments, ctx)
             => new StringValue($"{input.ToObjectValue():n}"));
 
-        foreach (var arg in args)
-        {
-            context.SetValue(arg.Key, arg.Value);
-        }
+            args ??= new Dictionary<string, string>();
+            foreach (var arg in args)
+            {
+                context.SetValue(arg.Key, arg.Value);
+            }
 
         // compute output
         string output = await fluidTemplate.RenderAsync(context);
