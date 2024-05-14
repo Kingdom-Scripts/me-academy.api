@@ -118,4 +118,34 @@ public class AuthController : BaseController
         var res = await _authService.UserProfile();
         return ProcessResponse(res);
     }
+
+    /// <summary>
+    /// Request password reset email
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns></returns>
+    [HttpGet("request-password-reset")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> RequestPasswordReset([FromQuery] string email)
+    {
+        var res = await _authService.RequestForPasswordReset(email);
+        return ProcessResponse(res);
+    }
+
+    /// <summary>
+    /// Reset password
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<AuthDataView>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+    {
+        var res = await _authService.ResetPassword(model);
+        return ProcessResponse(res);
+    }
 }

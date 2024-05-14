@@ -19,11 +19,17 @@ public class MeAcademyContext : DbContext
     public required DbSet<CourseViewCount> CourseViewCounts { get; set; }
     public required DbSet<Document> Documents { get; set; }
     public required DbSet<Duration> Durations { get; set; }
+    public required DbSet<InvitedUser> InvitedUsers { get; set; }
     public required DbSet<QaOption> QaOptions { get; set; }
     public required DbSet<QaResponse> QaResponses { get; set; }
     public required DbSet<QuestionAndAnswer> QuestionAndAnswers  { get; set; }
     public required DbSet<RefreshToken> RefreshTokens { get; set; }
     public required DbSet<Role> Roles { get; set; }
+    public required DbSet<Series> Series { get; set; }
+    public required DbSet<SeriesAuditLog> SeriesAuditLogs { get; set; }
+    public required DbSet<SeriesCourse> SeriesCourses { get; set; }
+    public required DbSet<SeriesPreview> SeriesPreviews { get; set; }
+    public required DbSet<SeriesPrice> SeriesPrices { get; set; }
     public required DbSet<User> Users { get; set; }
     public required DbSet<UserCourse> UserCourses { get; set; }
     public required DbSet<UserRole> UserRoles { get; set; }
@@ -80,5 +86,28 @@ public class MeAcademyContext : DbContext
             .WithMany()
             .HasForeignKey(cal => cal.CreatedById)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesAuditLog>()
+            .HasOne(sal => sal.CreatedBy)
+            .WithMany()
+            .HasForeignKey(sal => sal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesCourse>()
+            .HasOne(sal => sal.Series)
+            .WithMany()
+            .HasForeignKey(sal => sal.SeriesId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesCourse>()
+            .HasOne(sal => sal.CreatedBy)
+            .WithMany()
+            .HasForeignKey(sal => sal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesPreview>()
+            .HasOne(sal => sal.Series)
+            .WithOne(sal => sal.SeriesPreview)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

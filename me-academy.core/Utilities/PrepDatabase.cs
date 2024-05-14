@@ -44,6 +44,8 @@ public static class PrepDatabase
             context.Roles.AddRange(
                 new Role { Name = nameof(Roles.SuperAdmin) },
                 new Role { Name = nameof(Roles.Admin) },
+                new Role { Name = nameof(Roles.ManageCourse) },
+                new Role { Name = nameof(Roles.ManageUser) },
                 new Role { Name = nameof(Roles.Customer) }
             );
         }

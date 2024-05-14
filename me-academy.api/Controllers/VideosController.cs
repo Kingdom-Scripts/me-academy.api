@@ -15,31 +15,32 @@ public class VideosController : BaseController
     public VideosController(IVideoService videoService) => _videoService = videoService ?? throw new ArgumentNullException(nameof(videoService));
 
     /// <summary>
+    /// Get video upload token
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("upload-token")]
+    public async Task<IActionResult> GetUploadToken()
+    {
+        var res = await _videoService.GetUploadToken();
+        if (res.Success)
+        {
+            return ProcessResponse(new SuccessResult(res.Content));
+        }
+
+        return ProcessResponse(new ErrorResult(res.Message));
+    }
+
+    /// <summary>
     /// Get video upload data
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpGet("{courseUid}/upload-token")]
+    [HttpGet("{courseUid}/upload-data")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<ApiVideoToken>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> GetVideoUploadData(string courseUid)
     {
         var res = await _videoService.GetVideoUploadData(courseUid);
-        return ProcessResponse(res);
-    }
-
-    /// <summary>
-    /// Update the details of the video after successful upload to Api.Video
-    /// </summary>
-    /// <param name="courseUid"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    [HttpPatch("{courseUid}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> SetVideoDetails(string courseUid, VideoDetailModel model)
-    {
-        var res = await _videoService.SetVideoDetails(courseUid, model);
         return ProcessResponse(res);
     }
 

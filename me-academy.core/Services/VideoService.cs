@@ -35,6 +35,18 @@ public class VideoService : IVideoService
         _client = factory.CreateClient(HttpClientKeys.ApiVideo);
     }
 
+    public async Task<Result<ApiVideoToken>> GetUploadToken()
+    {
+        var response = await _client.PostAsync("upload-tokens", null);
+        if (!response.IsSuccessStatusCode)
+            return new ErrorResult<ApiVideoToken>("Failed to get video upload token");
+
+        string contentString = await response.Content.ReadAsStringAsync();
+        var uploadToken = JsonConvert.DeserializeObject<ApiVideoToken>(contentString);
+
+        return new SuccessResult<ApiVideoToken>(uploadToken!);
+    }
+
     public async Task<Result> GetVideoUploadData(string courseUid)
     {
         var uploadToken = _context.CourseVideos
@@ -68,42 +80,21 @@ public class VideoService : IVideoService
         return new SuccessResult(uploadToken);
     }
 
-    public async Task<Result> SetVideoDetails(string courseUid, VideoDetailModel model)
+    public async Task<Result> SetVideoDetails(VideoDetailModel model)
     {
-        var course = await _context.Courses
-            .Where(c => c.Uid == courseUid)
-            .Include(course => course.CourseVideo)
-            .Select(c => new Course
-            {
-                Id = c.Id,
-                CourseVideo = c.CourseVideo
-            })
-            .FirstOrDefaultAsync();
-
-        if (course is null)
-            return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
-
         model.playerId = _apiVideoConfig.PlayerId;
         var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
         var response = await _client.PatchAsync($"videos/{model.videoId}", content);
-        if (!response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
-            string contentString = await response.Content.ReadAsStringAsync();
-            object? error = JsonConvert.DeserializeObject<object>(contentString);
-            _logger.Error("Failed to set video details. {@Error}", error);
-            return new ErrorResult("Failed to set video details.");
+            return new SuccessResult();
         }
 
-        course.CourseVideo!.VideoId = model.videoId;
-        course.CourseVideo.IsUploaded = true;
-        course.CourseVideo.VideoDuration = model.Duration;
-
-        int saved = await _context.SaveChangesAsync();
-
-        return saved > 0
-            ? new SuccessResult()
-            : new ErrorResult("Failed to save video details to server.");
+        string contentString = await response.Content.ReadAsStringAsync();
+        object? error = JsonConvert.DeserializeObject<object>(contentString);
+        _logger.Error("Failed to set video details. {@Error}", error);
+        return new ErrorResult("Failed to set video details.");
     }
 
     public async Task<Result> SetVideoPreview(string courseUid, ApiVideoClipModel model)
@@ -145,7 +136,7 @@ public class VideoService : IVideoService
         var apiResult = JsonConvert.DeserializeObject<ApiVideoDetail>(responseContent);
 
         courseVideo.PreviewVideoId = apiResult!.VideoId;
-        courseVideo.PreviewThumbnailUrl = apiResult!.Assets.Thumbnail;
+        courseVideo.ThumbnailUrl = apiResult!.Assets.Thumbnail;
 
         int saved = await _context.SaveChangesAsync();
 
@@ -154,6 +145,23 @@ public class VideoService : IVideoService
             : new ErrorResult("Failed to save video thumbnail to server.");
     }
 
+    public async Task<Result> DeleteVideo(string videoId)
+    {
+        var response = await _client.DeleteAsync($"videos/{videoId}");
+        if (response.IsSuccessStatusCode)
+        {
+            return new SuccessResult();
+        }
+
+        string contentString = await response.Content.ReadAsStringAsync();
+        object? error = JsonConvert.DeserializeObject<object>(contentString);
+        _logger.Error("Failed to delete video. {@Error}", error);
+        return new ErrorResult("Failed to delete video.");
+    }
+
+    // TODO: when implementing this, remember to set up an authentication mechanism
+    // to validate that the user actually has paid to see this video or the video is
+    // part of a series the user has paid for.
     public async Task<Result> GetVideoPlayerDetails(string courseUid)
     {
         var courseVideo = await _context.CourseVideos

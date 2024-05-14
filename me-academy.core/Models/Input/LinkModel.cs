@@ -1,16 +1,16 @@
 using FluentValidation;
 
-namespace me_academy.core.Models.Input.Courses;
+namespace me_academy.core.Models.Input;
 
-public class CourseLinkModel
+public class LinkModel
 {
     public required string Title { get; set; }
     public required string Link { get; set; }
 }
 
-public class CourseLinkValidator : AbstractValidator<CourseLinkModel>
+public class LinkValidator : AbstractValidator<LinkModel>
 {
-    public CourseLinkValidator()
+    public LinkValidator()
     {
         RuleFor(model => model.Title)
             .NotEmpty().WithMessage("Title cannot be empty.")

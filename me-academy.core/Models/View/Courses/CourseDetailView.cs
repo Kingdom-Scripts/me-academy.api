@@ -16,5 +16,5 @@ public class CourseDetailView : CourseView
     public ReferencedUserView? CreatedBy { get; set; }
     public ReferencedUserView? UpdatedBy { get; set; }
     public ReferencedUserView? DeletedBy { get; set; }
-    public List<CoursePriceView> CoursePrices { get; set; } = new();
+    public List<PriceView> CoursePrices { get; set; } = new();
 }

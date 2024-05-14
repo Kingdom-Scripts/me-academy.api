@@ -1,16 +1,16 @@
 using FluentValidation;
 
-namespace me_academy.core.Models.Input.Courses;
+namespace me_academy.core.Models.Input;
 
-public class CoursePriceModel
+public class PriceModel
 {
     public int DurationId { get; set; }
     public decimal Price { get; set; }
 }
 
-public class CoursePriceValidation : AbstractValidator<CoursePriceModel>
+public class PriceValidation : AbstractValidator<PriceModel>
 {
-    public CoursePriceValidation()
+    public PriceValidation()
     {
         RuleFor(x => x.DurationId)
             .NotEmpty().WithMessage("Duration Id cannot be empty.");

@@ -10,8 +10,11 @@ using me_academy.core.Middlewares;
 using me_academy.core.Models.App;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
+using me_academy.core.Models.Input.Series;
 using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
+using me_academy.core.Models.View.Series;
 using me_academy.core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -123,7 +126,7 @@ public static class ServiceExtensions
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList());
 
-        TypeAdapterConfig<CoursePrice, CoursePriceView>
+        TypeAdapterConfig<CoursePrice, PriceView>
             .NewConfig()
             .Map(dest => dest.Name, src => src.Duration!.Name);
 
@@ -133,6 +136,15 @@ public static class ServiceExtensions
             .Map(dest => dest.Type, src => src.Document!.Type)
             .Map(dest => dest.Url, src => src.Document!.Url)
             .Map(dest => dest.ThumbnailUrl, src => src.Document!.ThumbnailUrl);
+
+        // map series models
+        TypeAdapterConfig<SeriesModel, Series>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
+
+        TypeAdapterConfig<Series, SeriesDetailView>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList());
 
         services.AddSingleton<ICacheService, CacheService>();
 
@@ -148,6 +160,7 @@ public static class ServiceExtensions
         services.TryAddTransient<ApiVideoHttpHandler>();
         services.TryAddTransient<IVideoService, VideoService>();
         services.TryAddTransient<IQaService, QaService>();
+        services.TryAddTransient<ISeriesService, SeriesService>();
 
         return services;
     }

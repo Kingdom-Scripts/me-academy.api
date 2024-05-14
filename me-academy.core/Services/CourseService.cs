@@ -1,21 +1,20 @@
 using Mapster;
 using me_academy.core.Extensions;
 using me_academy.core.Interfaces;
-using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.App;
 using me_academy.core.Models.App.Constants;
 using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
+using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Courses;
+using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using CourseView = me_academy.core.Models.View.Courses.CourseView;
+using Serilog;
 
 namespace me_academy.core.Services;
-
 public class CourseService : ICourseService
 {
     private readonly MeAcademyContext _context;
@@ -23,16 +22,14 @@ public class CourseService : ICourseService
     private readonly IFileService _fileService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IVideoService _videoService;
-    private readonly ILogger<CourseService> _logger;
 
     public CourseService(MeAcademyContext context, UserSession userSession, IFileService fileService,
-        IHttpContextAccessor httpContextAccessor, ILogger<CourseService> logger, IVideoService videoService)
+        IHttpContextAccessor httpContextAccessor, IVideoService videoService)
     {
         _context = context ?? throw new ArgumentException(nameof(context));
         _userSession = userSession ?? throw new ArgumentException(nameof(userSession));
         _fileService = fileService ?? throw new ArgumentException(nameof(fileService));
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentException(nameof(httpContextAccessor));
-        _logger = logger ?? throw new ArgumentException(nameof(logger));
         _videoService = videoService ?? throw new ArgumentException(nameof(videoService));
     }
 
@@ -40,9 +37,9 @@ public class CourseService : ICourseService
 
     public async Task<Result> CreateCourse(CourseModel model)
     {
-        // TODO: set up a mechanism to generate a unique UID
         // validate that course with title doesn't exist
         bool courseExist = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
             .AnyAsync(c => c.Title.ToLower().Trim() == model.Title.ToLower().Trim());
 
         if (courseExist)
@@ -51,7 +48,7 @@ public class CourseService : ICourseService
         // create course object
         var course = model.Adapt<Course>();
         course.CreatedById = _userSession.UserId;
-        course.Uid = course.Title.Trim().ToLower().Replace(" ", "-", StringComparison.OrdinalIgnoreCase);
+        course.Uid = await GetCourseUid(model.Title);
 
         // add prices
         if (model.Prices.Any())
@@ -67,7 +64,7 @@ public class CourseService : ICourseService
         AddCourseAuditLog(course, CourseAuditLogConstants.Created(course.Title, _userSession.Name));
 
         // save the data
-        await _context.Courses.AddAsync(course);
+        await _context.AddAsync(course);
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
@@ -79,6 +76,7 @@ public class CourseService : ICourseService
     {
         // get the course
         var course = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
             .Include(c => c.CoursePrices)
             .Include(c => c.UsefulLinks)
             .Where(c => c.Uid == courseUid)
@@ -89,6 +87,7 @@ public class CourseService : ICourseService
 
         // validate that course with title doesn't exist
         bool courseExist = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
             .AnyAsync(c => c.Id != course.Id
                            && c.Title.ToLower().Trim() == model.Title.ToLower().Trim());
 
@@ -97,6 +96,7 @@ public class CourseService : ICourseService
 
         // update the course object
         course = model.Adapt(course);
+        course.Uid = await GetCourseUid(model.Title);
         course.UpdatedById = _userSession.UserId;
         course.UpdatedOnUtc = DateTime.UtcNow;
         course.UsefulLinks = new();
@@ -147,7 +147,7 @@ public class CourseService : ICourseService
         }
 
         // save the data
-        _context.Courses.Update(course);
+        _context.Update(course);
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
@@ -159,13 +159,14 @@ public class CourseService : ICourseService
     {
         // get the course
         var course = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
             .FirstOrDefaultAsync();
         if (course == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
 
         // delete the course
-        _context.Courses.Remove(course);
+        _context.Remove(course);
 
         // add audit log
         AddCourseAuditLog(course, CourseAuditLogConstants.Deleted(course.Title, _userSession.Name));
@@ -179,7 +180,9 @@ public class CourseService : ICourseService
 
     public async Task<Result> GetCourse(string courseUid)
     {
-        var course = _context.Courses.AsQueryable();
+        var course = _context.Courses
+            .Where(c => !c.ForSeriesOnly)
+            .AsQueryable();
 
         // include deleted ones if user is admin
         if (!_userSession.IsAnyAdmin)
@@ -213,13 +216,14 @@ public class CourseService : ICourseService
     public async Task<Result> AddCourseView(string courseUid)
     {
         var course = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
             .FirstOrDefaultAsync();
         if (course == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
 
         course.ViewCount++;
-        _context.Courses.Update(course);
+        _context.Update(course);
 
         var countDetail = new CourseViewCount
         {
@@ -231,10 +235,8 @@ public class CourseService : ICourseService
 
         int saved = await _context.SaveChangesAsync();
 
-        if (saved > 0)
-            _logger.LogInformation("Course view count updated for course: {CourseTitle}", course.Title);
-        else
-            _logger.LogError(
+        if (saved < 1)
+            Log.Error(
                 "An error occurred while updating course view count for course: {CourseTitle}. Current view count before failure: {Count}",
                 course.Title, course.ViewCount - 1);
 
@@ -245,21 +247,21 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListCourses(CourseSearchModel request)
     {
-        if ((request.IsDraft || request.IsActive || request.WithDeleted) && !_userSession.IsAnyAdmin)
-        {
+        if ((request.IsDraft || request.IsActive || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.InRole(RolesConstants.ManageCourse)))
             return new ForbiddenResult();
-        }
 
         request.SearchQuery = !string.IsNullOrEmpty(request.SearchQuery)
-            ? request.SearchQuery.ToLower()
+            ? request.SearchQuery.ToLower().Trim()
             : null;
 
-        var courses = _context.Courses.AsQueryable();
+        var courses = _context.Courses.Where(c => !c.ForSeriesOnly).AsQueryable();
 
-        if (_userSession.IsAnyAdmin && request.WithDeleted)
-            courses = courses.Where(c => c.IsDeleted == request.WithDeleted && c.IsActive == request.IsActive);
-        else
-            courses = courses.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
+        // allow filters only for admin users or users who can manage courses
+        courses = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
+            ? courses
+                .Where(c => c.IsActive == request.IsActive && c.IsDraft == request.IsDraft)
+                .Where(c => request.WithDeleted || !c.IsDeleted)
+            : courses.Where(c => !c.IsDeleted && !c.IsDraft && c.IsActive && c.IsPublished);
 
         // TODO: implement Full text search for description and title
         var result = await courses
@@ -275,12 +277,13 @@ public class CourseService : ICourseService
     {
         // get the course
         var course = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
             .FirstOrDefaultAsync();
         if (course == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
 
-        if (course is { IsActive: true, PublishedOnUtc: not null })
+        if (course.IsPublished)
             return new ErrorResult("Course is already published.");
 
         // TODO: validate the course has video already before publishing
@@ -289,7 +292,7 @@ public class CourseService : ICourseService
         course.PublishedOnUtc = DateTime.UtcNow;
         course.PublishedById = _userSession.UserId;
 
-        _context.Courses.Update(course);
+        _context.Update(course);
 
         // add audit log
         AddCourseAuditLog(course, CourseAuditLogConstants.Published(course.Title, _userSession.Name));
@@ -305,6 +308,7 @@ public class CourseService : ICourseService
     {
         // get the course
         var course = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
             .FirstOrDefaultAsync();
         if (course == null)
@@ -312,7 +316,7 @@ public class CourseService : ICourseService
 
         course.IsActive = true;
 
-        _context.Courses.Update(course);
+        _context.Update(course);
 
         // add audit log
         AddCourseAuditLog(course, CourseAuditLogConstants.Activated(course.Title, _userSession.Name));
@@ -328,6 +332,7 @@ public class CourseService : ICourseService
     {
         // get the course
         var course = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
             .FirstOrDefaultAsync();
         if (course == null)
@@ -335,7 +340,7 @@ public class CourseService : ICourseService
 
         course.IsActive = false;
 
-        _context.Courses.Update(course);
+        _context.Update(course);
 
         // add audit log
         AddCourseAuditLog(course, CourseAuditLogConstants.Deactivated(course.Title, _userSession.Name));
@@ -351,10 +356,42 @@ public class CourseService : ICourseService
 
     #region Resources
 
+    public async Task<Result> SetCourseVideoDetails(string courseUid, VideoDetailModel model)
+    {
+        var course = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
+            .Where(c => c.Uid == courseUid)
+            .Include(course => course.CourseVideo)
+            .Select(c => new Course
+            {
+                Id = c.Id,
+                CourseVideo = c.CourseVideo
+            })
+            .FirstOrDefaultAsync();
+
+        if (course is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
+
+        var detailsSet = await _videoService.SetVideoDetails(model);
+        if (!detailsSet.Success)
+            return detailsSet;
+
+        course.CourseVideo!.VideoId = model.videoId;
+        course.CourseVideo.IsUploaded = true;
+        course.CourseVideo.VideoDuration = model.Duration;
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult()
+            : new ErrorResult("Failed to save video details to server.");
+    }
+
     public async Task<Result> AddResourceToCourse(string courseUid, FileUploadModel model)
     {
         // validate course
         var course = await _context.Courses
+            .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
             .Select(c => new Course
             {
@@ -439,6 +476,17 @@ public class CourseService : ICourseService
     #endregion
 
     #region Private Methods
+
+    private async Task<string> GetCourseUid(string title)
+    {
+        var trimmedTitle = title.Trim()  // trim
+            .ToLower().Replace("-", "", StringComparison.OrdinalIgnoreCase) // remove hyphens
+            .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
+
+        // get the next course number from sequence
+        var nextCourseNumber = await _context.GetNextCourseNumber();
+        return $"{trimmedTitle}-{nextCourseNumber}";
+    }
 
     private async void AddCourseAuditLog(Course course, string description)
     {
