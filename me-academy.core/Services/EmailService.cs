@@ -150,10 +150,11 @@ public class EmailService : IEmailService
         return SendMessage(email, "Reset Your Password", output);
     }
 
-        public async Task<Result> SendEmail(string to, string template, Dictionary<string, string>? args = null)
+        public async Task<Result> SendEmail(string to, string subject, string template,
+            Dictionary<string, string?>? args = null)
         {
             // get template file
-            string templatePath = Path.Combine(_hostingEnvironment.ContentRootPath, "EmailTemplates", );
+            string templatePath = Path.Combine(_hostingEnvironment.ContentRootPath, "EmailTemplates", template);
 
             // validate file
             if (!File.Exists(templatePath))
@@ -182,16 +183,16 @@ public class EmailService : IEmailService
         context.Options.Filters.AddFilter("to_comma_separated", (input, arguments, ctx)
             => new StringValue($"{input.ToObjectValue():n}"));
 
-            args ??= new Dictionary<string, string>();
-            foreach (var arg in args)
+            args ??= new Dictionary<string, string?>();
+            foreach (var value in args)
             {
-                context.SetValue(arg.Key, arg.Value);
+                context.SetValue(value.Key, value.Value ?? string.Empty);
             }
 
         // compute output
         string output = await fluidTemplate.RenderAsync(context);
 
         // send email
-        return SendMessage(to, subjecg, output);
+        return SendMessage(to, subject, output);
     }
 }

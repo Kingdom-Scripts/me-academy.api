@@ -7,5 +7,5 @@ public interface IEmailService
 {
     Task<Result> SendConfirmEmail(string to, string token);
     Task<Result> SendPasswordResetEmail(string email, string token);
-    Task<Result> SendEmail(string to, string template, Dictionary<string, string>? args = null);
+    Task<Result> SendEmail(string to, string subject, string template, Dictionary<string, string?>? args = null);
 }

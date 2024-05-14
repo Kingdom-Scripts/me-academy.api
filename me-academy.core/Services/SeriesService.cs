@@ -354,7 +354,7 @@ public class SeriesService : ISeriesService
             .FirstOrDefaultAsync();
 
         if (previewDetails is null)
-            return new ErrorResult(StatusCodes.Status404NotFound, "Preview details not found.");
+            return new SuccessResult(StatusCodes.Status204NoContent, "Preview details not found.");
 
         return new SuccessResult(previewDetails);
     }

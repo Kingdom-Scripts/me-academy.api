@@ -229,7 +229,7 @@ public class AuthService : IAuthService
             return new ErrorResult("Unable to reset password at the moment. Please try again.");
 
         // send password reset notification Email
-        await _emailService.SendEmail(model.Email, EmailTemplates.PasswordResetNotification);
+        await _emailService.SendEmail(model.Email, "Your Password Was Just Reset - ME Academy", EmailTemplates.PasswordResetNotification);
 
         return new SuccessResult("Password reset successful.");
     }
@@ -267,7 +267,7 @@ public class AuthService : IAuthService
             return new ErrorResult("Unable to send invitation at the moment. Please try again.");
 
         // send invitation email
-        var args = new Dictionary<string, string> {
+        var args = new Dictionary<string, string?> {
             {
                 "url", url
             },
@@ -278,7 +278,7 @@ public class AuthService : IAuthService
                 "sender_name", _userSession.Name
             }
         };
-        var emailRes = await _emailService.SendEmail(model.Email, EmailTemplates.Invitation, args);
+        var emailRes = await _emailService.SendEmail(model.Email, "Invitation to ME Academy", EmailTemplates.Invitation, args);
 
         return emailRes.Success
             ? new SuccessResult("Invitation sent successfully.")
@@ -289,6 +289,7 @@ public class AuthService : IAuthService
     {
         // validate invitation
         var invitation = await _context.InvitedUsers
+            .Include(i => i.CreatedBy)
             .FirstOrDefaultAsync(i => i.Email.ToLower().Trim() == model.Email.ToLower().Trim()
                 && i.Token == model.Token);
         if (invitation == null)
@@ -296,7 +297,7 @@ public class AuthService : IAuthService
 
         // validate user
         bool userExist = await _context.Users
-            .AnyAsync(u => invitation.IsAccepted 
+            .AnyAsync(u => invitation.IsAccepted
                 || u.Email.ToLower().Trim() == model.Email.ToLower().Trim());
         if (userExist)
             return new ErrorResult("User already exist in the system");
@@ -308,7 +309,7 @@ public class AuthService : IAuthService
 
         // set up user roles
         var userRoles = new List<UserRole> { new() { RoleId = (int)Roles.Manager} };
-        if (invitation.CanManageCourses) 
+        if (invitation.CanManageCourses)
             userRoles.Add(new() { RoleId = (int)Roles.ManageCourse });
         if (invitation.CanManageUsers)
             userRoles.Add(new() { RoleId = (int)Roles.ManageUser });
@@ -326,19 +327,20 @@ public class AuthService : IAuthService
         if (saved < 1)
             return new ErrorResult("Unable to add user at the moment. Please try again");
 
-        saved = await _context.SaveChangesAsync();
-
         // send invitation accepted email
-        var args = new Dictionary<string, string>
+        var args = new Dictionary<string, string?>
         {
             {
-               "name", $"{user.FirstName} {user.LastName}"
+                "name", invitation.CreatedBy?.FirstName
+            },
+            {
+               "member", $"{user.FirstName} {user.LastName}"
             },
             {
                 "url", $"{_baseUrls.AdminClient}/auth/users"
             }
         };
-        await _emailService.SendEmail(user.Email, EmailTemplates.InvitationAccepted, args);
+        await _emailService.SendEmail(user.Email, "Welcome on board", EmailTemplates.InvitationAccepted, args);
 
         // create user token
         var authData = await _tokenGenerator.GenerateJwtToken(user);
