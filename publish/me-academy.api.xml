@@ -75,6 +75,20 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:me_academy.api.Controllers.AuthController.RequestPasswordReset(System.String)">
+            <summary>
+            Request password reset email
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AuthController.ResetPassword(me_academy.core.Models.Input.Auth.ResetPasswordModel)">
+            <summary>
+            Reset password
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="M:me_academy.api.Controllers.BaseController.ProcessResponse(me_academy.core.Models.Utilities.Result)">
             <summary>
             Returns the appropriate HTTP Response.
@@ -92,6 +106,14 @@
             <summary>
             Create a new course
             </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.CoursesController.SetVideoDetails(System.String,me_academy.core.Models.Input.Videos.VideoDetailModel)">
+            <summary>
+            Update the details of the video after successful upload to Api.Video
+            </summary>
+            <param name="courseUid"></param>
             <param name="model"></param>
             <returns></returns>
         </member>
@@ -198,19 +220,128 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.CreateSeries(me_academy.core.Models.Input.Series.SeriesModel)">
+            <summary>
+            Create a new series
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.UpdateSeries(System.String,me_academy.core.Models.Input.Series.SeriesModel)">
+            <summary>
+            Update series details
+            </summary>
+            <param name="seriesUid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.DeleteSeries(System.String)">
+            <summary>
+            Delete a series
+            </summary>
+            <param name="seriesUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.ListSeries(me_academy.core.Models.Input.Series.SeriesSearchModel)">
+            <summary>
+            List all series
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.GetSeries(System.String)">
+            <summary>
+            Get series details
+            </summary>
+            <param name="seriesUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.ViewSeries(System.String)">
+            <summary>
+            Add a view to a series
+            </summary>
+            <param name="seriesUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.PublishSeries(System.String)">
+            <summary>
+            Publish a series
+            </summary>
+            <param name="seriesUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.ActivateSeries(System.String)">
+            <summary>
+            Activate a series
+            </summary>
+            <param name="seriesUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.DeactivateSeries(System.String)">
+            <summary>
+            Deactivate a series
+            </summary>
+            <param name="seriesUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.GetPreviewToken(System.String)">
+            <summary>
+            Get upload token for a series
+            </summary>
+            <param name="seriesUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.SetPreview(System.String,me_academy.core.Models.Input.Videos.VideoDetailModel)">
+            <summary>
+            Set preview details for a series
+            </summary>
+            <param name="seriesUid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.GetPreview(System.String)">
+            <summary>
+            Get preview details for a series
+            </summary>
+            <param name="seriesUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.AddNewCourseToSeries(System.String,me_academy.core.Models.Input.Series.SeriesNewCourseModel)">
+            <summary>
+            Add a new course to a series
+            </summary>
+            <param name="seriesUid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.AddCourseToSeries(System.String,System.String,me_academy.core.Models.Input.Series.SeriesCourseModel)">
+            <summary>
+            Add an existing course to a series
+            </summary>
+            <param name="seriesUid"></param>
+            <param name="courseUid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.RemoveCourseFromSeries(System.String,System.Int32)">
+            <summary>
+            Remove a course from a series
+            </summary>
+            <param name="seriesUid"></param>
+            <param name="seriesCourseId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.VideosController.GetUploadToken">
+            <summary>
+            Get video upload token
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:me_academy.api.Controllers.VideosController.GetVideoUploadData(System.String)">
             <summary>
             Get video upload data
             </summary>
             <param name="courseUid"></param>
-            <returns></returns>
-        </member>
-        <member name="M:me_academy.api.Controllers.VideosController.SetVideoDetails(System.String,me_academy.core.Models.Input.Videos.VideoDetailModel)">
-            <summary>
-            Update the details of the video after successful upload to Api.Video
-            </summary>
-            <param name="courseUid"></param>
-            <param name="model"></param>
             <returns></returns>
         </member>
         <member name="M:me_academy.api.Controllers.VideosController.SetVideoPreview(System.String,me_academy.core.Models.Input.Videos.ApiVideoClipModel)">
@@ -471,6 +602,30 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.Twenty.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.TwentyOne">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyOne.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyOne.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyOne.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.TwentyTwo">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyTwo.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyTwo.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyTwo.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
