@@ -145,9 +145,7 @@ public class SeriesService : ISeriesService
     public async Task<Result> ListSeries(SeriesSearchModel request)
     {
         if ((request.IsDraft || request.IsActive || request.WithDeleted) && !_userSession.IsAnyAdmin)
-        {
             return new ForbiddenResult();
-        }
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)
             ? request.SearchQuery.ToLower().Trim()
@@ -155,10 +153,11 @@ public class SeriesService : ISeriesService
 
         var series = _context.Series.AsQueryable();
 
-        if (_userSession.IsAnyAdmin && request.WithDeleted)
-            series = series.Where(s => s.IsDeleted == request.WithDeleted && s.IsActive == request.IsActive);
-        else
-            series = series.Where(s => !s.IsDeleted && s.IsActive && s.IsPublished);
+        // allow filters only for admin users or users who can manage courses
+        series = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
+            ? series.Where(s => s.IsActive == request.IsActive && s.IsDraft == request.IsDraft)
+                .Where(s => request.WithDeleted || !s.IsDeleted)
+            : series.Where(s => s.IsActive && s.IsPublished && !s.IsDeleted);
 
         var result = await series
             .Where(s => string.IsNullOrWhiteSpace(request.SearchQuery) ||

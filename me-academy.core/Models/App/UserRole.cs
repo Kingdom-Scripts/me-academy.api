@@ -17,12 +17,6 @@ public class UserRole : BaseAppModel
     public int RoleId { get; set; }
 
     /// <summary>
-    /// The date this role was created for this user
-    /// </summary>
-    [Required]
-    public DateTime DateCreated { get; set; } = DateTime.UtcNow;
-
-    /// <summary>
     /// A foreign key to the user who assigned this role to this user
     /// </summary>
     [Required]

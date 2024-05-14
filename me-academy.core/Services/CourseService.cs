@@ -247,10 +247,8 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListCourses(CourseSearchModel request)
     {
-        if ((request.IsDraft || request.IsActive || request.WithDeleted) && !_userSession.IsAnyAdmin)
-        {
+        if ((request.IsDraft || request.IsActive || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.InRole(RolesConstants.ManageCourse)))
             return new ForbiddenResult();
-        }
 
         request.SearchQuery = !string.IsNullOrEmpty(request.SearchQuery)
             ? request.SearchQuery.ToLower().Trim()
@@ -258,10 +256,12 @@ public class CourseService : ICourseService
 
         var courses = _context.Courses.Where(c => !c.ForSeriesOnly).AsQueryable();
 
-        if (_userSession.IsAnyAdmin && request.WithDeleted)
-            courses = courses.Where(c => c.IsDeleted == request.WithDeleted && c.IsActive == request.IsActive);
-        else
-            courses = courses.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
+        // allow filters only for admin users or users who can manage courses
+        courses = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
+            ? courses
+                .Where(c => c.IsActive == request.IsActive && c.IsDraft == request.IsDraft)
+                .Where(c => request.WithDeleted || !c.IsDeleted)
+            : courses.Where(c => !c.IsDeleted && !c.IsDraft && c.IsActive && c.IsPublished);
 
         // TODO: implement Full text search for description and title
         var result = await courses

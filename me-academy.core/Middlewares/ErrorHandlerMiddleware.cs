@@ -69,7 +69,7 @@ public class ErrorHandlerMiddleware
             }, _options);
 
             // Set the response content type to JSON
-            context.Response.ContentType = "application/json";
+            // context.Response.ContentType = "application/json";
 
             // Write the JSON response
             await context.Response.WriteAsync(result);
@@ -84,7 +84,7 @@ public class ErrorHandlerMiddleware
             }, _options);
 
             // Set the response content type to JSON
-            context.Response.ContentType = "application/json";
+            // context.Response.ContentType = "application/json";
 
             // Write the JSON response
             await context.Response.WriteAsync(result);
@@ -95,8 +95,6 @@ public class ErrorHandlerMiddleware
     {
         //Get a StackTrace object for the exception
         StackTrace st = new StackTrace(ex, true);
-
-        var traceInfo = new List<TraceInfo>();
 
         List<StackFrame> frames = st.GetFrames().Where(x => x.GetFileName() != null).ToList();
 
