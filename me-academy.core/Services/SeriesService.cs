@@ -43,7 +43,7 @@ public class SeriesService : ISeriesService
         var series = model.Adapt<Series>();
         series.CreatedById = _userSession.UserId;
         series.Uid = await GetSeriesUid(model.Title);
-        series.SeriesPreview = new()
+        series.Preview = new()
         {
             UploadToken = ""
         };
@@ -318,26 +318,34 @@ public class SeriesService : ISeriesService
     {
         var series = await _context.Series
             .Where(c => c.Uid == seriesUid)
-            .Include(series => series.SeriesPreview)
+            .Include(series => series.Preview)
             .Select(c => new Series
             {
                 Id = c.Id,
-                SeriesPreview = c.SeriesPreview
+                Preview = c.Preview
             })
             .FirstOrDefaultAsync();
 
         if (series is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Series not found.");
 
+        // delete existing video
+        if (!string.IsNullOrEmpty(series.Preview!.VideoId))
+        {
+            var deletedRes = await _videoService.DeleteVideo(series.Preview.VideoId);
+            if (!deletedRes.Success)
+                Log.Error("Failed to delete existing video for series: {SeriesUid}, videoId: {VideoId}", seriesUid, series.Preview.VideoId);
+        }
+
         model.@public = true;
         var detailsSet = await _videoService.SetVideoDetails(model);
         if (!detailsSet.Success)
             return detailsSet;
 
-        series.SeriesPreview!.VideoId = model.videoId;
-        series.SeriesPreview.ThumbnailUrl = model.ThumbnailUrl;
-        series.SeriesPreview.IsUploaded = true;
-        series.SeriesPreview.VideoDuration = model.Duration;
+        series.Preview!.VideoId = model.videoId;
+        series.Preview.ThumbnailUrl = model.ThumbnailUrl;
+        series.Preview.IsUploaded = true;
+        series.Preview.VideoDuration = model.Duration;
 
         int saved = await _context.SaveChangesAsync();
 

@@ -247,7 +247,11 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListCourses(CourseSearchModel request)
     {
-        if ((request.IsDraft || request.IsActive || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.InRole(RolesConstants.ManageCourse)))
+        if (((request.IsDraft.HasValue && request.IsDraft.Value)
+             || (request.IsActive.HasValue && request.IsActive.Value)
+             || request.WithDeleted)
+            && !_userSession.IsAnyAdmin
+            && !_userSession.InRole(RolesConstants.ManageCourse))
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrEmpty(request.SearchQuery)
@@ -259,7 +263,8 @@ public class CourseService : ICourseService
         // allow filters only for admin users or users who can manage courses
         courses = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
             ? courses
-                .Where(c => c.IsActive == request.IsActive && c.IsDraft == request.IsDraft)
+                .Where(c => !request.IsActive.HasValue || c.IsActive == request.IsActive)
+                .Where(c => !request.IsDraft.HasValue || c.IsDraft == request.IsDraft)
                 .Where(c => request.WithDeleted || !c.IsDeleted)
             : courses.Where(c => !c.IsDeleted && !c.IsDraft && c.IsActive && c.IsPublished);
 

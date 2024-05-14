@@ -35,7 +35,6 @@ public class QaService : IQaService
         var newQuestion = model.Adapt<List<QuestionAndAnswer>>();
         newQuestion.ForEach(q =>
         {
-            // q.Options = q.Options.Adapt<List<QuestionOption>>();
             q.CourseId = courseId;
             q.CreatedById = _userSession.UserId;
         });

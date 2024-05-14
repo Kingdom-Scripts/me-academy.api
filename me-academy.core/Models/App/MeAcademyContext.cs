@@ -107,7 +107,7 @@ public class MeAcademyContext : DbContext
 
         builder.Entity<SeriesPreview>()
             .HasOne(sal => sal.Series)
-            .WithOne(sal => sal.SeriesPreview)
+            .WithOne(sal => sal.Preview)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

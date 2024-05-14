@@ -12,5 +12,6 @@ public class SeriesDetailView : SeriesView
     public ReferencedUserView? CreatedBy { get; set; }
     public ReferencedUserView? UpdatedBy { get; set; }
     public ReferencedUserView? DeletedBy { get; set; }
+    public VideoView? Preview { get; set; } = new();
     public List<PriceView> SeriesPrices { get; set; } = new();
 }

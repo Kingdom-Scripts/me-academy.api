@@ -37,7 +37,7 @@ public class Series : BaseAppModel, ISoftDeletable
     public User? PublishedBy { get; set; }
     public User? DeletedBy { get; set; }
 
-    public SeriesPreview? SeriesPreview { get; set; }
+    public SeriesPreview? Preview { get; set; }
     public List<SeriesPrice> SeriesPrices { get; set; } = new();
     public List<SeriesCourse> SeriesCourses { get; set; } = new();
 }
