@@ -123,7 +123,7 @@ public static class ServiceExtensions
 
         TypeAdapterConfig<Course, CourseDetailView>
             .NewConfig()
-            .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList());
+            .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList());
 
         TypeAdapterConfig<CoursePrice, PriceView>
             .NewConfig()
@@ -143,7 +143,7 @@ public static class ServiceExtensions
 
         TypeAdapterConfig<Series, SeriesDetailView>
             .NewConfig()
-            .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList());
+            .Map(dest => dest.Tags, src => src!.Tags.Split(",", StringSplitOptions.None).ToList());
 
         TypeAdapterConfig<SeriesCourse, SeriesCouresView>
             .NewConfig()

@@ -10,4 +10,5 @@ public interface IVideoService
     Task<Result> GetVideoUploadData(string courseUid);
     Task<Result> SetVideoDetails(VideoDetailModel model);
     Task<Result> SetVideoPreview(string courseUid, ApiVideoClipModel model);
+    Task<Result> DeleteVideo(string videoId);
 }
