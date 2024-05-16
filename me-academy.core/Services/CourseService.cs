@@ -284,6 +284,7 @@ public class CourseService : ICourseService
         var course = await _context.Courses
             .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
+            .Include(c => c.CourseVideo)
             .FirstOrDefaultAsync();
         if (course == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
@@ -291,9 +292,11 @@ public class CourseService : ICourseService
         if (course.IsPublished)
             return new ErrorResult("Course is already published.");
 
-        // TODO: validate the course has video already before publishing
-
+        if (!course.CourseVideo!.IsUploaded)
+            return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
+        
         course.IsPublished = true;
+        course.IsDraft = false;
         course.PublishedOnUtc = DateTime.UtcNow;
         course.PublishedById = _userSession.UserId;
 
