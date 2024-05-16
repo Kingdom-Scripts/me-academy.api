@@ -96,7 +96,7 @@ public class CourseService : ICourseService
 
         // update the course object
         course = model.Adapt(course);
-        course.Uid = await GetCourseUid(model.Title);
+        course.Uid = await GetCourseUid(model.Title);   
         course.UpdatedById = _userSession.UserId;
         course.UpdatedOnUtc = DateTime.UtcNow;
         course.UsefulLinks = new();

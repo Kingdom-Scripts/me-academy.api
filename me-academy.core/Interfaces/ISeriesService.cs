@@ -21,4 +21,5 @@ public interface ISeriesService
     Task<Result> AddExistingCourseToSeries(string seriesUid, string courseUid, SeriesCourseModel model);
     Task<Result> AddNewCourseToSeries(string seriesUid, SeriesNewCourseModel model);
     Task<Result> RemoveCourseFromSeries(string seriesUid, int seriesCourseId);
+    Task<Result> ListCoursesInSeries(string seriesUid);
 }

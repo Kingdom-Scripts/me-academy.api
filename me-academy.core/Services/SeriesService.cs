@@ -10,7 +10,6 @@ using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
 using me_academy.core.Models.View.Series;
-using me_academy.core.Models.View.Videos;
 using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -359,7 +358,7 @@ public class SeriesService : ISeriesService
         return new SuccessResult(previewDetails);
     }
 
-public async Task<Result> AddExistingCourseToSeries(string seriesUid, string courseUid, SeriesCourseModel model)
+    public async Task<Result> AddExistingCourseToSeries(string seriesUid, string courseUid, SeriesCourseModel model)
     {
         var series = await _context.Series
             .FirstOrDefaultAsync(x => x.Uid == seriesUid);
@@ -467,6 +466,18 @@ public async Task<Result> AddExistingCourseToSeries(string seriesUid, string cou
         return saved > 0
             ? new SuccessResult()
             : new ErrorResult("Failed to delete series course.");
+    }
+
+    public async Task<Result> ListCoursesInSeries(string seriesUid)
+    {
+        var seriesCourses = await _context.SeriesCourses
+            .Include(sc => sc.Course)
+            .Where(sc => sc.Series!.Uid == seriesUid)
+            .OrderBy(sc => sc.Order)
+            .ProjectToType<SeriesCourseView>()
+            .ToListAsync();
+
+        return new SuccessResult(seriesCourses);
     }
 
     #region PRIVATE METHODS

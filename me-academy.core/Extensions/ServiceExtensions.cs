@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
-using Azure.Identity;
 using FluentValidation;
 using Mapster;
 using me_academy.core.Constants;
@@ -145,6 +144,14 @@ public static class ServiceExtensions
         TypeAdapterConfig<Series, SeriesDetailView>
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", System.StringSplitOptions.None).ToList());
+
+        TypeAdapterConfig<SeriesCourse, SeriesCouresView>
+            .NewConfig()
+            .Map(dest => dest.Id, src => src.CourseId)
+            .Map(dest => dest.Uid, src => src.Course!.Uid)
+            .Map(dest => dest.Title, src => src.Course!.Title)
+            .Map(dest => dest.Summary, src => src.Course!.Summary)
+            .Map(dest => dest.IsDraft, src => src.Course!.IsDraft);
 
         services.AddSingleton<ICacheService, CacheService>();
 

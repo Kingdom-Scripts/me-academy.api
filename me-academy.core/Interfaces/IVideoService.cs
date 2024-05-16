@@ -6,7 +6,7 @@ namespace me_academy.core.Interfaces;
 
 public interface IVideoService
 {
-    Task<Result<ApiVideoToken>> GetUploadToken();
+    Task<Result<ApiVideoToken>> GetUploadToken(int expiresInSec = 0);
     Task<Result> GetVideoUploadData(string courseUid);
     Task<Result> SetVideoDetails(VideoDetailModel model);
     Task<Result> SetVideoPreview(string courseUid, ApiVideoClipModel model);

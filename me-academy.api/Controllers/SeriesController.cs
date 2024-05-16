@@ -233,5 +233,19 @@ namespace me_academy.api.Controllers
             var res = await _seriesService.RemoveCourseFromSeries(seriesUid, seriesCourseId);
             return ProcessResponse(res);
         }
+
+        /// <summary>
+        /// List all courses in a series
+        /// </summary>
+        /// <param name="seriesUid"></param>
+        /// <returns></returns>
+        [HttpGet("{seriesUid}/courses")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<SeriesCourseView>>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+        public async Task<IActionResult> ListCoursesInSeries(string seriesUid)
+        {
+            var res = await _seriesService.ListCoursesInSeries(seriesUid);
+            return ProcessResponse(res);
+        }
     }
 }
