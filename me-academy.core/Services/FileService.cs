@@ -1,7 +1,5 @@
 using Mapster;
 using me_academy.core.Interfaces;
-using me_academy.core.Middlewares;
-using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.App;
 using me_academy.core.Models.App.Constants;
 using me_academy.core.Models.Configurations;
@@ -11,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace me_academy.core.Services;
 
@@ -54,7 +51,8 @@ public class FileService : IFileService
             : new ErrorResult<DocumentView>("Saving file failed");
     }
 
-    public async Task<Result<Document>> UploadFileInternal(string folder, IFormFile file) => await Upload(folder, file);
+    public async Task<Result<Document>> UploadFileInternal(string folder, IFormFile file)
+        => await Upload(folder, file);
 
     public FileStreamResult? GetFile(string folder, string fileName)
     {

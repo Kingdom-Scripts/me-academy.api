@@ -30,6 +30,7 @@ public class MeAcademyContext : DbContext
     public required DbSet<SeriesCourse> SeriesCourses { get; set; }
     public required DbSet<SeriesPreview> SeriesPreviews { get; set; }
     public required DbSet<SeriesPrice> SeriesPrices { get; set; }
+    public required DbSet<SmeHub> SmeHubs { get; set; }
     public required DbSet<User> Users { get; set; }
     public required DbSet<UserCourse> UserCourses { get; set; }
     public required DbSet<UserRole> UserRoles { get; set; }

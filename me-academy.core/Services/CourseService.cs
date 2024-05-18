@@ -292,8 +292,9 @@ public class CourseService : ICourseService
         if (course.IsPublished)
             return new ErrorResult("Course is already published.");
 
-        if (!course.CourseVideo!.IsUploaded)
-            return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
+        // TODO: uncomment the check below
+        //if (!course.CourseVideo!.IsUploaded)
+        //    return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
         
         course.IsPublished = true;
         course.IsDraft = false;
