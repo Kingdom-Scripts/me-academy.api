@@ -45,4 +45,5 @@ public class Course : BaseAppModel, ISoftDeletable
     public List<CourseAuditLog> CourseAuditLogs { get; set; } = new();
     public List<CoursePrice> CoursePrices { get; set; } = new();
     public IQueryable<QuestionAndAnswer> QuestionAndAnswers { get; set; } = new List<QuestionAndAnswer>().AsQueryable();
+    public List<SeriesCourse> SeriesCourses { get; set; } = new();
 }

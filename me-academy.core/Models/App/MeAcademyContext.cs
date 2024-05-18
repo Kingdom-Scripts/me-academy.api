@@ -106,6 +106,16 @@ public class MeAcademyContext : DbContext
             .HasForeignKey(sal => sal.CreatedById)
             .OnDelete(DeleteBehavior.NoAction);
 
+        builder.Entity<SeriesCourse>()
+            .HasOne(sc => sc.Series)
+            .WithMany(s => s.SeriesCourses) // Assuming Series has a collection of SeriesCourse
+            .HasForeignKey(sc => sc.SeriesId);
+
+        builder.Entity<SeriesCourse>()
+            .HasOne(sc => sc.Course)
+            .WithMany(c => c.SeriesCourses) // Assuming Course has a collection of SeriesCourse
+            .HasForeignKey(sc => sc.CourseId);
+
         builder.Entity<SeriesPreview>()
             .HasOne(sal => sal.Series)
             .WithOne(sal => sal.Preview)

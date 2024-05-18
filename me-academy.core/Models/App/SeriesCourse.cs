@@ -1,6 +1,8 @@
-﻿namespace me_academy.core.Models.App;
+﻿using me_academy.core.Interfaces;
 
-public class SeriesCourse : BaseAppModel
+namespace me_academy.core.Models.App;
+
+public class SeriesCourse : BaseAppModel, ISoftDeletable
 {
     public int SeriesId { get; set; }
     public int CourseId { get; set; }
@@ -9,6 +11,10 @@ public class SeriesCourse : BaseAppModel
     public int CreatedById { get; set; }
     public int? UpdatedById { get; set; }
     public DateTime? UpdatedOnUtc { get; set; }
+
+    public bool IsDeleted { get; set; } = false;
+    public int? DeletedById { get; set; }
+    public DateTime? DeletedOnUtc { get; set; }
 
     public Series? Series { get; set; }
     public Course? Course { get; set; }

@@ -213,9 +213,9 @@ namespace me_academy.api.Controllers
         [HttpPost("{seriesUid}/courses/{courseUid}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SeriesCourseView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> AddCourseToSeries(string seriesUid, string courseUid, SeriesCourseModel model)
+        public async Task<IActionResult> AddCourseToSeries(string seriesUid, string courseUid)
         {
-            var res = await _seriesService.AddExistingCourseToSeries(seriesUid, courseUid, model);
+            var res = await _seriesService.AddExistingCourseToSeries(seriesUid, courseUid);
             return ProcessResponse(res);
         }
 
@@ -228,7 +228,7 @@ namespace me_academy.api.Controllers
         [HttpDelete("{seriesUid}/courses/{seriesCourseId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> RemoveCourseFromSeries(string seriesUid, int seriesCourseId)
+        public async Task<IActionResult> RemoveCourseFromSeries(string seriesUid, string seriesCourseId)
         {
             var res = await _seriesService.RemoveCourseFromSeries(seriesUid, seriesCourseId);
             return ProcessResponse(res);
@@ -245,6 +245,22 @@ namespace me_academy.api.Controllers
         public async Task<IActionResult> ListCoursesInSeries(string seriesUid)
         {
             var res = await _seriesService.ListCoursesInSeries(seriesUid);
+            return ProcessResponse(res);
+        }
+
+        /// <summary>
+        /// Change the order of a course in a series
+        /// </summary>
+        /// <param name="seriesUid"></param>
+        /// <param name="courseUid"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPatch("{seriesUid}/courses/{courseUid}/order")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+        public async Task<IActionResult> ChangeCourseOrder(string seriesUid, string courseUid, SeriesCourseOrderModel model)
+        {
+            var res = await _seriesService.ChangeCourseOrder(seriesUid, courseUid, model);
             return ProcessResponse(res);
         }
     }

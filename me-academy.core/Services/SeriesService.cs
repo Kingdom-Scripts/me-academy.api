@@ -215,6 +215,7 @@ public class SeriesService : ISeriesService
     {
         var series = await _context.Series
             .Where(s => s.Uid == seriesUid)
+            .Include(s => s.Preview)
             .FirstOrDefaultAsync();
 
         if (series is null)
@@ -222,6 +223,10 @@ public class SeriesService : ISeriesService
 
         if (series.IsPublished)
             return new ErrorResult("Series is already published.");
+
+        // validate that series set up is complete
+        if (string.IsNullOrWhiteSpace(series.Preview!.VideoId))
+            return new ErrorResult("Series preview video is not set.");
 
         series.IsPublished = true;
         series.PublishedOnUtc = DateTime.UtcNow;
@@ -366,7 +371,7 @@ public class SeriesService : ISeriesService
         return new SuccessResult(previewDetails);
     }
 
-    public async Task<Result> AddExistingCourseToSeries(string seriesUid, string courseUid, SeriesCourseModel model)
+    public async Task<Result> AddExistingCourseToSeries(string seriesUid, string courseUid)
     {
         var series = await _context.Series
             .FirstOrDefaultAsync(x => x.Uid == seriesUid);
@@ -376,7 +381,7 @@ public class SeriesService : ISeriesService
 
         var course = await _context.Courses
             .Where(c => c.Uid == courseUid)
-            .Select(c => new Course { Id = c.Id, IsActive = c.IsActive })
+            .Select(c => new Course { Id = c.Id, IsActive = c.IsActive, Title =c.Title, Summary = c.Summary})
             .FirstOrDefaultAsync();
 
         if (course is null)
@@ -384,20 +389,29 @@ public class SeriesService : ISeriesService
         if (!course.IsActive)
             return new ErrorResult("Cannot add a deactivated course.");
 
+        bool courseExistInSeries = await _context.SeriesCourses
+            .AnyAsync(sc => sc.SeriesId == series.Id && sc.CourseId == course.Id && !sc.IsDeleted);
+
+        if (courseExistInSeries)
+            return new ErrorResult("Course already exists in this series.");
+
         var seriesCourse = new SeriesCourse
         {
             SeriesId = series.Id,
             CourseId = course.Id,
-            Order = _context.SeriesCourses.Count() + 1
+            Order = _context.SeriesCourses.Count(sc => sc.SeriesId == series.Id && !sc.IsDeleted) + 1,
+            CreatedById =  _userSession.UserId
         };
 
         await _context.AddAsync(seriesCourse);
 
         int saved = await _context.SaveChangesAsync();
 
-        return saved > 0
-            ? new SuccessResult(seriesCourse.Adapt<SeriesCourseView>())
-            : new ErrorResult("Failed to save changes.");
+        if (saved < 1)
+            return new ErrorResult("Failed to save changes.");
+
+        seriesCourse.Course = course;
+        return new SuccessResult(seriesCourse.Adapt<SeriesCourseView>());
     }
 
     public async Task<Result> AddNewCourseToSeries(string seriesUid, SeriesNewCourseModel model)
@@ -444,30 +458,27 @@ public class SeriesService : ISeriesService
             : new ErrorResult("Failed to save changes.");
     }
 
-    public async Task<Result> RemoveCourseFromSeries(string seriesUid, int seriesCourseId)
+    public async Task<Result> RemoveCourseFromSeries(string seriesUid, string seriesCourseId)
     {
         var seriesCourse = await _context.SeriesCourses
-            .Include(sc => sc.Course).ThenInclude(c => c.CourseVideo)
-            .FirstOrDefaultAsync(sc => sc.Id == seriesCourseId && sc.Series!.Uid == seriesUid);
+            .FirstOrDefaultAsync(sc => sc.Course!.Uid == seriesCourseId && sc.Series!.Uid == seriesUid && !sc.IsDeleted);
 
         if (seriesCourse is null)
-            return new ErrorResult(StatusCodes.Status404NotFound, "Series course not found.");
-
-        // delete associated video if course is for this series only
-        if (seriesCourse.Course!.ForSeriesOnly)
-        {
-            var course = await _context.Courses
-                .Include(c => c.CourseVideo)
-                .FirstOrDefaultAsync(c => c.Id == seriesCourse.CourseId);
-
-            if (course is not null)
-            {
-                _context.Remove(course.CourseVideo!);
-                _context.Remove(course);
-            }
-        }
+            return new ErrorResult(StatusCodes.Status404NotFound, "Course not found in this series.");
 
         _context.Remove(seriesCourse);
+
+        // get courses after this one
+        var remainingCourses = await _context.SeriesCourses
+            .Where(sc => sc.SeriesId == seriesCourse.SeriesId && sc.Order > seriesCourse.Order)
+            .ToListAsync();
+
+        // decrement the order of the remaining courses
+        foreach (var course in remainingCourses)
+        {
+            course.Order--;
+            _context.Update(course);
+        }
 
         int saved = await _context.SaveChangesAsync();
 
@@ -480,12 +491,60 @@ public class SeriesService : ISeriesService
     {
         var seriesCourses = await _context.SeriesCourses
             .Include(sc => sc.Course)
-            .Where(sc => sc.Series!.Uid == seriesUid)
+            .Where(sc => sc.Series!.Uid == seriesUid && !sc.IsDeleted)
             .OrderBy(sc => sc.Order)
             .ProjectToType<SeriesCourseView>()
             .ToListAsync();
 
         return new SuccessResult(seriesCourses);
+    }
+
+    public async Task<Result> ChangeCourseOrder(string seriesUid, string courseUid, SeriesCourseOrderModel model)
+    {
+        var seriesCourse = await _context.SeriesCourses
+            .Where(sc => sc.Series!.Uid == seriesUid && sc.Course!.Uid == courseUid && !sc.IsDeleted)
+            .FirstOrDefaultAsync();
+        if (seriesCourse is null)
+            return new ErrorResult("Course not found in this series.");
+
+        // Get the current order of the course
+        int currentOrder = seriesCourse.Order;
+
+        // Update the order of the specified course
+        seriesCourse.Order = model.NewOrder;
+        seriesCourse.UpdatedById = _userSession.UserId;
+        seriesCourse.UpdatedOnUtc = DateTime.UtcNow;
+
+        // Adjust the order of the other courses in the series
+        var otherCourses = await _context.SeriesCourses
+            .Where(sc => sc.Series!.Uid == seriesUid && sc.Course!.Uid != courseUid && !sc.IsDeleted)
+            .ToListAsync();
+
+        foreach (var course in otherCourses)
+        {
+            if (model.NewOrder < currentOrder)
+            {
+                if (course.Order >= model.NewOrder && course.Order < currentOrder)
+                    course.Order++;
+            }
+            else
+            {
+                if (course.Order <= model.NewOrder && course.Order > currentOrder)
+                    course.Order--;
+            }
+
+            course.UpdatedById = _userSession.UserId;
+            course.UpdatedOnUtc = DateTime.UtcNow;
+            _context.Update(course);
+        }
+
+        _context.Update(seriesCourse);
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult()
+            : new ErrorResult("Failed to save changes.");
     }
 
     #region PRIVATE METHODS

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240518125648_Twenty-Three")]
+    partial class TwentyThree
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -756,15 +759,6 @@ namespace me_academy.api.Migrations
 
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
-
-                    b.Property<int?>("DeletedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<int>("Order")
                         .HasColumnType("int");
