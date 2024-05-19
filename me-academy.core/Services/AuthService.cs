@@ -252,7 +252,7 @@ public class AuthService : IAuthService
 
         // get and encode the url with token
         string url =
-            $"{_baseUrls.AdminClient}/auth/accept-invitation?email={model.Email}&token={HttpUtility.UrlEncode(token)}";
+            $"{_baseUrls.AdminClient}/auth/accept-invitation/{model.Email}/{HttpUtility.UrlEncode(token)}";
 
         // save invitation
         var invitation = model.Adapt<InvitedUser>();

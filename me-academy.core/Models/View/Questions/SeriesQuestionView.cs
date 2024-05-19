@@ -1,9 +1,9 @@
 namespace me_academy.core.Models.View.Questions;
 
-public class QuestionView
+public class SeriesQuestionView
 {
     public int Id { get; set; }
-    public string CourseUid { get; set; } = null!;
+    public string SeriesUid { get; set; } = null!;
     public string Text { get; set; } = null!;
     public bool IsMultiple { get; set; }
     public bool IsRequired { get; set; }
