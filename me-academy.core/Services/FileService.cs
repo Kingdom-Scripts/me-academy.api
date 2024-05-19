@@ -105,7 +105,7 @@ public class FileService : IFileService
             if (!Directory.Exists(thumbNailFolder))
                 Directory.CreateDirectory(thumbNailFolder);
             string thumbNailPath = Path.Combine(thumbNailFolder, fileUploadName);
-            await SaveImageAsync(filePath, thumbNailPath, file);
+            await SaveImage(filePath, thumbNailPath, file);
         }
 
         // save file info to database
@@ -123,7 +123,7 @@ public class FileService : IFileService
         return new SuccessResult<Document>(document);
     }
 
-    private static async Task SaveImageAsync(string filePath, string thumbnailPath, IFormFile image)
+    private static async Task SaveImage(string filePath, string thumbnailPath, IFormFile image)
     {
         await using (var stream = new MemoryStream())
         {
@@ -203,6 +203,4 @@ public class FileService : IFileService
             return DocumentTypeEnum.UNKNWON;
         }
     }
-
-
 }

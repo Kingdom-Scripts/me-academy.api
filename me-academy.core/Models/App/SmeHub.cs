@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using me_academy.core.Interfaces;
 
 namespace me_academy.core.Models.App;
 
-public class SmeHub : BaseAppModel
+public class SmeHub : BaseAppModel, ISoftDeletable
 {
     [Required][MaxLength(200)] public string Uid { get; set; } = null!;
 
