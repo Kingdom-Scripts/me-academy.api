@@ -18,7 +18,9 @@ public interface ISeriesService
     Task<Result> GetUploadToken(string seriesUid);
     Task<Result> SetPreviewDetails(string seriesUid, VideoDetailModel model);
     Task<Result> GetPreviewDetails(string seriesUid);
-    Task<Result> AddExistingCourseToSeries(string seriesUid, string courseUid, SeriesCourseModel model);
+    Task<Result> AddExistingCourseToSeries(string seriesUid, string courseUid);
     Task<Result> AddNewCourseToSeries(string seriesUid, SeriesNewCourseModel model);
-    Task<Result> RemoveCourseFromSeries(string seriesUid, int seriesCourseId);
+    Task<Result> RemoveCourseFromSeries(string seriesUid, string seriesCourseId);
+    Task<Result> ListCoursesInSeries(string seriesUid);
+    Task<Result> ChangeCourseOrder(string seriesUid, string courseUid, SeriesCourseOrderModel model);
 }

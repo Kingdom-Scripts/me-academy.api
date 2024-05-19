@@ -128,7 +128,7 @@ public class EmailService : IEmailService
 
         // get and encode the url with token
         string url =
-            $"{_appConfig.BaseURLs.Client}/auth/reset-password?email={email}&token={HttpUtility.UrlEncode(token)}";
+            $"{_appConfig.BaseURLs.Client}/auth/reset-password/{email}/{HttpUtility.UrlEncode(token)}";
 
         // parse template using Fluid
         var context = new TemplateContext

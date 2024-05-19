@@ -31,7 +31,6 @@ public class Course : BaseAppModel, ISoftDeletable
     public DateTime? PublishedOnUtc { get; set; }
     public int ViewCount { get; set; } = 0;
 
-    // public bool VideoIsUploaded { get; set; } = false;
     [Required] public bool IsDeleted { get; set; } = false;
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
@@ -45,5 +44,6 @@ public class Course : BaseAppModel, ISoftDeletable
     public List<CourseLink> UsefulLinks { get; set; } = new();
     public List<CourseAuditLog> CourseAuditLogs { get; set; } = new();
     public List<CoursePrice> CoursePrices { get; set; } = new();
-    public IQueryable<QuestionAndAnswer> QuestionAndAnswers { get; set; } = new List<QuestionAndAnswer>().AsQueryable();
+    public IQueryable<CourseQuestion> QuestionAndAnswers { get; set; } = new List<CourseQuestion>().AsQueryable();
+    public List<SeriesCourse> SeriesCourses { get; set; } = new();
 }

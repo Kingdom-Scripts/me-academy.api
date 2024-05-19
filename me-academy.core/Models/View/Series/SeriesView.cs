@@ -12,6 +12,7 @@ public class SeriesView
     public int CreatedById { get; set; }
     public required bool IsDraft { get; set; }
     public bool IsActive { get; set; }
+    public bool IsPublished { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? PublishedOnUtc { get; set; }
 }

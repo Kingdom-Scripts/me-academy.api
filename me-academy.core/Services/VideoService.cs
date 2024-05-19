@@ -1,8 +1,6 @@
 using System.Text;
-using Mapster;
 using me_academy.core.Constants;
 using me_academy.core.Interfaces;
-using me_academy.core.Models.ApiVideo.Request;
 using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.App;
 using me_academy.core.Models.Configurations;
@@ -35,9 +33,20 @@ public class VideoService : IVideoService
         _client = factory.CreateClient(HttpClientKeys.ApiVideo);
     }
 
-    public async Task<Result<ApiVideoToken>> GetUploadToken()
-    {
-        var response = await _client.PostAsync("upload-tokens", null);
+    public async Task<Result<ApiVideoToken>> GetUploadToken(int expiresInSec = 0)
+    { 
+        HttpResponseMessage response = new HttpResponseMessage();
+        if (expiresInSec == 0)
+        {
+            response = await _client.PostAsync("upload-tokens", null);
+        }
+        else
+        {
+            var request = new { ttl = expiresInSec };
+            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+            response = await _client.PostAsync("upload-tokens", content);
+        }
+
         if (!response.IsSuccessStatusCode)
             return new ErrorResult<ApiVideoToken>("Failed to get video upload token");
 

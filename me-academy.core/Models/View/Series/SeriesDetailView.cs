@@ -7,10 +7,8 @@ public class SeriesDetailView : SeriesView
     public int? UpdatedById { get; set; }
     public DateTime? UpdatedOnUtc { get; set; }
     public bool IsDeleted { get; set; }
-    public int? DeletedById { get; set; }
-    public DateTime? DeletedOnUtc { get; set; }
     public ReferencedUserView? CreatedBy { get; set; }
     public ReferencedUserView? UpdatedBy { get; set; }
-    public ReferencedUserView? DeletedBy { get; set; }
+    public VideoView? Preview { get; set; } = new();
     public List<PriceView> SeriesPrices { get; set; } = new();
 }

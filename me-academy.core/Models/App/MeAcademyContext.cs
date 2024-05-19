@@ -20,9 +20,9 @@ public class MeAcademyContext : DbContext
     public required DbSet<Document> Documents { get; set; }
     public required DbSet<Duration> Durations { get; set; }
     public required DbSet<InvitedUser> InvitedUsers { get; set; }
-    public required DbSet<QaOption> QaOptions { get; set; }
-    public required DbSet<QaResponse> QaResponses { get; set; }
-    public required DbSet<QuestionAndAnswer> QuestionAndAnswers  { get; set; }
+    public required DbSet<CourseQuestionOption> CourseQuestionOptions { get; set; }
+    public required DbSet<CourseQuestionResponse> CourseQuestionResponses { get; set; }
+    public required DbSet<CourseQuestion> CourseQuestions  { get; set; }
     public required DbSet<RefreshToken> RefreshTokens { get; set; }
     public required DbSet<Role> Roles { get; set; }
     public required DbSet<Series> Series { get; set; }
@@ -30,6 +30,10 @@ public class MeAcademyContext : DbContext
     public required DbSet<SeriesCourse> SeriesCourses { get; set; }
     public required DbSet<SeriesPreview> SeriesPreviews { get; set; }
     public required DbSet<SeriesPrice> SeriesPrices { get; set; }
+    public required DbSet<SeriesQuestion> SeriesQuestions { get; set; }
+    public required DbSet<SeriesQuestionOption> SeriesQuestionOptions { get; set; }
+    public required DbSet<SeriesQuestionResponse> SeriesQuestionResponses { get; set; }
+    public required DbSet<SmeHub> SmeHubs { get; set; }
     public required DbSet<User> Users { get; set; }
     public required DbSet<UserCourse> UserCourses { get; set; }
     public required DbSet<UserRole> UserRoles { get; set; }
@@ -75,16 +79,40 @@ public class MeAcademyContext : DbContext
             .HasForeignKey(cal => cal.CreatedById)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.Entity<QuestionAndAnswer>()
+        builder.Entity<CourseQuestion>()
             .HasOne(cal => cal.CreatedBy)
             .WithMany()
             .HasForeignKey(cal => cal.CreatedById)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.Entity<QaResponse>()
+        builder.Entity<CourseQuestionResponse>()
             .HasOne(cal => cal.CreatedBy)
             .WithMany()
             .HasForeignKey(cal => cal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CourseQuestionResponse>()
+            .HasOne(cal => cal.Course)
+            .WithMany()
+            .HasForeignKey(cal => cal.CourseId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesQuestion>()
+            .HasOne(cal => cal.CreatedBy)
+            .WithMany()
+            .HasForeignKey(cal => cal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesQuestionResponse>()
+            .HasOne(cal => cal.CreatedBy)
+            .WithMany()
+            .HasForeignKey(cal => cal.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<SeriesQuestionResponse>()
+            .HasOne(cal => cal.Series)
+            .WithMany()
+            .HasForeignKey(cal => cal.SeriesId)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<SeriesAuditLog>()
@@ -105,9 +133,19 @@ public class MeAcademyContext : DbContext
             .HasForeignKey(sal => sal.CreatedById)
             .OnDelete(DeleteBehavior.NoAction);
 
+        builder.Entity<SeriesCourse>()
+            .HasOne(sc => sc.Series)
+            .WithMany(s => s.SeriesCourses) // Assuming Series has a collection of SeriesCourse
+            .HasForeignKey(sc => sc.SeriesId);
+
+        builder.Entity<SeriesCourse>()
+            .HasOne(sc => sc.Course)
+            .WithMany(c => c.SeriesCourses) // Assuming Course has a collection of SeriesCourse
+            .HasForeignKey(sc => sc.CourseId);
+
         builder.Entity<SeriesPreview>()
             .HasOne(sal => sal.Series)
-            .WithOne(sal => sal.SeriesPreview)
+            .WithOne(sal => sal.Preview)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

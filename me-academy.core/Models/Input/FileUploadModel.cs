@@ -6,7 +6,7 @@ namespace me_academy.core.Models.Input;
 
 public class FileUploadModel
 {
-    public IFormFile File { get; set; }
+    public required IFormFile File { get; set; }
 }
 
 public class FileUploadValidator : AbstractValidator<FileUploadModel>

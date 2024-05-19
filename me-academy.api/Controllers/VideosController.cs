@@ -19,9 +19,9 @@ public class VideosController : BaseController
     /// </summary>
     /// <returns></returns>
     [HttpGet("upload-token")]
-    public async Task<IActionResult> GetUploadToken()
+    public async Task<IActionResult> GetUploadToken([FromQuery] int expiresInSec = 0)
     {
-        var res = await _videoService.GetUploadToken();
+        var res = await _videoService.GetUploadToken(expiresInSec);
         if (res.Success)
         {
             return ProcessResponse(new SuccessResult(res.Content));

@@ -1,43 +1,41 @@
-﻿using me_academy.core.Interfaces;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace me_academy.core.Models.App;
 
-public class Series : BaseAppModel, ISoftDeletable
+public class SmeHub : BaseAppModel
 {
     [Required][MaxLength(200)] public string Uid { get; set; } = null!;
+
     [Required][MaxLength(100)] public string Title { get; set; } = null!;
 
-    // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
-    [Required]
-    [Column(TypeName = "nvarchar(MAX)")]
-    public string Description { get; set; } = null!;
+    [Required][MaxLength(255)] public string Summary { get; set; } = "null!";
 
-    [StringLength(255)]
-    public string Summary { get; set; } = null!;
-    [Required] public bool IsDraft { get; set; } = true;
-    [Required] public bool IsActive { get; set; } = true;
+    // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
+    [Column(TypeName = "nvarchar(MAX)")]
+    [Required]
+    public required string Description { get; set; }
+
+    [Required]
+    public decimal Price { get; set; }
+
+    public int DocumentId { get; set; }
+
     public string? Tags { get; set; }
+
+    [Required] public bool IsActive { get; set; } = true;
 
     public int CreatedById { get; set; }
     public int? UpdatedById { get; set; }
     public DateTime? UpdatedOnUtc { get; set; }
-    public bool IsPublished { get; set; } = false;
-    public int? PublishedById { get; set; }
-    public DateTime? PublishedOnUtc { get; set; }
     public int ViewCount { get; set; } = 0;
 
     [Required] public bool IsDeleted { get; set; } = false;
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
 
+    public Document? Document { get; set; }
     public User? CreatedBy { get; set; }
     public User? UpdatedBy { get; set; }
-    public User? PublishedBy { get; set; }
     public User? DeletedBy { get; set; }
-
-    public SeriesPreview? Preview { get; set; }
-    public List<SeriesPrice> SeriesPrices { get; set; } = new();
-    public List<SeriesCourse> SeriesCourses { get; set; } = new();
 }
