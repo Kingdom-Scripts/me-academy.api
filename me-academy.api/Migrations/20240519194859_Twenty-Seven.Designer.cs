@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240519194859_Twenty-Seven")]
+    partial class TwentySeven
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1071,9 +1074,6 @@ namespace me_academy.api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("TypeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Uid")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1096,31 +1096,9 @@ namespace me_academy.api.Migrations
 
                     b.HasIndex("DocumentId");
 
-                    b.HasIndex("TypeId");
-
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("SmeHubs", "dbo");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.SmeHubType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SmeHubTypes", "dbo");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.User", b =>
@@ -1664,12 +1642,6 @@ namespace me_academy.api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("me_academy.core.Models.App.SmeHubType", "Type")
-                        .WithMany()
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("me_academy.core.Models.App.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById");
@@ -1679,8 +1651,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("DeletedBy");
 
                     b.Navigation("Document");
-
-                    b.Navigation("Type");
 
                     b.Navigation("UpdatedBy");
                 });
