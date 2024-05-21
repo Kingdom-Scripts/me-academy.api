@@ -143,7 +143,7 @@ public class SeriesService : ISeriesService
 
     public async Task<Result> ListSeries(SeriesSearchModel request)
     {
-        if ((request.IsDraft || request.IsActive || request.WithDeleted) && !_userSession.IsAnyAdmin)
+        if ((request.IsActive || request.WithDeleted) && !_userSession.IsAnyAdmin)
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)
@@ -154,7 +154,7 @@ public class SeriesService : ISeriesService
 
         // allow filters only for admin users or users who can manage courses
         series = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
-            ? series.Where(s => s.IsActive == request.IsActive && s.IsDraft == request.IsDraft)
+            ? series.Where(s => s.IsActive == request.IsActive)
                 .Where(s => request.WithDeleted || !s.IsDeleted)
             : series.Where(s => s.IsActive && s.IsPublished && !s.IsDeleted);
 
@@ -288,34 +288,43 @@ public class SeriesService : ISeriesService
 
     public async Task<Result> GetUploadToken(string seriesUid)
     {
-        var uploadToken = _context.SeriesPreviews
+        var preview = _context.SeriesPreviews
             .Where(cv => cv.Series!.Uid == seriesUid)
-            .Select(cv => new ApiVideoToken { Token = cv.UploadToken })
             .FirstOrDefault();
 
-        if (uploadToken is null || string.IsNullOrEmpty(uploadToken.Token))
+        if (preview is null || string.IsNullOrEmpty(preview.UploadToken))
         {
             var uploadTokenRes = await _videoService.GetUploadToken();
             if (!uploadTokenRes.Success)
                 return new ErrorResult(uploadTokenRes.Message);
 
-            uploadToken = uploadTokenRes.Content;
+            var uploadToken = uploadTokenRes.Content;
 
             int seriesId = await _context.Series
                 .Where(c => c.Uid == seriesUid)
                 .Select(c => c.Id)
                 .FirstOrDefaultAsync();
 
-            var newUploadData = new SeriesPreview
+            if (preview is not null) {
+              preview.UploadToken = uploadToken!.Token;
+
+              _context.Update(preview);
+            }
+            else 
             {
-                SeriesId = seriesId,
-                UploadToken = uploadToken!.Token
-            };
-            await _context.AddAsync(newUploadData);
+              var newUploadData = new SeriesPreview
+              {
+                  SeriesId = seriesId,
+                  UploadToken = uploadToken!.Token
+              };
+              await _context.AddAsync(newUploadData);
+            }
+            
             await _context.SaveChangesAsync();
+            return new SuccessResult(uploadToken);
         }
 
-        return new SuccessResult(uploadToken);
+        return new SuccessResult(new ApiVideoToken { Token = preview.UploadToken });
     }
 
     public async Task<Result> SetPreviewDetails(string seriesUid, VideoDetailModel model)
@@ -427,7 +436,6 @@ public class SeriesService : ISeriesService
         newCourse.Uid = await GetCourseUid(model.Title);
         newCourse.ForSeriesOnly = true;
         newCourse.IsPublished = true;
-        newCourse.IsDraft = false;
 
         // set video details
         var detailsSet = await _videoService.SetVideoDetails(model.VideoDetails);

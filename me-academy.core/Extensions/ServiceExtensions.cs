@@ -13,6 +13,7 @@ using me_academy.core.Models.Input.Series;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
+using me_academy.core.Models.View.Questions;
 using me_academy.core.Models.View.Series;
 using me_academy.core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -150,8 +151,11 @@ public static class ServiceExtensions
             .Map(dest => dest.Id, src => src.CourseId)
             .Map(dest => dest.Uid, src => src.Course!.Uid)
             .Map(dest => dest.Title, src => src.Course!.Title)
-            .Map(dest => dest.Summary, src => src.Course!.Summary)
-            .Map(dest => dest.IsDraft, src => src.Course!.IsDraft);
+            .Map(dest => dest.Summary, src => src.Course!.Summary);
+
+        TypeAdapterConfig<SeriesQuestion, SeriesQuestionView>
+            .NewConfig()
+            .Map(dest => dest.Options, src => src.Options.Where(opt => !opt.IsDeleted).Adapt<List<QuestionOptionView>>());
 
         services.AddSingleton<ICacheService, CacheService>();
 
