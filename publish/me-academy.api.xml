@@ -384,6 +384,48 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:me_academy.api.Controllers.SmeHubsController.CreateSmeHub(me_academy.core.Models.Input.SmeHub.SmeHubModel)">
+            <summary>
+            Save a new SME Hub file
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SmeHubsController.UpdateSmeHub(System.String,me_academy.core.Models.Input.SmeHub.SmeHubModel)">
+            <summary>
+            Update an SME Hub
+            </summary>
+            <param name="uid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SmeHubsController.RemoveSmeHub(System.String)">
+            <summary>
+            Delete and SME Hub
+            </summary>
+            <param name="uid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SmeHubsController.ListSmeHubs(me_academy.core.Models.Input.Courses.SmeHubSearchModel)">
+            <summary>
+            List all the SME Hubs
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SmeHubsController.GetSmeHubs(System.String)">
+            <summary>
+            Get the details of and SME Hub
+            </summary>
+            <param name="uid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SmeHubsController.ListTypes">
+            <summary>
+            List the types of SME Hubs
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:me_academy.api.Controllers.VideosController.GetUploadToken(System.Int32)">
             <summary>
             Get video upload token
@@ -727,6 +769,18 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.TwentySix.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.TwentySeven">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentySeven.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentySeven.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentySeven.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
