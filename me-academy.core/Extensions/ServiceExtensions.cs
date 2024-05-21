@@ -168,6 +168,7 @@ public static class ServiceExtensions
         services.TryAddTransient<IVideoService, VideoService>();
         services.TryAddTransient<IQuestionService, QuestionService>();
         services.TryAddTransient<ISeriesService, SeriesService>();
+        services.TryAddTransient<ISmeHubService, SmeHubService>();
 
         return services;
     }
