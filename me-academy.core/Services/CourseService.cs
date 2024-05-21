@@ -247,8 +247,7 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListCourses(CourseSearchModel request)
     {
-        if (((request.IsDraft.HasValue && request.IsDraft.Value)
-             || (request.IsActive.HasValue && request.IsActive.Value)
+        if (((request.IsActive.HasValue && request.IsActive.Value)
              || request.WithDeleted)
             && !_userSession.IsAnyAdmin
             && !_userSession.InRole(RolesConstants.ManageCourse))
@@ -264,9 +263,8 @@ public class CourseService : ICourseService
         courses = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
             ? courses
                 .Where(c => !request.IsActive.HasValue || c.IsActive == request.IsActive)
-                .Where(c => !request.IsDraft.HasValue || c.IsDraft == request.IsDraft)
                 .Where(c => request.WithDeleted || !c.IsDeleted)
-            : courses.Where(c => !c.IsDeleted && !c.IsDraft && c.IsActive && c.IsPublished);
+            : courses.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         // TODO: implement Full text search for description and title
         var result = await courses
@@ -292,12 +290,10 @@ public class CourseService : ICourseService
         if (course.IsPublished)
             return new ErrorResult("Course is already published.");
 
-        // TODO: uncomment the check below
-        //if (!course.CourseVideo!.IsUploaded)
-        //    return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
+        if (!course.CourseVideo!.IsUploaded)
+          return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
         
         course.IsPublished = true;
-        course.IsDraft = false;
         course.PublishedOnUtc = DateTime.UtcNow;
         course.PublishedById = _userSession.UserId;
 

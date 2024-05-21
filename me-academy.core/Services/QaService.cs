@@ -134,13 +134,6 @@ public class QuestionService : IQuestionService
         if (question == null)
             return new ErrorResult("Question not found");
 
-        question.Text = model.Text;
-        question.IsMultiple = model.IsMultiple;
-        question.IsRequired = model.IsRequired;
-
-        question.UpdatedById = _userSession.UserId;
-        question.UpdatedOnUtc = DateTime.UtcNow;
-
         if (question.IsMultiple && !model.IsMultiple) {
             _context.SeriesQuestionOptions.RemoveRange(question.Options);
         }
@@ -166,6 +159,14 @@ public class QuestionService : IQuestionService
           var deletedOptions = question.Options.Where(o => !optionIds.Contains(o.Id)).ToList();
           _context.SeriesQuestionOptions.RemoveRange(deletedOptions);
         }
+
+        // Update questions
+        question.Text = model.Text;
+        question.IsMultiple = model.IsMultiple;
+        question.IsRequired = model.IsRequired;
+
+        question.UpdatedById = _userSession.UserId;
+        question.UpdatedOnUtc = DateTime.UtcNow;
 
         int saved = await _context.SaveChangesAsync();
 
