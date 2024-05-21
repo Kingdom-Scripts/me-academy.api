@@ -7,7 +7,7 @@ public class SmeHubModel : FileUploadModel
 {
     [JsonIgnore]
     public int Id { get; set; }
-
+    public int TypeId { get; set; }
     public required string Title { get; set; }
     public required string Summary{ get; set; }
     public required string Description { get; set; }

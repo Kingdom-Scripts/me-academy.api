@@ -50,6 +50,20 @@ public static class PrepDatabase
             );
         }
 
+        // create default sme hub types
+        if (!context.SmeHubTypes.Any())
+        {
+            Log.Information("--> Seeding Sme Hub Type Data...");
+
+            context.SmeHubTypes.AddRange(
+                new SmeHubType { Name = "Resolutions" },
+                new SmeHubType { Name = "Employee and HR Documents" },
+                new SmeHubType { Name = "Agreements" },
+                new SmeHubType { Name = "Forms and Notices" },
+                new SmeHubType { Name = "Power of Attorney" }
+                                                                                       );
+        }
+
         context.SaveChanges();
     }
 }

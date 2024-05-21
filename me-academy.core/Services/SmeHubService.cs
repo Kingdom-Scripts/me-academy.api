@@ -14,7 +14,7 @@ using Microsoft.Identity.Client;
 
 namespace me_academy.core.Services;
 
-public class SmeHubService
+public class SmeHubService : ISmeHubService
 {
     private readonly MeAcademyContext _context;
     private readonly UserSession _userSession;
@@ -42,7 +42,7 @@ public class SmeHubService
         await _context.AddAsync(smeHub);
         await _context.SaveChangesAsync();
 
-        return new SuccessResult(StatusCodes.Status201Created, smeHub.Adapt<SmeHubView>());
+        return new SuccessResult(StatusCodes.Status201Created, smeHub.Adapt<SmeHubDetailView>());
     }
 
     public async Task<Result> UpdateSmeHub(string uid, SmeHubModel model)
@@ -74,7 +74,7 @@ public class SmeHubService
 
         await _context.SaveChangesAsync();
 
-        return new SuccessResult(smeHub.Adapt<SmeHubView>());
+        return new SuccessResult(smeHub.Adapt<SmeHubDetailView>());
     }
 
     public async Task<Result> RemoveSmeHub(string uid)
@@ -117,6 +117,33 @@ public class SmeHubService
                 || sh.Title.ToLower().Contains(request.SearchQuery))
             .ProjectToType<SmeHubView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
+
+        return new SuccessResult(result);
+    }
+
+    public async Task<Result> GetSmeHub(string uid)
+    {
+        var smeHub = _context.SmeHubs
+            .Where(sh => sh.Uid == uid).AsQueryable();
+
+        if (!_userSession.IsAnyAdmin)
+            smeHub = smeHub.Where(sh => !sh.IsDeleted && sh.IsActive);
+
+        var result = await smeHub
+            .ProjectToType<SmeHubDetailView>()
+            .FirstOrDefaultAsync();
+
+        if (result is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The Sme Hub you requested cannot be found");
+
+        return new SuccessResult(result);
+    }
+
+    public async Task<Result> ListTypes()
+    {
+        var result = await _context.SmeHubTypes
+            .ProjectToType<SmeHubTypeView>()
+            .ToListAsync();
 
         return new SuccessResult(result);
     }
