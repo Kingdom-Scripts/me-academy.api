@@ -12,4 +12,6 @@ public interface ISmeHubService
     Task<Result> ListSmeHubs(SmeHubSearchModel request);
     Task<Result> GetSmeHub(string uid);
     Task<Result> ListTypes();
+    Task<Result> ActivateSmeHub(string uid);
+    Task<Result> DeactivateSmeHub(string uid);
 }

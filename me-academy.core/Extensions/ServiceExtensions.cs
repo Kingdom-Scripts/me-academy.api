@@ -10,11 +10,13 @@ using me_academy.core.Models.App;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Series;
+using me_academy.core.Models.Input.SmeHub;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
 using me_academy.core.Models.View.Questions;
 using me_academy.core.Models.View.Series;
+using me_academy.core.Models.View.SmeHub;
 using me_academy.core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -156,6 +158,16 @@ public static class ServiceExtensions
         TypeAdapterConfig<SeriesQuestion, SeriesQuestionView>
             .NewConfig()
             .Map(dest => dest.Options, src => src.Options.Where(opt => !opt.IsDeleted).Adapt<List<QuestionOptionView>>());
+
+        // map sme hubs
+        TypeAdapterConfig<SmeHubModel, SmeHub>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
+
+
+        TypeAdapterConfig<SmeHub, SmeHubDetailView>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList());
 
         services.AddSingleton<ICacheService, CacheService>();
 

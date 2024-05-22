@@ -27,17 +27,26 @@ public class SmeHubService : ISmeHubService
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
     }
 
-    public async Task<Result> CreateSmeHub(SmeHubModel input)
+    public async Task<Result> CreateSmeHub(SmeHubModel model)
     {
-        var smeHub = input.Adapt<SmeHub>();
+        bool hubExist = await _context.SmeHubs
+            .AnyAsync(sm => sm.Title.ToLower().Trim() == model.Title.ToLower().Trim());
+
+        if (hubExist)
+            return new ErrorResult("SME Hub already exists");
+
+        var smeHub = model.Adapt<SmeHub>();
         smeHub.CreatedById = _userSession.UserId;
+        smeHub.Uid = model.Title.Trim()  // trim
+            .ToLower().Replace("-", "", StringComparison.OrdinalIgnoreCase) // remove hyphens
+            .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
 
         // add document
-        var documentResult = await _fileService.UploadFileInternal("sme-hubs", input.File);
+        var documentResult = await _fileService.UploadFileInternal("sme-hubs", model.File);
         if (!documentResult.Success)
             return new ErrorResult(documentResult.Title, documentResult.Message);
 
-        smeHub.DocumentId = documentResult.Content.Id;
+        smeHub.Document = documentResult.Content;
 
         await _context.AddAsync(smeHub);
         await _context.SaveChangesAsync();
@@ -55,7 +64,12 @@ public class SmeHubService : ISmeHubService
         if (smeHub == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Item not found");
 
-        smeHub = model.Adapt(smeHub);
+        smeHub.Title = model.Title;
+        smeHub.Description = model.Description;
+        smeHub.Summary = model.Summary;
+        smeHub.TypeId = model.TypeId;
+        smeHub.Price = model.Price;
+        smeHub.Tags = string.Join(",", model.Tags);
 
         if (model.File != null)
         {
@@ -72,9 +86,13 @@ public class SmeHubService : ISmeHubService
             smeHub.DocumentId = documentResult.Content.Id;
         }
 
-        await _context.SaveChangesAsync();
+        smeHub.UpdatedById = _userSession.UserId;
+        smeHub.UpdatedOnUtc = DateTime.UtcNow;
+        int saved = await _context.SaveChangesAsync();
 
-        return new SuccessResult(smeHub.Adapt<SmeHubDetailView>());
+        return saved > 0
+            ? new SuccessResult(smeHub.Adapt<SmeHubDetailView>())
+            : new ErrorResult("Unable to save changes, kindly try again later.");
     }
 
     public async Task<Result> RemoveSmeHub(string uid)
@@ -146,5 +164,63 @@ public class SmeHubService : ISmeHubService
             .ToListAsync();
 
         return new SuccessResult(result);
+    }
+
+    public async Task<Result> ActivateSmeHub(string uid)
+    {
+        // validate sme hub
+        var smeHub = await _context.SmeHubs
+            .Where(sm => sm.Uid == uid)
+            .FirstOrDefaultAsync();
+
+        if (smeHub is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The resourse you requested for cannot be found.");
+
+        if (smeHub.IsActive)
+            return new ErrorResult("The resource is already active.");
+
+        if (smeHub.IsDeleted)
+            return new ErrorResult("The resource is deleted.");
+
+        smeHub.IsActive = true;
+        smeHub.UpdatedById = _userSession.UserId;
+        smeHub.UpdatedOnUtc = DateTime.UtcNow;
+
+        _context.Update(smeHub);
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult("Resource is activated successfully.")
+            : new ErrorResult("Unable to save changes, kindly try again later.");
+    }
+
+    public async Task<Result> DeactivateSmeHub(string uid)
+    {
+        // validate sme hub
+        var smeHub = await _context.SmeHubs
+            .Where(sm => sm.Uid == uid)
+            .FirstOrDefaultAsync();
+
+        if (smeHub is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The resourse you requested for cannot be found.");
+
+        if (!smeHub.IsActive)
+            return new ErrorResult("The resource is already inactive.");
+
+        if (smeHub.IsDeleted)
+            return new ErrorResult("The resource is deleted.");
+
+        smeHub.IsActive = false;
+        smeHub.UpdatedById = _userSession.UserId;
+        smeHub.UpdatedOnUtc = DateTime.UtcNow;
+
+        _context.Update(smeHub);
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult("Resource is deactivated successfully.")
+            : new ErrorResult("Unable to save changes, kindly try again later.");
     }
 }

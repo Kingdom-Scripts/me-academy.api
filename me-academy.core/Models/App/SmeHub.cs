@@ -43,3 +43,4 @@ public class SmeHub : BaseAppModel, ISoftDeletable
     public User? UpdatedBy { get; set; }
     public User? DeletedBy { get; set; }
 }
+    

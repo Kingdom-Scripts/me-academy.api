@@ -18,7 +18,6 @@ public class FileService : IFileService
     private readonly IHostEnvironment _hostEnvironment;
     private readonly MeAcademyContext _context;
     private readonly UserSession _userSession;
-    private readonly HttpClient _apiVideoClient;
 
     public FileService(IOptions<AppConfig> appConfig, IHostEnvironment hostEnvironment, MeAcademyContext context,
         UserSession userSession, IHttpClientFactory clientFactory)
@@ -32,8 +31,6 @@ public class FileService : IFileService
 
         // set up tinify
         TinifyAPI.Tinify.Key = appConfig.Value.TinifyKey;
-
-        _apiVideoClient = clientFactory.CreateClient("ApiVideoClient");
     }
 
     public async Task<Result<DocumentView>> UploadFile(string folder, IFormFile file)
@@ -60,8 +57,11 @@ public class FileService : IFileService
         if (!File.Exists(filePath))
             return null;
 
-        var stream = new FileStream(filePath, FileMode.Open);
-        return new FileStreamResult(stream, "application/octet-stream");
+        var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        return new FileStreamResult(stream, "application/octet-stream")
+        {
+            FileDownloadName = fileName
+        };
     }
 
     public async Task<Result> DeleteFile(int documentId)
@@ -115,8 +115,8 @@ public class FileService : IFileService
             Type = fileType,
             Url = $"{folder}/{fileUploadName}",
             ThumbnailUrl = fileType == DocumentTypeEnum.IMAGE
-                ? $"{folder}/_thumbnails/{fileUploadName}"
-                : $"_thumbnails/{fileType}.png",
+                ? $"{folder}/thumbnails/{fileUploadName}"
+                : $"static/thumbnails/{fileType}.png",
             CreatedById = _userSession.UserId
         };
 
