@@ -9,6 +9,7 @@ public class MeAcademyContext : DbContext
 
     public MeAcademyContext(DbContextOptions<MeAcademyContext> options) : base(options) { }
 
+    public required DbSet<AnnotatedAgreement> AnnotatedAgreements { get; set; }
     public required DbSet<Code> Codes { get; set; }
     public required DbSet<Course> Courses { get; set; }
     public required DbSet<CourseAuditLog> CourseAuditLogs { get; set; }

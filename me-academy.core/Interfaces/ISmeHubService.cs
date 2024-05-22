@@ -1,5 +1,4 @@
-﻿using me_academy.core.Models.Input.Courses;
-using me_academy.core.Models.Input.SmeHub;
+﻿using me_academy.core.Models.Input.SmeHub;
 using me_academy.core.Models.Utilities;
 
 namespace me_academy.core.Interfaces;

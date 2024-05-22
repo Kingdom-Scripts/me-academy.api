@@ -7,6 +7,7 @@ using me_academy.core.Constants;
 using me_academy.core.Interfaces;
 using me_academy.core.Middlewares;
 using me_academy.core.Models.App;
+using me_academy.core.Models.Input.AnnotatedAgreements;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Series;
@@ -164,8 +165,18 @@ public static class ServiceExtensions
             .NewConfig()
             .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
 
-
+                
         TypeAdapterConfig<SmeHub, SmeHubDetailView>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList());
+
+        // map sme hubs
+        TypeAdapterConfig<AnnotatedAgreementModel, AnnotatedAgreement>
+            .NewConfig()
+            .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
+
+
+        TypeAdapterConfig<AnnotatedAgreement, AnnotatedAgreementDetailView>
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList());
 

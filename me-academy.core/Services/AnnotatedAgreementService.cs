@@ -3,107 +3,105 @@ using me_academy.core.Extensions;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.App;
 using me_academy.core.Models.App.Constants;
+using me_academy.core.Models.Input.AnnotatedAgreements;
 using me_academy.core.Models.Input.Auth;
-using me_academy.core.Models.Input.SmeHub;
 using me_academy.core.Models.Utilities;
-using me_academy.core.Models.View.SmeHub;
+using me_academy.core.Models.View.AnnotatedAgreement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace me_academy.core.Services;
 
-public class SmeHubService : ISmeHubService
+public class AnnotatedAgreementService : IAnnotatedAgreementService
 {
     private readonly MeAcademyContext _context;
     private readonly UserSession _userSession;
     private readonly IFileService _fileService;
 
-    public SmeHubService(MeAcademyContext context, UserSession userSession, IFileService fileService)
+    public AnnotatedAgreementService(MeAcademyContext context, UserSession userSession, IFileService fileService)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _userSession = userSession ?? throw new ArgumentNullException(nameof(userSession));
         _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
     }
 
-    public async Task<Result> CreateSmeHub(SmeHubModel model)
+    public async Task<Result> CreateAnnotatedAgreement(AnnotatedAgreementModel model)
     {
-        bool hubExist = await _context.SmeHubs
+        bool hubExist = await _context.AnnotatedAgreements
             .AnyAsync(sm => sm.Title.ToLower().Trim() == model.Title.ToLower().Trim());
 
         if (hubExist)
-            return new ErrorResult("SME Hub already exists");
+            return new ErrorResult("Annotated Agreement already exists");
 
-        var smeHub = model.Adapt<SmeHub>();
-        smeHub.CreatedById = _userSession.UserId;
-        smeHub.Uid = model.Title.Trim()  // trim
+        var annotatedAgreement = model.Adapt<AnnotatedAgreement>();
+        annotatedAgreement.CreatedById = _userSession.UserId;
+        annotatedAgreement.Uid = model.Title.Trim()  // trim
             .ToLower().Replace("-", "", StringComparison.OrdinalIgnoreCase) // remove hyphens
             .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
 
         // add document
-        var documentResult = await _fileService.UploadFileInternal("sme-hubs", model.File);
+        var documentResult = await _fileService.UploadFileInternal("annotated-agreements", model.File);
         if (!documentResult.Success)
             return new ErrorResult(documentResult.Title, documentResult.Message);
 
-        smeHub.Document = documentResult.Content;
+        annotatedAgreement.Document = documentResult.Content;
 
-        await _context.AddAsync(smeHub);
+        await _context.AddAsync(annotatedAgreement);
         await _context.SaveChangesAsync();
 
-        return new SuccessResult(StatusCodes.Status201Created, smeHub.Adapt<SmeHubDetailView>());
+        return new SuccessResult(StatusCodes.Status201Created, annotatedAgreement.Adapt<AnnotatedAgreementDetailView>());
     }
 
-    public async Task<Result> UpdateSmeHub(string uid, SmeHubModel model)
+    public async Task<Result> UpdateAnnotatedAgreement(string uid, AnnotatedAgreementModel model)
     {
-        var smeHub = await _context.SmeHubs
+        var annotatedAgreement = await _context.AnnotatedAgreements
             .Where(sh => sh.Uid == uid)
             .Include(sh => sh.Document)
             .FirstOrDefaultAsync();
 
-        if (smeHub == null)
+        if (annotatedAgreement == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Item not found");
 
-        smeHub.Title = model.Title;
-        smeHub.Description = model.Description;
-        smeHub.Summary = model.Summary;
-        smeHub.TypeId = model.TypeId;
-        smeHub.Price = model.Price;
-        smeHub.Tags = string.Join(",", model.Tags);
+        annotatedAgreement.Title = model.Title;
+        annotatedAgreement.Description = model.Description;
+        annotatedAgreement.Summary = model.Summary;
+        annotatedAgreement.Price = model.Price;
+        annotatedAgreement.Tags = string.Join(",", model.Tags);
 
         if (model.File != null)
         {
-            var deletedRes = await _fileService.DeleteFileInternal(smeHub.DocumentId);
+            var deletedRes = await _fileService.DeleteFileInternal(annotatedAgreement.DocumentId);
             if (!deletedRes.Success)
                 return new ErrorResult("Unable to delete existing file, kindly try again later");
 
-            var documentResult = await _fileService.UploadFile("sme-hubs", model.File);
+            var documentResult = await _fileService.UploadFile("annotated-agreements", model.File);
             if (!documentResult.Success)
             {
                 return new ErrorResult(documentResult.Title, documentResult.Message);
             }
 
-            smeHub.DocumentId = documentResult.Content.Id;
+            annotatedAgreement.DocumentId = documentResult.Content.Id;
         }
 
-        smeHub.UpdatedById = _userSession.UserId;
-        smeHub.UpdatedOnUtc = DateTime.UtcNow;
+        annotatedAgreement.UpdatedById = _userSession.UserId;
+        annotatedAgreement.UpdatedOnUtc = DateTime.UtcNow;
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
-            ? new SuccessResult(smeHub.Adapt<SmeHubDetailView>())
+            ? new SuccessResult(annotatedAgreement.Adapt<AnnotatedAgreementDetailView>())
             : new ErrorResult("Unable to save changes, kindly try again later.");
     }
 
-    public async Task<Result> RemoveSmeHub(string uid)
+    public async Task<Result> RemoveAnnotatedAgreement(string uid)
     {
-        var smeHub = await _context.SmeHubs
+        var annotatedAgreement = await _context.AnnotatedAgreements
             .Where(sh => sh.Uid == uid)
             .FirstOrDefaultAsync();
 
-        if (smeHub is null)
+        if (annotatedAgreement is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "The resource is not found.");
 
-        _context.Remove(smeHub);
+        _context.Remove(annotatedAgreement);
 
         int saved = await _context.SaveChangesAsync();
 
@@ -112,7 +110,7 @@ public class SmeHubService : ISmeHubService
             : new ErrorResult("Unable to save changes, kindly try again later.");
     }
 
-    public async Task<Result> ListSmeHubs(SmeHubSearchModel request)
+    public async Task<Result> ListAnnotatedAgreements(AnnotatedAgreementSearchModel request)
     {
         if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && !_userSession.IsAnyAdmin)
             return new ForbiddenResult();
@@ -121,71 +119,62 @@ public class SmeHubService : ISmeHubService
             ? request.SearchQuery.ToLower().Trim()
             : null;
 
-        var smeHubs = _context.SmeHubs.AsQueryable();
+        var annotatedAgreements = _context.AnnotatedAgreements.AsQueryable();
 
         // allow filters only for admin users or users who can manage courses
-        smeHubs = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
-            ? smeHubs.Where(sh => !request.IsActive.HasValue || sh.IsActive == request.IsActive.Value)
+        annotatedAgreements = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
+            ? annotatedAgreements.Where(sh => !request.IsActive.HasValue || sh.IsActive == request.IsActive.Value)
                 .Where(sh => request.WithDeleted || !sh.IsDeleted)
-            : smeHubs.Where(sh => sh.IsActive && !sh.IsDeleted);
+            : annotatedAgreements.Where(sh => sh.IsActive && !sh.IsDeleted);
 
-        var result = await smeHubs
+        var result = await annotatedAgreements
             .Where(sh => string.IsNullOrEmpty(request.SearchQuery)
                 || sh.Title.ToLower().Contains(request.SearchQuery))
-            .ProjectToType<SmeHubView>()
+            .ProjectToType<AnnotatedAgreementView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
         return new SuccessResult(result);
     }
 
-    public async Task<Result> GetSmeHub(string uid)
+    public async Task<Result> GetAnnotatedAgreement(string uid)
     {
-        var smeHub = _context.SmeHubs
+        var annotatedAgreement = _context.AnnotatedAgreements
             .Where(sh => sh.Uid == uid).AsQueryable();
 
         if (!_userSession.IsAnyAdmin)
-            smeHub = smeHub.Where(sh => !sh.IsDeleted && sh.IsActive);
+            annotatedAgreement = annotatedAgreement.Where(sh => !sh.IsDeleted && sh.IsActive);
 
-        var result = await smeHub
-            .ProjectToType<SmeHubDetailView>()
+        var result = await annotatedAgreement
+            .ProjectToType<AnnotatedAgreementDetailView>()
             .FirstOrDefaultAsync();
 
         if (result is null)
-            return new ErrorResult(StatusCodes.Status404NotFound, "The Sme Hub you requested cannot be found");
+            return new ErrorResult(StatusCodes.Status404NotFound, "The Annotated Agreement you requested cannot be found");
 
         return new SuccessResult(result);
     }
 
-    public async Task<Result> ListTypes()
+    public async Task<Result> ActivateAnnotatedAgreement(string uid)
     {
-        var result = await _context.SmeHubTypes
-            .ProjectToType<SmeHubTypeView>()
-            .ToListAsync();
-
-        return new SuccessResult(result);
-    }
-
-    public async Task<Result> ActivateSmeHub(string uid)
-    {
-        // validate sme hub
-        var smeHub = await _context.SmeHubs
+        // validate Annotated Agreement
+        var annotatedAgreement = await _context.AnnotatedAgreements
             .Where(sm => sm.Uid == uid)
             .FirstOrDefaultAsync();
 
-        if (smeHub is null)
+        if (annotatedAgreement is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "The resourse you requested for cannot be found.");
 
-        if (smeHub.IsActive)
+        if (annotatedAgreement.IsActive)
             return new ErrorResult("The resource is already active.");
 
-        if (smeHub.IsDeleted)
+        if (annotatedAgreement.IsDeleted)
             return new ErrorResult("The resource is deleted.");
 
-        smeHub.IsActive = true;
-        smeHub.UpdatedById = _userSession.UserId;
-        smeHub.UpdatedOnUtc = DateTime.UtcNow;
+        annotatedAgreement.IsActive = true;
+        annotatedAgreement.UpdatedById = _userSession.UserId;
+        annotatedAgreement.UpdatedOnUtc = DateTime.UtcNow;
 
-        _context.Update(smeHub);
+        _context.Update(annotatedAgreement);
 
         int saved = await _context.SaveChangesAsync();
 
@@ -194,27 +183,27 @@ public class SmeHubService : ISmeHubService
             : new ErrorResult("Unable to save changes, kindly try again later.");
     }
 
-    public async Task<Result> DeactivateSmeHub(string uid)
+    public async Task<Result> DeactivateAnnotatedAgreement(string uid)
     {
-        // validate sme hub
-        var smeHub = await _context.SmeHubs
+        // validate Annotated Agreement
+        var annotatedAgreement = await _context.AnnotatedAgreements
             .Where(sm => sm.Uid == uid)
             .FirstOrDefaultAsync();
 
-        if (smeHub is null)
+        if (annotatedAgreement is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "The resourse you requested for cannot be found.");
 
-        if (!smeHub.IsActive)
+        if (!annotatedAgreement.IsActive)
             return new ErrorResult("The resource is already inactive.");
 
-        if (smeHub.IsDeleted)
+        if (annotatedAgreement.IsDeleted)
             return new ErrorResult("The resource is deleted.");
 
-        smeHub.IsActive = false;
-        smeHub.UpdatedById = _userSession.UserId;
-        smeHub.UpdatedOnUtc = DateTime.UtcNow;
+        annotatedAgreement.IsActive = false;
+        annotatedAgreement.UpdatedById = _userSession.UserId;
+        annotatedAgreement.UpdatedOnUtc = DateTime.UtcNow;
 
-        _context.Update(smeHub);
+        _context.Update(annotatedAgreement);
 
         int saved = await _context.SaveChangesAsync();
 
