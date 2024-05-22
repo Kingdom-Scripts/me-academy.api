@@ -4,6 +4,56 @@
         <name>me-academy.api</name>
     </assembly>
     <members>
+        <member name="M:me_academy.api.Controllers.AnnotatedAgreementsController.CreateAnnotatedAgreement(me_academy.core.Models.Input.AnnotatedAgreements.AnnotatedAgreementModel)">
+            <summary>
+            Save a new Annotated Agreement file
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AnnotatedAgreementsController.UpdateAnnotatedAgreement(System.String,me_academy.core.Models.Input.AnnotatedAgreements.AnnotatedAgreementModel)">
+            <summary>
+            Update an Annotated Agreement
+            </summary>
+            <param name="uid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AnnotatedAgreementsController.RemoveAnnotatedAgreement(System.String)">
+            <summary>
+            Delete and Annotated Agreement
+            </summary>
+            <param name="uid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AnnotatedAgreementsController.ListAnnotatedAgreements(me_academy.core.Models.Input.AnnotatedAgreements.AnnotatedAgreementSearchModel)">
+            <summary>
+            List all the Annotated Agreements
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AnnotatedAgreementsController.GetAnnotatedAgreements(System.String)">
+            <summary>
+            Get the details of and Annotated Agreement
+            </summary>
+            <param name="uid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AnnotatedAgreementsController.ActivateAnnotatedAgreement(System.String)">
+            <summary>
+            Activate an Annotated Agreement, making it visible. Only Admins, SuperAdmins, and ManageCourse users can do this
+            </summary>
+            <param name="uid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.AnnotatedAgreementsController.DeactivateAnnotatedAgreement(System.String)">
+            <summary>
+            Deactivate an Annotated Agreement, making it invisible. Only Admins, SuperAdmins, and ManageCourse users can do this
+            </summary>
+            <param name="uid"></param>
+            <returns></returns>
+        </member>
         <member name="M:me_academy.api.Controllers.AssetsController.UploadAsset(System.String,Microsoft.AspNetCore.Http.IFormFile)">
             <summary>
             Upload a file for a course
@@ -406,7 +456,7 @@
             <param name="uid"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.SmeHubsController.ListSmeHubs(me_academy.core.Models.Input.Courses.SmeHubSearchModel)">
+        <member name="M:me_academy.api.Controllers.SmeHubsController.ListSmeHubs(me_academy.core.Models.Input.SmeHub.SmeHubSearchModel)">
             <summary>
             List all the SME Hubs
             </summary>
@@ -424,6 +474,20 @@
             <summary>
             List the types of SME Hubs
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SmeHubsController.ActivateSmeHub(System.String)">
+            <summary>
+            Activate an SME Hub, making it visible. Only Admins, SuperAdmins, and ManageCourse users can do this
+            </summary>
+            <param name="uid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SmeHubsController.DeactivateSmeHub(System.String)">
+            <summary>
+            Deactivate an SME Hub, making it invisible. Only Admins, SuperAdmins, and ManageCourse users can do this
+            </summary>
+            <param name="uid"></param>
             <returns></returns>
         </member>
         <member name="M:me_academy.api.Controllers.VideosController.GetUploadToken(System.Int32)">
@@ -781,6 +845,18 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.TwentySeven.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.TwentyEight">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyEight.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyEight.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyEight.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
