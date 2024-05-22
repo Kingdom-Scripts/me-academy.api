@@ -1,6 +1,6 @@
-namespace me_academy.core.Models.Input.SmeHub;
+namespace me_academy.core.Models.Input.AnnotatedAgreements;
 
-public class SmeHubSearchModel : PagingOptionModel
+public class AnnotatedAgreementSearchModel : PagingOptionModel
 {
     public string? SearchQuery { get; set; }
     public bool? IsActive { get; set; }

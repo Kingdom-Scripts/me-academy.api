@@ -1,55 +1,55 @@
 ﻿using me_academy.core.Interfaces;
 using me_academy.core.Models.App.Constants;
-using me_academy.core.Models.Input.SmeHub;
 using me_academy.core.Models.Utilities;
-using me_academy.core.Models.View.SmeHub;
-using me_academy.core.Models.View.SmeHub;
+using me_academy.core.Models.View.AnnotatedAgreement;
+using me_academy.core.Models.View.AnnotatedAgreement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using me_academy.core.Models.Input.AnnotatedAgreements;
 
 namespace me_academy.api.Controllers
 {
     [ApiController]
-    [Route("api/v1/sme-hubs")]
-    public class SmeHubsController : BaseController
+    [Route("api/v1/annotated-agreements")]
+    public class AnnotatedAgreementsController : BaseController
     {
-        private readonly ISmeHubService _smeHubService;
-        public SmeHubsController(ISmeHubService smeHubService)
+        private readonly IAnnotatedAgreementService _smeHubService;
+        public AnnotatedAgreementsController(IAnnotatedAgreementService smeHubService)
             => _smeHubService = smeHubService ?? throw new ArgumentNullException(nameof(smeHubService));
 
         /// <summary>
-        /// Save a new SME Hub file
+        /// Save a new Annotated Agreement file
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize(Roles = $"{nameof(Roles.SuperAdmin)},{nameof(Roles.Admin)},{nameof(Roles.ManageCourse)}")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult<SmeHubDetailView>))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult<AnnotatedAgreementDetailView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> CreateSmeHub([FromForm] SmeHubModel model)
+        public async Task<IActionResult> CreateAnnotatedAgreement([FromForm] AnnotatedAgreementModel model)
         {
-            var res = await _smeHubService.CreateSmeHub(model);
+            var res = await _smeHubService.CreateAnnotatedAgreement(model);
             return ProcessResponse(res);
         }
 
         /// <summary>
-        /// Update an SME Hub
+        /// Update an Annotated Agreement
         /// </summary>
         /// <param name="uid"></param>
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPatch("{uid}")]
         [Authorize(Roles = $"{nameof(Roles.SuperAdmin)},{nameof(Roles.Admin)},{nameof(Roles.ManageCourse)}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SmeHubDetailView>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<AnnotatedAgreementDetailView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> UpdateSmeHub(string uid, [FromForm] SmeHubModel model)
+        public async Task<IActionResult> UpdateAnnotatedAgreement(string uid, [FromForm] AnnotatedAgreementModel model)
         {
-            var res = await _smeHubService.UpdateSmeHub(uid, model);
+            var res = await _smeHubService.UpdateAnnotatedAgreement(uid, model);
             return ProcessResponse(res);
         }
 
         /// <summary>
-        /// Delete and SME Hub
+        /// Delete and Annotated Agreement
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
@@ -57,57 +57,43 @@ namespace me_academy.api.Controllers
         [Authorize(Roles = $"{nameof(Roles.SuperAdmin)},{nameof(Roles.Admin)},{nameof(Roles.ManageCourse)}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> RemoveSmeHub(string uid)
+        public async Task<IActionResult> RemoveAnnotatedAgreement(string uid)
         {
-            var res = await _smeHubService.RemoveSmeHub(uid);
+            var res = await _smeHubService.RemoveAnnotatedAgreement(uid);
             return ProcessResponse(res);
         }
 
         /// <summary>
-        /// List all the SME Hubs
+        /// List all the Annotated Agreements
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<SmeHubView>>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<AnnotatedAgreementView>>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> ListSmeHubs([FromQuery] SmeHubSearchModel request)
+        public async Task<IActionResult> ListAnnotatedAgreements([FromQuery] AnnotatedAgreementSearchModel request)
         {
-            var res = await _smeHubService.ListSmeHubs(request);
+            var res = await _smeHubService.ListAnnotatedAgreements(request);
             return ProcessResponse(res);
         }
 
         /// <summary>
-        /// Get the details of and SME Hub
+        /// Get the details of and Annotated Agreement
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
         [HttpGet("{uid}")]
         [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SmeHubDetailView>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<AnnotatedAgreementDetailView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> GetSmeHubs(string uid)
+        public async Task<IActionResult> GetAnnotatedAgreements(string uid)
         {
-            var res = await _smeHubService.GetSmeHub(uid);
+            var res = await _smeHubService.GetAnnotatedAgreement(uid);
             return ProcessResponse(res);
         }
 
         /// <summary>
-        /// List the types of SME Hubs
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("types")]
-        [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SmeHubTypeView>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> ListTypes()
-        {
-            var res = await _smeHubService.ListTypes();
-            return ProcessResponse(res);
-        }
-
-        /// <summary>
-        /// Activate an SME Hub, making it visible. Only Admins, SuperAdmins, and ManageCourse users can do this
+        /// Activate an Annotated Agreement, making it visible. Only Admins, SuperAdmins, and ManageCourse users can do this
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
@@ -115,14 +101,14 @@ namespace me_academy.api.Controllers
         [Authorize(Roles = $"{nameof(Roles.SuperAdmin)},{nameof(Roles.Admin)},{nameof(Roles.ManageCourse)}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> ActivateSmeHub(string uid)
+        public async Task<IActionResult> ActivateAnnotatedAgreement(string uid)
         {
-            var res = await _smeHubService.ActivateSmeHub(uid);
+            var res = await _smeHubService.ActivateAnnotatedAgreement(uid);
             return ProcessResponse(res);
         }
 
         /// <summary>
-        /// Deactivate an SME Hub, making it invisible. Only Admins, SuperAdmins, and ManageCourse users can do this
+        /// Deactivate an Annotated Agreement, making it invisible. Only Admins, SuperAdmins, and ManageCourse users can do this
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
@@ -130,9 +116,9 @@ namespace me_academy.api.Controllers
         [Authorize(Roles = $"{nameof(Roles.SuperAdmin)},{nameof(Roles.Admin)},{nameof(Roles.ManageCourse)}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-        public async Task<IActionResult> DeactivateSmeHub(string uid)
+        public async Task<IActionResult> DeactivateAnnotatedAgreement(string uid)
         {
-            var res = await _smeHubService.DeactivateSmeHub(uid);
+            var res = await _smeHubService.DeactivateAnnotatedAgreement(uid);
             return ProcessResponse(res);
         }
     }

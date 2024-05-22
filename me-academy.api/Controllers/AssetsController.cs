@@ -1,5 +1,6 @@
 using me_academy.core.Interfaces;
 using me_academy.core.Models.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace me_academy.api.Controllers;
@@ -40,6 +41,7 @@ public class AssetsController : BaseController
     /// <param name="fileName">The file name, with its extension</param>
     /// <returns></returns>
     [HttpGet("{folder}/thumbnails/{fileName}")]
+    [AllowAnonymous]
     public IActionResult GetThumbnail(string folder, string fileName) =>
         GetFile(folder, $"_thumbnails/{fileName}");
 
