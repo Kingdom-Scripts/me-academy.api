@@ -125,9 +125,17 @@ public static class ServiceExtensions
             .NewConfig()
             .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
 
+        TypeAdapterConfig<Course, CourseView>
+            .NewConfig()
+            .Map(dest => dest.ThumbnailUrl, src => src.Video != null ? src.Video.ThumbnailUrl : "")
+            .Map(dest => dest.Duration, src => src.Video == null ? "" : TimeSpan.FromSeconds(src.Video.VideoDuration).ToString("hh\\:mm\\:ss"));
+
         TypeAdapterConfig<Course, CourseDetailView>
             .NewConfig()
-            .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList());
+            .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList())
+            .Map(dest => dest.ThumbnailUrl, src => src.Video != null ? src.Video.ThumbnailUrl : "")
+            .Map(dest => dest.PreviewVideoId, src => src.Video != null ? src.Video.PreviewVideoId : null)
+            .Map(dest => dest.Duration, src => src.Video == null ? "" : TimeSpan.FromSeconds(src.Video.VideoDuration).ToString("hh\\:mm\\:ss"));
 
         TypeAdapterConfig<CoursePrice, PriceView>
             .NewConfig()

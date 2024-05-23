@@ -442,7 +442,7 @@ public class SeriesService : ISeriesService
         if (!detailsSet.Success)
             return detailsSet;
 
-        newCourse.CourseVideo = new CourseVideo
+        newCourse.Video = new CourseVideo
         {
             UploadToken = "",
             VideoId = model.VideoDetails.videoId,

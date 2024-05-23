@@ -14,4 +14,7 @@ public class CourseView
     public bool IsActive { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? PublishedOnUtc { get; set; }
+    public string? ThumbnailUrl { get; set; }
+    public List<PriceView> Prices { get; set; } = new();
+    public string? Duration { get; set; }
 }

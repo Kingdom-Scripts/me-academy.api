@@ -53,7 +53,7 @@ public class CourseService : ICourseService
         // add prices
         if (model.Prices.Any())
         {
-            course.CoursePrices = model.Prices.Select(p => new CoursePrice
+            course.Prices = model.Prices.Select(p => new CoursePrice
             {
                 Price = p.Price,
                 DurationId = p.DurationId
@@ -77,7 +77,7 @@ public class CourseService : ICourseService
         // get the course
         var course = await _context.Courses
             .Where(c => !c.ForSeriesOnly)
-            .Include(c => c.CoursePrices)
+            .Include(c => c.Prices)
             .Include(c => c.UsefulLinks)
             .Where(c => c.Uid == courseUid)
             .FirstOrDefaultAsync();
@@ -102,7 +102,7 @@ public class CourseService : ICourseService
         course.UsefulLinks = new();
 
         // update the IsDeleted for the removed prices
-        var removedPrices = course.CoursePrices
+        var removedPrices = course.Prices
             .Where(cp => model.Prices.All(p => p.DurationId != cp.DurationId))
             .ToList();
 
@@ -111,7 +111,7 @@ public class CourseService : ICourseService
         // add new prices
         foreach (var price in model.Prices)
         {
-            var existingPrice = course.CoursePrices.FirstOrDefault(cp => cp.DurationId == price.DurationId);
+            var existingPrice = course.Prices.FirstOrDefault(cp => cp.DurationId == price.DurationId);
             if (existingPrice != null)
             {
                 existingPrice.Price = price.Price;
@@ -119,7 +119,7 @@ public class CourseService : ICourseService
             }
             else
             {
-                course.CoursePrices.Add(new CoursePrice
+                course.Prices.Add(new CoursePrice
                 {
                     Price = price.Price,
                     DurationId = price.DurationId
@@ -190,12 +190,7 @@ public class CourseService : ICourseService
 
         var result = await course
             .Where(c => c.Uid == courseUid)
-            .Include(c => c.CreatedBy)
-            .Include(c => c.UpdatedBy)
-            .Include(c => c.DeletedBy)
-            .Include(c => c.UsefulLinks)
-            .Include(c => c.CoursePrices)
-            .ThenInclude(cp => cp.Duration)
+            .OrderByDescending(c => c.CreatedAtUtc).ThenBy(c => c.UpdatedOnUtc)
             .ProjectToType<CourseDetailView>()
             .FirstOrDefaultAsync();
 
@@ -203,7 +198,7 @@ public class CourseService : ICourseService
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
 
         // remove deleted prices
-        result.CoursePrices = result.CoursePrices.Where(cp => !cp.IsDeleted).ToList();
+        result.Prices = result.Prices.Where(cp => !cp.IsDeleted).ToList();
 
         result.Resources = _context.CourseDocuments
             .Where(cd => cd.CourseId == result.Id)
@@ -270,6 +265,7 @@ public class CourseService : ICourseService
         var result = await courses
             .Where(c => string.IsNullOrEmpty(request.SearchQuery)
                         || c.Title.ToLower().Contains(request.SearchQuery))
+            .Include(c => c.Video)
             .ProjectToType<CourseView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
@@ -282,7 +278,7 @@ public class CourseService : ICourseService
         var course = await _context.Courses
             .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
-            .Include(c => c.CourseVideo)
+            .Include(c => c.Video)
             .FirstOrDefaultAsync();
         if (course == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
@@ -290,7 +286,7 @@ public class CourseService : ICourseService
         if (course.IsPublished)
             return new ErrorResult("Course is already published.");
 
-        if (!course.CourseVideo!.IsUploaded)
+        if (!course.Video!.IsUploaded)
           return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
         
         course.IsPublished = true;
@@ -366,11 +362,11 @@ public class CourseService : ICourseService
         var course = await _context.Courses
             .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
-            .Include(course => course.CourseVideo)
+            .Include(course => course.Video)
             .Select(c => new Course
             {
                 Id = c.Id,
-                CourseVideo = c.CourseVideo
+                Video = c.Video
             })
             .FirstOrDefaultAsync();
 
@@ -381,9 +377,9 @@ public class CourseService : ICourseService
         if (!detailsSet.Success)
             return detailsSet;
 
-        course.CourseVideo!.VideoId = model.videoId;
-        course.CourseVideo.IsUploaded = true;
-        course.CourseVideo.VideoDuration = model.Duration;
+        course.Video!.VideoId = model.videoId;
+        course.Video.IsUploaded = true;
+        course.Video.VideoDuration = model.Duration;
 
         int saved = await _context.SaveChangesAsync();
 
