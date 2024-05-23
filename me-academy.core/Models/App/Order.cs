@@ -12,8 +12,7 @@ public class Order : BaseAppModel
 
     public required string BillingAddress { get; set; }
     public int DurationId { get; set; }
-    public string? DiscountCode { get; set; }
-    public decimal? DiscountApplied { get; set; }
+    public decimal DiscountApplied { get; set; } = 0m;
     public decimal ItemAmount { get; set; }
     public decimal TotalAmount { get; set; }
 
@@ -22,9 +21,9 @@ public class Order : BaseAppModel
 
     public bool IsPaid { get; set; } = false;
     public DateTime? PaidAt { get; set; }
-    public string Authorization_Url { get; set; }
-    public string Access_Code { get; set; }
-    public string Reference { get; set; }
+    public string? Authorization_Url { get; set; }
+    public string? Access_Code { get; set; }
+    public string? Reference { get; set; }
 
-
+  public Discount? Discount { get; set; }
 }

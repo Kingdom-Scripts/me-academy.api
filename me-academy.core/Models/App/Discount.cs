@@ -11,7 +11,7 @@ public class Discount : BaseAppModel
     public bool IsActive { get; set; }
     public bool IsPercentage { get; set; }
     public bool IsSingleUse { get; set; }
-    public int Available { get; set; } = -1;
+    public int TotalLeft { get; set; } = -1;
     public decimal? MinAmount { get; set; }
     public DateTime? ExpiryDate { get; set; }
     public bool IsDeleted { get; set; }
