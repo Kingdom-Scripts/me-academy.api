@@ -24,6 +24,20 @@
             <returns>Returns a paginated list.</returns>
             <remarks>This functionality may not work in SQL Compact 3.5</remarks>
         </member>
+        <member name="T:me_academy.core.Extensions.ServiceExtensions">
+            <summary>
+            Extension methods for configuring services in the application.
+            </summary>
+        </member>
+        <member name="M:me_academy.core.Extensions.ServiceExtensions.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration,System.Boolean)">
+            <summary>
+            Configures services for the application, including database, validation, authentication, authorization, HTTP context, caching, and various services.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add services to.</param>
+            <param name="configuration">The configuration for the application.</param>
+            <param name="isProduction">A flag indicating whether the application is running in a production environment.</param>
+            <returns>The modified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> for method chaining.</returns>
+        </member>
         <member name="P:me_academy.core.Models.App.UserRole.UserId">
             <summary>
             A foreign key to the user this role is attached to
@@ -39,6 +53,16 @@
             A foreign key to the user who assigned this role to this user
             </summary>
         </member>
+        <member name="T:me_academy.core.Models.Configurations.PasystackConfig">
+            <summary>
+            Represents the configuration settings for interacting with the Paystack API.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Configurations.PasystackConfig.HttpClientName">
+            <summary>
+            Gets or sets the name of the HTTP client used for Paystack API requests.
+            </summary>
+        </member>
         <member name="P:me_academy.core.Models.Input.PagingOptionModel.PageIndex">
             <summary>
             The page index/number to query. Defaults to 1
@@ -47,6 +71,82 @@
         <member name="P:me_academy.core.Models.Input.PagingOptionModel.PageSize">
             <summary>
             The page size to return or how many items to return. Defaults to 15
+            </summary>
+        </member>
+        <member name="T:me_academy.core.Models.Paystack.InitiateTransactionModel">
+            <summary>
+            Represents the model for initiating a transaction.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.InitiateTransactionModel.email">
+            <summary>
+            Email associated with the transaction initiation.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.InitiateTransactionModel.amount">
+            <summary>
+            Amount for the transaction initiation.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.InitiateTransactionModel.metadata">
+            <summary>
+            Additional metadata information for the transaction initiation.
+            </summary>
+        </member>
+        <member name="T:me_academy.core.Models.Paystack.PaystackResponse`1">
+            <summary>
+            Represents a generic Paystack response with status, message, and generic data payload.
+            </summary>
+            <typeparam name="T">Type of the data payload.</typeparam>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.PaystackResponse`1.status">
+            <summary>
+            Status of the Paystack response.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.PaystackResponse`1.message">
+            <summary>
+            Message associated with the Paystack response.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.PaystackResponse`1.data">
+            <summary>
+            Data payload of the Paystack response, generic type.
+            </summary>
+        </member>
+        <member name="T:me_academy.core.Models.Paystack.TransactionResponse">
+            <summary>
+            Represents the response for a transaction, including authorization URL, access code, and reference.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.TransactionResponse.authorization_url">
+            <summary>
+            URL for user authorization in the transaction response.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.TransactionResponse.access_code">
+            <summary>
+            Access code associated with the transaction response.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.TransactionResponse.reference">
+            <summary>
+            Reference identifier for the transaction response.
+            </summary>
+        </member>
+        <member name="T:me_academy.core.Models.Paystack.VerifyTransactionResponse">
+            <summary>
+            Represents the response for verifying a transaction, including an identifier and status.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.VerifyTransactionResponse.id">
+            <summary>
+            Identifier associated with the verified transaction.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Paystack.VerifyTransactionResponse.status">
+            <summary>
+            Status of the verified transaction.
             </summary>
         </member>
         <member name="T:me_academy.core.Models.Utilities.BadErrorResult">
@@ -288,6 +388,108 @@
             </summary>
         </member>
         <member name="P:me_academy.core.Models.Utilities.ForbiddenResult.Paging">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="T:me_academy.core.Models.Utilities.NotFoundErrorResult">
+            <summary>
+            Represents a Not found error result, derived from the <see cref="T:me_academy.core.Models.Utilities.Result"/> class.
+            </summary>
+        </member>
+        <member name="M:me_academy.core.Models.Utilities.NotFoundErrorResult.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:me_academy.core.Models.Utilities.NotFoundErrorResult"/> class with a default failure status.
+            </summary>
+        </member>
+        <member name="M:me_academy.core.Models.Utilities.NotFoundErrorResult.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:me_academy.core.Models.Utilities.NotFoundErrorResult"/> class with a specified error message.
+            </summary>
+            <param name="message">The error message associated with the result.</param>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult.Detail">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult.Instance">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult.Path">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult.TraceInfo">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult.ValidationErrors">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult.Content">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult.Paging">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="T:me_academy.core.Models.Utilities.NotFoundErrorResult`1">
+            <summary>
+            Represents an error result.
+            </summary>
+        </member>
+        <member name="M:me_academy.core.Models.Utilities.NotFoundErrorResult`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:me_academy.core.Models.Utilities.NotFoundErrorResult"/> class with a default failure status.
+            </summary>
+        </member>
+        <member name="M:me_academy.core.Models.Utilities.NotFoundErrorResult`1.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:me_academy.core.Models.Utilities.NotFoundErrorResult"/> class with a specified error message.
+            </summary>
+            <param name="message">The error message associated with the result.</param>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult`1.Detail">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult`1.Instance">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult`1.Path">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult`1.TraceInfo">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult`1.ValidationErrors">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult`1.Content">
+            <summary>
+            <inheritdoc/>
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.Utilities.NotFoundErrorResult`1.Paging">
             <summary>
             <inheritdoc/>
             </summary>
@@ -658,6 +860,58 @@
             <summary>
             <inheritdoc/>
             </summary>
+        </member>
+        <member name="T:me_academy.core.Models.View.Orders.PaymentRequestView">
+            <summary>
+            Represents a view model for displaying payment request information.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.View.Orders.PaymentRequestView.Id">
+            <summary>
+            Identifier for the payment request.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.View.Orders.PaymentRequestView.Authorization_Url">
+            <summary>
+            URL for user authorization in the payment request.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.View.Orders.PaymentRequestView.Access_Code">
+            <summary>
+            Access code associated with the payment request.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.View.Orders.PaymentRequestView.Reference">
+            <summary>
+            Reference identifier for the payment request.
+            </summary>
+        </member>
+        <member name="P:me_academy.core.Models.View.Orders.PaymentRequestView.IsPaid">
+            <summary>
+            Indicates whether the payment associated with the request has been made (JsonIgnore).
+            </summary>
+        </member>
+        <member name="M:me_academy.core.Services.OrderService.InitiateTransaction(me_academy.core.Models.Paystack.InitiateTransactionModel)">
+            <summary>
+            Initiates a transaction with the payment provider.
+            </summary>
+        </member>
+        <member name="M:me_academy.core.Services.OrderService.VerifyTransaction(System.String)">
+            <summary>
+            Verifies a transaction with the payment provider.
+            </summary>
+        </member>
+        <member name="T:me_academy.core.Utilities.HttpUtilities">
+            <summary>
+            Utility class for HTTP-related operations.
+            </summary>
+        </member>
+        <member name="M:me_academy.core.Utilities.HttpUtilities.ToJsonContent(System.Object)">
+            <summary>
+            Converts an object to JSON content for HTTP requests.
+            </summary>
+            <param name="obj">The object to be serialized to JSON content.</param>
+            <returns>An instance of <see cref="T:System.Net.Http.StringContent"/> representing JSON content.</returns>
         </member>
     </members>
 </doc>

@@ -119,12 +119,6 @@
             <param name="userReference"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.AuthController.UserProfile">
-            <summary>
-            Get user profile
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:me_academy.api.Controllers.AuthController.RequestPasswordReset(System.String)">
             <summary>
             Request password reset email
@@ -246,6 +240,56 @@
             </summary>
             <param name="courseUid"></param>
             <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.OrderController.ValidateDiscount(System.String,System.Decimal)">
+            <summary>
+            Validates a discount code.
+            </summary>
+            <remarks>
+            This endpoint validates a discount code and returns the discount information. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="discountCode">The discount code to validate.</param>
+            <param name="totalAmount">The total amount of the order.</param>
+            <response code="200">Returns the discount information.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.OrderController.CreateOrder(me_academy.core.Models.Input.Orders.NewOrderModel)">
+            <summary>
+            Creates a new order.
+            </summary>
+            <remarks>
+            This endpoint creates a new order with the specified details. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="model">The details of the order to create.</param>
+            <response code="201">Returns the payment information.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.OrderController.AttemptPayment(System.Int32)">
+            <summary>
+            Attempts to retry payment for an order.
+            </summary>
+            <remarks>
+            This endpoint attempts to retry payment for an order with the specified identifier. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="orderId">The identifier of the order for which payment is to be retried.</param>
+            <response code="200">Returns the payment information.</response>
+            <response code="404">Returns Not Found if the order for which payment should be retried does not exist.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.OrderController.ConfirmPayment(System.Int32)">
+            <summary>
+            Confirms payment for an order.
+            </summary>
+            <remarks>
+            This endpoint confirms payment for an order with the specified identifier. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="orderId">The identifier of the order for which payment is to be confirmed.</param>
+            <response code="200">Returns a success message</response>
+            <response code="404">Returns Not Found if order for which payment should be confirmed does not exist.</response>
+            <response code="400">Returns an error if any occurred.</response>
         </member>
         <member name="M:me_academy.api.Controllers.QuestionController.CreateQuestion(System.String,System.Collections.Generic.List{me_academy.core.Models.Input.Questions.QuestionAndAnswerModel})">
             <summary>
@@ -488,6 +532,12 @@
             Deactivate an SME Hub, making it invisible. Only Admins, SuperAdmins, and ManageCourse users can do this
             </summary>
             <param name="uid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.UserController.UserProfile">
+            <summary>
+            Get user profile
+            </summary>
             <returns></returns>
         </member>
         <member name="M:me_academy.api.Controllers.VideosController.GetUploadToken(System.Int32)">
@@ -857,6 +907,30 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.TwentyEight.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.TwentyNine">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyNine.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyNine.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.TwentyNine.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.Thirty">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Thirty.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Thirty.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.Thirty.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
