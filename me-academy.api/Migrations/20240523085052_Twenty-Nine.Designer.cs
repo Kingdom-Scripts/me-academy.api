@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240523085052_Twenty-Nine")]
+    partial class TwentyNine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -549,7 +552,10 @@ namespace me_academy.api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Available")
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -587,10 +593,7 @@ namespace me_academy.api.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("MinAmount")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<int>("TotalLeft")
-                        .HasColumnType("int");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("int");
@@ -652,8 +655,8 @@ namespace me_academy.api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<short>("Count")
-                        .HasColumnType("smallint");
+                    b.Property<int?>("Count")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
@@ -749,12 +752,14 @@ namespace me_academy.api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Access_Code")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("AnnotatedAgreementId")
                         .HasColumnType("int");
 
                     b.Property<string>("Authorization_Url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BillingAddress")
@@ -767,20 +772,20 @@ namespace me_academy.api.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("DiscountApplied")
-                        .HasColumnType("decimal(18, 2)");
+                    b.Property<decimal?>("DiscountApplied")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("DiscountId")
-                        .HasColumnType("int");
+                    b.Property<string>("DiscountCode")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("DurationId")
+                    b.Property<int>("DurationId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("ItemAmount")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ItemType")
                         .IsRequired()
@@ -790,6 +795,7 @@ namespace me_academy.api.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SeriesId")
@@ -799,7 +805,7 @@ namespace me_academy.api.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("UpdateById")
                         .HasColumnType("int");
@@ -811,10 +817,6 @@ namespace me_academy.api.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DiscountId");
-
-                    b.HasIndex("DurationId");
 
                     b.ToTable("Orders", "dbo", t =>
                         {
@@ -1394,34 +1396,6 @@ namespace me_academy.api.Migrations
                     b.ToTable("Users", "dbo");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.UserContent", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserContents", "dbo");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.UserCourse", b =>
                 {
                     b.Property<int>("Id")
@@ -1735,21 +1709,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("CreatedBy");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.Order", b =>
-                {
-                    b.HasOne("me_academy.core.Models.App.Discount", "Discount")
-                        .WithMany()
-                        .HasForeignKey("DiscountId");
-
-                    b.HasOne("me_academy.core.Models.App.Duration", "Duration")
-                        .WithMany()
-                        .HasForeignKey("DurationId");
-
-                    b.Navigation("Discount");
-
-                    b.Navigation("Duration");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.RefreshToken", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.User", "User")
@@ -1824,7 +1783,7 @@ namespace me_academy.api.Migrations
                         .IsRequired();
 
                     b.HasOne("me_academy.core.Models.App.Series", "Series")
-                        .WithMany("Courses")
+                        .WithMany("SeriesCourses")
                         .HasForeignKey("SeriesId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -1862,7 +1821,7 @@ namespace me_academy.api.Migrations
                         .IsRequired();
 
                     b.HasOne("me_academy.core.Models.App.Series", "Series")
-                        .WithMany("Prices")
+                        .WithMany("SeriesPrices")
                         .HasForeignKey("SeriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2026,11 +1985,11 @@ namespace me_academy.api.Migrations
 
             modelBuilder.Entity("me_academy.core.Models.App.Series", b =>
                 {
-                    b.Navigation("Courses");
-
                     b.Navigation("Preview");
 
-                    b.Navigation("Prices");
+                    b.Navigation("SeriesCourses");
+
+                    b.Navigation("SeriesPrices");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.SeriesQuestion", b =>

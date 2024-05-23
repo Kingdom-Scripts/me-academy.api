@@ -9,7 +9,6 @@ using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.SmeHub;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace me_academy.core.Services;
 

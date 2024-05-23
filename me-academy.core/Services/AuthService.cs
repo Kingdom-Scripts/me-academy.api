@@ -160,19 +160,6 @@ public class AuthService : IAuthService
         return new SuccessResult();
     }
 
-    public async Task<Result> UserProfile()
-    {
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Id == _userSession.UserId);
-
-        if (user == null)
-            return new ErrorResult(StatusCodes.Status404NotFound, "User not found.");
-
-        var userView = user.Adapt<UserProfileView>();
-
-        return new SuccessResult(userView);
-    }
-
     public async Task<Result> RequestForPasswordReset(string email)
     {
         string responseMessage = "If this email is associated with an account, you will receive a password reset email shortly.";

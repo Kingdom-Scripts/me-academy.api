@@ -13,5 +13,6 @@ public class CourseDetailView : CourseView
     public IEnumerable<DocumentView> Resources { get; set; } = new List<DocumentView>();
     public ReferencedUserView? CreatedBy { get; set; }
     public ReferencedUserView? UpdatedBy { get; set; }
-    public List<PriceView> CoursePrices { get; set; } = new();
+
+    public string? PreviewVideoId { get; set; }
 }

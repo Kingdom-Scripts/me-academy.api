@@ -18,12 +18,14 @@ public class MeAcademyContext : DbContext
     public required DbSet<CoursePrice> CoursePrices { get; set; }
     public required DbSet<CourseVideo> CourseVideos { get; set; }
     public required DbSet<CourseViewCount> CourseViewCounts { get; set; }
+    public required DbSet<Discount> Discounts { get; set; }
     public required DbSet<Document> Documents { get; set; }
     public required DbSet<Duration> Durations { get; set; }
     public required DbSet<InvitedUser> InvitedUsers { get; set; }
     public required DbSet<CourseQuestionOption> CourseQuestionOptions { get; set; }
     public required DbSet<CourseQuestionResponse> CourseQuestionResponses { get; set; }
     public required DbSet<CourseQuestion> CourseQuestions  { get; set; }
+    public required DbSet<Order> Orders  { get; set; }
     public required DbSet<RefreshToken> RefreshTokens { get; set; }
     public required DbSet<Role> Roles { get; set; }
     public required DbSet<Series> Series { get; set; }
@@ -37,6 +39,7 @@ public class MeAcademyContext : DbContext
     public required DbSet<SmeHub> SmeHubs { get; set; }
     public required DbSet<SmeHubType> SmeHubTypes { get; set; }
     public required DbSet<User> Users { get; set; }
+    public required DbSet<UserContent> UserContents { get; set; }
     public required DbSet<UserCourse> UserCourses { get; set; }
     public required DbSet<UserRole> UserRoles { get; set; }
 
@@ -71,7 +74,7 @@ public class MeAcademyContext : DbContext
 
         builder.Entity<CourseAuditLog>()
             .HasOne(cal => cal.Course)
-            .WithMany(c => c.CourseAuditLogs)
+            .WithMany(c => c.AuditLogs)
             .HasForeignKey(cal => cal.CourseId)
             .OnDelete(DeleteBehavior.NoAction);
 
@@ -137,7 +140,7 @@ public class MeAcademyContext : DbContext
 
         builder.Entity<SeriesCourse>()
             .HasOne(sc => sc.Series)
-            .WithMany(s => s.SeriesCourses) // Assuming Series has a collection of SeriesCourse
+            .WithMany(s => s.Courses) // Assuming Series has a collection of SeriesCourse
             .HasForeignKey(sc => sc.SeriesId);
 
         builder.Entity<SeriesCourse>()
@@ -149,5 +152,8 @@ public class MeAcademyContext : DbContext
             .HasOne(sal => sal.Series)
             .WithOne(sal => sal.Preview)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Order>()
+            .ToTable(p => p.HasCheckConstraint("CK_Order_ItemType", "[ItemType] IN ('Course', 'Series', 'SmeHub', 'AnnotatedAgreement')"));
     }
 }
