@@ -31,8 +31,18 @@ using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace me_academy.core.Extensions;
 
+/// <summary>
+/// Extension methods for configuring services in the application.
+/// </summary>
 public static class ServiceExtensions
 {
+    /// <summary>
+    /// Configures services for the application, including database, validation, authentication, authorization, HTTP context, caching, and various services.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
+    /// <param name="configuration">The configuration for the application.</param>
+    /// <param name="isProduction">A flag indicating whether the application is running in a production environment.</param>
+    /// <returns>The modified <see cref="IServiceCollection"/> for method chaining.</returns>
     public static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration configuration, bool isProduction)
     {
         // set up database
@@ -110,6 +120,25 @@ public static class ServiceExtensions
             {
                 AllowAutoRedirect = false,
                 UseDefaultCredentials = true
+            });
+
+        // Set up Paystack HttpClient
+        string paystackHttpClientName = configuration["Paystack:HttpClientName"]!;
+        ArgumentException.ThrowIfNullOrEmpty(paystackHttpClientName);
+
+        string paystackKey = configuration["Paystack:Key"]!;
+        ArgumentException.ThrowIfNullOrEmpty(paystackKey);
+
+        // Configure Paystack HttpClient
+        services.AddHttpClient(
+            paystackHttpClientName,
+            client =>
+            {
+                // Set the base address of the named client.
+                client.BaseAddress = new Uri("https://api.paystack.co/");
+
+                // Add a user-agent default request header.
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", paystackKey);
             });
 
         // Mapster global Setting. This can also be overwritten per transform

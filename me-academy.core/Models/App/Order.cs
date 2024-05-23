@@ -1,4 +1,6 @@
-﻿namespace me_academy.core.Models.App;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace me_academy.core.Models.App;
 
 public class Order : BaseAppModel
 {
@@ -11,9 +13,13 @@ public class Order : BaseAppModel
     public int? AnnotatedAgreementId { get; set; }
 
     public required string BillingAddress { get; set; }
-    public int DurationId { get; set; }
+    public int? DurationId { get; set; }
+    public int? DiscountId { get; set; }
+    [Column(TypeName = "decimal(18, 2)")]
     public decimal DiscountApplied { get; set; } = 0m;
+    [Column(TypeName = "decimal(18, 2)")]
     public decimal ItemAmount { get; set; }
+    [Column(TypeName = "decimal(18, 2)")]
     public decimal TotalAmount { get; set; }
 
     public int? UpdateById { get; set; }
@@ -25,5 +31,6 @@ public class Order : BaseAppModel
     public string? Access_Code { get; set; }
     public string? Reference { get; set; }
 
+    public Duration? Duration { get; set; }
   public Discount? Discount { get; set; }
 }

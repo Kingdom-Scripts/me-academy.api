@@ -10,12 +10,12 @@ public class AnnotatedAgreement : BaseAppModel, ISoftDeletable
 
     [Required][MaxLength(100)] public string Title { get; set; } = null!;
 
-    [Required][MaxLength(255)] public string Summary { get; set; } = "null!";
+    [Required][MaxLength(255)] public string Summary { get; set; } = null!;
 
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     [Column(TypeName = "nvarchar(MAX)")]
     [Required]
-    public required string Description { get; set; }
+    public string Description { get; set; } = null!;
 
     [Required]
     [Column(TypeName = "decimal(18, 2)")]

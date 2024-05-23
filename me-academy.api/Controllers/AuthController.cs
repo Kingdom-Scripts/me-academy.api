@@ -2,6 +2,7 @@ using me_academy.core.Interfaces;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Auth;
+using me_academy.core.Models.View.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -103,19 +104,6 @@ public class AuthController : BaseController
     public async Task<IActionResult> AuthenticateUserAsync([FromRoute] string userReference)
     {
         var res = await _authService.Logout(userReference);
-        return ProcessResponse(res);
-    }
-
-    /// <summary>
-    /// Get user profile
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("profile")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<UserProfileView>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> UserProfile()
-    {
-        var res = await _authService.UserProfile();
         return ProcessResponse(res);
     }
 

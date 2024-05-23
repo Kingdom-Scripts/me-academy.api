@@ -50,7 +50,7 @@ public class SeriesService : ISeriesService
         // add prices
         if (model.Prices.Any())
         {
-            series.SeriesPrices = model.Prices.Select(p => new SeriesPrice
+            series.Prices = model.Prices.Select(p => new SeriesPrice
             {
                 Price = p.Price,
                 DurationId = p.DurationId
@@ -72,7 +72,7 @@ public class SeriesService : ISeriesService
     public async Task<Result> UpdateSeries(string seriesUid, SeriesModel model)
     {
         var series = await _context.Series
-            .Include(x => x.SeriesPrices)
+            .Include(x => x.Prices)
             .FirstOrDefaultAsync(x => x.Uid == seriesUid);
 
         if (series == null)
@@ -85,20 +85,20 @@ public class SeriesService : ISeriesService
         series.UpdatedOnUtc = DateTime.UtcNow;
 
         // remove already deleted prices
-        var removedPrices = series.SeriesPrices
+        var removedPrices = series.Prices
             .Where(x => model.Prices.All(p => p.DurationId != x.DurationId));
         _context.RemoveRange(removedPrices);
 
         // add new prices
         foreach (var price in model.Prices)
         {
-            if (series.SeriesPrices.Any(x => x.DurationId == price.DurationId))
+            if (series.Prices.Any(x => x.DurationId == price.DurationId))
             {
-                series.SeriesPrices.First(x => x.DurationId == price.DurationId).Price = price.Price;
+                series.Prices.First(x => x.DurationId == price.DurationId).Price = price.Price;
             }
             else
             {
-                series.SeriesPrices.Add(new SeriesPrice
+                series.Prices.Add(new SeriesPrice
                 {
                     Price = price.Price,
                     DurationId = price.DurationId

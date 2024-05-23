@@ -1,4 +1,4 @@
-﻿namespace me_academy.core.Models.View.Auth;
+﻿namespace me_academy.core.Models.View.Users;
 
 public class UserProfileView
 {
