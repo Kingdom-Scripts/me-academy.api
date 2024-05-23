@@ -1,6 +1,7 @@
 ﻿using me_academy.core.Models.App;
 using me_academy.core.Models.Input.Orders;
 using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View.Orders;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,6 +43,10 @@ public class OrderService
         if (discountCode.MinAmount.HasValue && totalAmount < discountCode.MinAmount)
             return new ErrorResult(StatusCodes.Status400BadRequest, "Discount code is not valid for this amount.");
 
+        var result = new DiscountView();
+
+
+
         return new SuccessResult();
     }
 
@@ -56,9 +61,9 @@ public class OrderService
         // validate discount
        if (!string.IsNullOrEmpty(model.DiscountCode))
         {
-            //var discountRes = await ValidateDiscount(model.DiscountCode, duration.
+            var discountRes = await ValidateDiscount(model.DiscountCode, duration
         }
 
-        return new SuccessResult();
+
     }
 }
