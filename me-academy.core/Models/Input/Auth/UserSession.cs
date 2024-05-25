@@ -21,6 +21,10 @@ public class UserSession
     }
 
     public bool IsAnyAdmin => InRole(RolesConstants.SuperAdmin, RolesConstants.Admin);
+    public bool IsAnyManager => InRole(RolesConstants.Manager, RolesConstants.ManageCourse, RolesConstants.ManageUser);
+    public bool IsOnlyManager => InRole(RolesConstants.Manager);
+    public bool IsCourseManager => InRole(RolesConstants.Manager, RolesConstants.ManageCourse);
+    public bool IsUserManager => InRole(RolesConstants.Manager, RolesConstants.ManageUser);
     public bool IsCustomer => InRole(RolesConstants.Customer);
     public bool IsSuperAdmin => InRole(RolesConstants.SuperAdmin);
     public bool IsAdmin => InRole(RolesConstants.Admin);

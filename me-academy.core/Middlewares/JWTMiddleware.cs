@@ -5,7 +5,6 @@ using System.Text;
 using me_academy.core.Constants;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.Configurations;
-using me_academy.core.Models.View.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -118,6 +117,9 @@ public class JWTMiddleware
                 Id = int.Parse(id),
                 Roles = jwtToken.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList()
             };
+
+            // attach jwt to user context
+            //context.User = new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims));
 
             return true;
         }

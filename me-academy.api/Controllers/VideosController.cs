@@ -2,12 +2,14 @@ using me_academy.core.Interfaces;
 using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace me_academy.api.Controllers;
 
 [ApiController]
 [Route("api/v1/videos")]
+[Authorize]
 public class VideosController : BaseController
 {
     private readonly IVideoService _videoService;

@@ -125,11 +125,10 @@ public class UserService : IUserService
         if (invitation.CanManageUsers)
             roleIds.Add((int)Roles.ManageUser);
 
-        //var userRoles = new List<UserRole> { new() { RoleId = (int)Roles.Manager } };
-        //if (invitation.CanManageCourses)
-        //    userRoles.Add(new() { RoleId = (int)Roles.ManageCourse });
-        //if (invitation.CanManageUsers)
-        //    userRoles.Add(new() { RoleId = (int)Roles.ManageUser });
+        var userRoles = _context.Roles
+            .Where(r => roleIds.Contains(r.Id))
+            .Select(r => new UserRole { RoleId = r.Id, Role = r })
+            .ToList();
 
         // create user object
         var user = new User
@@ -155,20 +154,21 @@ public class UserService : IUserService
         if (saved < 1)
             return new ErrorResult("Unable to add user at the moment. Please try again");
 
+        // TODO: sort this out later
         // send invitation accepted email
-        var args = new Dictionary<string, string?>
-        {
-            {
-                "name", invitation.CreatedBy?.FirstName
-            },
-            {
-               "member", $"{user.FirstName} {user.LastName}"
-            },
-            {
-                "url", $"{_baseUrls.AdminClient}/auth/users"
-            }
-        };
-        await _emailService.SendEmail(user.Email, "Welcome on board", EmailTemplates.InvitationAccepted, args);
+        //var args = new Dictionary<string, string?>
+        //{
+        //    {
+        //        "name", invitation.CreatedBy?.FirstName
+        //    },
+        //    {
+        //       "member", $"{user.FirstName} {user.LastName}"
+        //    },
+        //    {
+        //        "url", $"{_baseUrls.AdminClient}/auth/users"
+        //    }
+        //};
+        //await _emailService.SendEmail(user.Email, "Welcome on board", EmailTemplates.InvitationAccepted, args);
 
         // create user token
         var authData = await _tokenGenerator.GenerateJwtToken(user);
@@ -206,7 +206,7 @@ public class UserService : IUserService
 
         // get and encode the url with token
         string url =
-            $"{_baseUrls.AdminClient}/auth/accept-invitation?email={invitation.Email}&token{HttpUtility.UrlEncode(token)}";
+            $"{_baseUrls.AdminClient}/auth/accept-invitation?email={invitation.Email}&token={HttpUtility.UrlEncode(token)}";
 
         // save invitation
         invitation.Token = token;

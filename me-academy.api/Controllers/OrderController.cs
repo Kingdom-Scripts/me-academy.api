@@ -2,12 +2,14 @@
 using me_academy.core.Models.Input.Orders;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Orders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace me_academy.api.Controllers;
 
 [ApiController]
 [Route("api/v1/orders")]
+[Authorize]
 public class OrderController : BaseController
 {
     private readonly IOrderService _orderService;

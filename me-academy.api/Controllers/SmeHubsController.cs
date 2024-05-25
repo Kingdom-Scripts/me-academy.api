@@ -3,7 +3,6 @@ using me_academy.core.Models.App.Constants;
 using me_academy.core.Models.Input.SmeHub;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.SmeHub;
-using me_academy.core.Models.View.SmeHub;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +10,7 @@ namespace me_academy.api.Controllers
 {
     [ApiController]
     [Route("api/v1/sme-hubs")]
+    [Authorize]
     public class SmeHubsController : BaseController
     {
         private readonly ISmeHubService _smeHubService;
@@ -69,6 +69,7 @@ namespace me_academy.api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet]
+        //[AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<SmeHubView>>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> ListSmeHubs([FromQuery] SmeHubSearchModel request)

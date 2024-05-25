@@ -2,7 +2,6 @@
 using me_academy.core.Models.App.Constants;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.AnnotatedAgreement;
-using me_academy.core.Models.View.AnnotatedAgreement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using me_academy.core.Models.Input.AnnotatedAgreements;
@@ -11,6 +10,7 @@ namespace me_academy.api.Controllers
 {
     [ApiController]
     [Route("api/v1/annotated-agreements")]
+    [Authorize]
     public class AnnotatedAgreementsController : BaseController
     {
         private readonly IAnnotatedAgreementService _smeHubService;

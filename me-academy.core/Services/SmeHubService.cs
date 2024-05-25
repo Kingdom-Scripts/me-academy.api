@@ -113,7 +113,7 @@ public class SmeHubService : ISmeHubService
 
     public async Task<Result> ListSmeHubs(SmeHubSearchModel request)
     {
-        if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && !_userSession.IsAnyAdmin)
+        if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)

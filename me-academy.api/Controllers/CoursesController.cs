@@ -11,15 +11,14 @@ namespace me_academy.api.Controllers;
 
 [ApiController]
 [Route("api/v1/courses")]
+[Authorize]
 public class CoursesController : BaseController
 {
     private readonly ICourseService _courseService;
-    private readonly IVideoService _videoService;
 
-    public CoursesController(ICourseService courseService, IVideoService videoService)
+    public CoursesController(ICourseService courseService)
     {
         _courseService = courseService ?? throw new ArgumentNullException(nameof(courseService));
-        _videoService = videoService ?? throw new ArgumentNullException(nameof(videoService));
     }
 
     /// <summary>

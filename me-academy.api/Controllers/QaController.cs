@@ -1,14 +1,15 @@
 using me_academy.core.Interfaces;
-using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Questions;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Questions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace me_academy.api.Controllers;
 
 [ApiController]
 [Route("api/v1/question")]
+[Authorize]
 public class QuestionController : BaseController
 {
     private readonly IQuestionService _questionService;

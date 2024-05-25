@@ -96,7 +96,7 @@ public class CourseService : ICourseService
 
         // update the course object
         course = model.Adapt(course);
-        course.Uid = await GetCourseUid(model.Title);   
+        course.Uid = await GetCourseUid(model.Title);
         course.UpdatedById = _userSession.UserId;
         course.UpdatedOnUtc = DateTime.UtcNow;
         course.UsefulLinks = new();
@@ -244,8 +244,7 @@ public class CourseService : ICourseService
     {
         if (((request.IsActive.HasValue && request.IsActive.Value)
              || request.WithDeleted)
-            && !_userSession.IsAnyAdmin
-            && !_userSession.InRole(RolesConstants.ManageCourse))
+            && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrEmpty(request.SearchQuery)
@@ -287,8 +286,8 @@ public class CourseService : ICourseService
             return new ErrorResult("Course is already published.");
 
         if (!course.Video!.IsUploaded)
-          return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
-        
+            return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
+
         course.IsPublished = true;
         course.PublishedOnUtc = DateTime.UtcNow;
         course.PublishedById = _userSession.UserId;

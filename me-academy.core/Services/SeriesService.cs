@@ -143,7 +143,7 @@ public class SeriesService : ISeriesService
 
     public async Task<Result> ListSeries(SeriesSearchModel request)
     {
-        if ((request.IsActive || request.WithDeleted) && !_userSession.IsAnyAdmin)
+        if ((request.IsActive || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)

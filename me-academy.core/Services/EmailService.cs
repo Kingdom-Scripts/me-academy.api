@@ -36,7 +36,7 @@ public class EmailService : IEmailService
             var mail = new MailMessage();
             try
             {
-                mail.From = new MailAddress("test@kingdomscripts.com");
+                mail.From = new MailAddress("test@kingdomscripts.com", "ME Academy");
                 mail.To.Add(to);
                 mail.Subject = subject;
                 mail.Body = body;
