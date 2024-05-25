@@ -540,6 +540,33 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:me_academy.api.Controllers.UserController.InviteUser(me_academy.core.Models.Input.Users.UserInvitationModel)">
+            <summary>
+            Invite a user
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.UserController.AcceptInvitation(me_academy.core.Models.Input.Users.AcceptInvitationModel)">
+            <summary>
+            Accept an invitation
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.UserController.ListInvitedUsers">
+            <summary>
+            List invited users
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.UserController.ResendInvitationEmail(System.Int32)">
+            <summary>
+            Resend invitation email
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:me_academy.api.Controllers.VideosController.GetUploadToken(System.Int32)">
             <summary>
             Get video upload token
@@ -931,6 +958,18 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.Thirty.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.ThirtyOne">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyOne.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyOne.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyOne.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>

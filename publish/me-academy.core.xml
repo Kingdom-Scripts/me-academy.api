@@ -88,6 +88,11 @@
             Amount for the transaction initiation.
             </summary>
         </member>
+        <member name="P:me_academy.core.Models.Paystack.InitiateTransactionModel.callback_url">
+            <summary>
+            The URL that will be called upon successful payment
+            </summary>
+        </member>
         <member name="P:me_academy.core.Models.Paystack.InitiateTransactionModel.metadata">
             <summary>
             Additional metadata information for the transaction initiation.
