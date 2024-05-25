@@ -123,8 +123,6 @@ public class UserService : IUserService
         if (invitation.CanManageUsers)
             userRoles.Add(new() { RoleId = (int)Roles.ManageUser });
 
-        user.UserRoles = userRoles;
-
         // create user object
         var user = new User
         {
