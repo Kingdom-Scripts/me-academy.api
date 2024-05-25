@@ -38,7 +38,7 @@ jobs:
                 NUGET_AUTH_TOKEN: ${{ github.token }}
                   
             - name: Build
-              run: dotnet publish me-academy.api --configuration Release
+              run: dotnet publish me-academy.api --configuration Release /p:EnvironmentName=Production
 
             # Clone this repository (deploy-release branch) inside the "deploy-release" folder
             # Before clearing out, move .git folder out of the "deploy-release" folder

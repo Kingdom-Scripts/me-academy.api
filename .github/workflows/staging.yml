@@ -38,7 +38,7 @@ jobs:
                 NUGET_AUTH_TOKEN: ${{ github.token }}
                   
             - name: Build
-              run: dotnet publish me-academy.api --configuration Staging
+              run: dotnet publish me-academy.api --configuration Staging /p:EnvironmentName=Staging
 
             # Clone this repository (deploy-staging branch) inside the "deploy-staging" folder
             # Before clearing out, move .git folder out of the "deploy-staging" folder
