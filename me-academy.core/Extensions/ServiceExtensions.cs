@@ -234,6 +234,7 @@ public static class ServiceExtensions
         services.TryAddTransient<ISeriesService, SeriesService>();
         services.TryAddTransient<ISmeHubService, SmeHubService>();
         services.TryAddTransient<IOrderService, OrderService>();
+        services.TryAddTransient<IUserService, UserService>();
 
         return services;
     }
