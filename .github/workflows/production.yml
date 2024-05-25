@@ -3,7 +3,7 @@ name: create-release
 on:
     push:
         branches:
-            - 'staging'
+            - 'master'
 jobs:
     build:
         name: create-release
@@ -40,20 +40,20 @@ jobs:
             - name: Build
               run: dotnet publish me-academy.api --configuration Release
 
-            # Clone this repository (deploy branch) inside the "deploy" folder
-            # Before clearing out, move .git folder out of the "deploy" folder
-            # Recreate deploy folder, empty
+            # Clone this repository (deploy-release branch) inside the "deploy-release" folder
+            # Before clearing out, move .git folder out of the "deploy-release" folder
+            # Recreate deploy-release folder, empty
             # Move .git folder back again
-            # Move publish to deploy folder
-            # Push files to the "deploy" branch
-            - name: Deploy
+            # Move publish to deploy-release folder
+            # Push files to the "deploy-release" branch
+            - name: Deploy-Release
               run: |
-                git clone --depth 1 --single-branch -b deploy git@github.com:${{ github.repository }}.git deploy
-                mv deploy/.git deploy-.git
-                rm -rf deploy
-                mkdir deploy
-                mv deploy-.git deploy/.git
-                cd deploy
+                git clone --depth 1 --single-branch -b deploy-release git@github.com:${{ github.repository }}.git deploy-release
+                mv deploy-release/.git deploy-release-.git
+                rm -rf deploy-release
+                mkdir deploy-release
+                mv deploy-release-.git deploy-release/.git
+                cd deploy-release
                 cp -R ../me-academy.api/bin/Release/net7.0/publish .
                 git add .
                 git diff --staged --quiet || git commit -m "Update Artifacts"

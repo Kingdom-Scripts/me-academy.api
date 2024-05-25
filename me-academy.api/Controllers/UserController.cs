@@ -81,7 +81,7 @@ public class UserController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("invites/{id}/resend")]
+    [HttpPatch("invites/{id}/resend")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> ResendInvitationEmail(int id)
