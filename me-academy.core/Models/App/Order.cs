@@ -23,7 +23,7 @@ public class Order : BaseAppModel
     public decimal TotalAmount { get; set; }
 
     public int? UpdateById { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
     public bool IsPaid { get; set; } = false;
     public DateTime? PaidAt { get; set; }

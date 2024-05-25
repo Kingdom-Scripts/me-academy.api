@@ -9,6 +9,7 @@ public class NewOrderModel
     public string? DiscountCode { get; set; }
     public required string ItemUid { get; set; }
     public required string ItemType { get; set; }
+    public required string CallBackUrl { get; set; }
 }
 
 public class NewOrderValidator : AbstractValidator<NewOrderModel>
@@ -25,5 +26,7 @@ public class NewOrderValidator : AbstractValidator<NewOrderModel>
         // Require DurationId when type is either Course or Series
         RuleFor(x => x.DurationId).NotEmpty().When(x => x.ItemType == "Course" || x.ItemType == "Series")
             .WithMessage("DurationId is required for Course or Series.");
+
+        RuleFor(x => x.CallBackUrl).NotEmpty();
     }
 }

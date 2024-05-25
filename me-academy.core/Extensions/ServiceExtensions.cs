@@ -138,7 +138,7 @@ public static class ServiceExtensions
                 client.BaseAddress = new Uri("https://api.paystack.co/");
 
                 // Add a user-agent default request header.
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", paystackKey);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", paystackKey);
             });
 
         // Mapster global Setting. This can also be overwritten per transform
@@ -233,6 +233,7 @@ public static class ServiceExtensions
         services.TryAddTransient<IQuestionService, QuestionService>();
         services.TryAddTransient<ISeriesService, SeriesService>();
         services.TryAddTransient<ISmeHubService, SmeHubService>();
+        services.TryAddTransient<IOrderService, OrderService>();
 
         return services;
     }

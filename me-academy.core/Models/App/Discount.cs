@@ -13,14 +13,14 @@ public class Discount : BaseAppModel
     public bool IsActive { get; set; }
     public bool IsPercentage { get; set; }
     public bool IsSingleUse { get; set; }
-    public int TotalLeft { get; set; } = -1;
+    public int TotalAvailable { get; set; } = -1;
+    public int TotalUsed { get; set; } = 0;
     [Column(TypeName = "decimal(18, 2)")]
     public decimal? MinAmount { get; set; }
     public DateTime? ExpiryDate { get; set; }
     public bool IsDeleted { get; set; }
 
     public int CreatedById { get; set; }
-    public DateTime CreatedOnUtc { get; set; }
     public int? UpdatedById { get; set; }
     public DateTime? UpdatedOnUtc { get; set; }
     public int? DeletedById { get; set; }
