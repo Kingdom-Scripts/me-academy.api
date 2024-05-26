@@ -534,33 +534,33 @@
             <param name="uid"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.UserController.UserProfile">
+        <member name="M:me_academy.api.Controllers.UsersController.UserProfile">
             <summary>
             Get user profile
             </summary>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.UserController.InviteUser(me_academy.core.Models.Input.Users.UserInvitationModel)">
+        <member name="M:me_academy.api.Controllers.UsersController.InviteUser(me_academy.core.Models.Input.Users.UserInvitationModel)">
             <summary>
             Invite a user
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.UserController.AcceptInvitation(me_academy.core.Models.Input.Users.AcceptInvitationModel)">
+        <member name="M:me_academy.api.Controllers.UsersController.AcceptInvitation(me_academy.core.Models.Input.Users.AcceptInvitationModel)">
             <summary>
             Accept an invitation
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.UserController.ListInvitedUsers">
+        <member name="M:me_academy.api.Controllers.UsersController.ListInvitedUsers">
             <summary>
             List invited users
             </summary>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.UserController.ResendInvitationEmail(System.Int32)">
+        <member name="M:me_academy.api.Controllers.UsersController.ResendInvitationEmail(System.Int32)">
             <summary>
             Resend invitation email
             </summary>
