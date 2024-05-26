@@ -143,7 +143,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpPost("{courseUid}/view")]
+    [HttpPatch("{courseUid}/view")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> AddCourseView(string courseUid)
