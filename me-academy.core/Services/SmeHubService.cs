@@ -130,7 +130,7 @@ public class SmeHubService : ISmeHubService
 
         var result = await smeHubs
             .Where(sh => string.IsNullOrEmpty(request.SearchQuery)
-                || sh.Title.ToLower().Contains(request.SearchQuery))
+                || sh.Title.ToLower().Contains(request.SearchQuery) || sh.Summary.ToLower().Contains(request.SearchQuery))
             .ProjectToType<SmeHubView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 

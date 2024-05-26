@@ -143,7 +143,7 @@ public class SeriesService : ISeriesService
 
     public async Task<Result> ListSeries(SeriesSearchModel request)
     {
-        if ((request.IsActive || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
+        if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)
@@ -154,13 +154,13 @@ public class SeriesService : ISeriesService
 
         // allow filters only for admin users or users who can manage courses
         series = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
-            ? series.Where(s => s.IsActive == request.IsActive)
+            ? series.Where(s => !request.IsActive.HasValue || s.IsActive == request.IsActive)
                 .Where(s => request.WithDeleted || !s.IsDeleted)
             : series.Where(s => s.IsActive && s.IsPublished && !s.IsDeleted);
 
         var result = await series
             .Where(s => string.IsNullOrWhiteSpace(request.SearchQuery) ||
-                        s.Title.ToLower().Contains(request.SearchQuery))
+                        s.Title.ToLower().Contains(request.SearchQuery) || s.Summary.ToLower().Contains(request.SearchQuery))
             .ProjectToType<SeriesView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 

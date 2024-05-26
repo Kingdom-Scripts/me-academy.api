@@ -263,7 +263,7 @@ public class CourseService : ICourseService
         // TODO: implement Full text search for description and title
         var result = await courses
             .Where(c => string.IsNullOrEmpty(request.SearchQuery)
-                        || c.Title.ToLower().Contains(request.SearchQuery))
+                        || c.Title.ToLower().Contains(request.SearchQuery) || c.Summary.ToLower().Contains(request.SearchQuery))
             .Include(c => c.Video)
             .ProjectToType<CourseView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);

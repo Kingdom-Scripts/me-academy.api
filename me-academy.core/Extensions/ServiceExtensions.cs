@@ -14,10 +14,12 @@ using me_academy.core.Models.Input.Series;
 using me_academy.core.Models.Input.SmeHub;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
+using me_academy.core.Models.View.Auth;
 using me_academy.core.Models.View.Courses;
 using me_academy.core.Models.View.Questions;
 using me_academy.core.Models.View.Series;
 using me_academy.core.Models.View.SmeHub;
+using me_academy.core.Models.View.Users;
 using me_academy.core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -148,6 +150,11 @@ public static class ServiceExtensions
                         .AddDestinationTransform((string x) => x.Trim())
                         .AddDestinationTransform((string x) => x ?? "")
                         .AddDestinationTransform(DestinationTransform.EmptyCollectionIfNull);
+
+        // map user models
+        TypeAdapterConfig<User, UserProfileView>
+            .NewConfig()
+            .Map(dest => dest.Roles, src => src.UserRoles != null ? src.UserRoles.Select(ur => ur.Role!.Name) : new List<string>());
 
         // map courses models
         TypeAdapterConfig<CourseModel, Course>
