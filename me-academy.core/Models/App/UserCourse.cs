@@ -10,4 +10,6 @@ public class UserCourse : BaseAppModel
 
     public DateTime PurchasedAtUtc { get; set; }
     public DateTime ExpiresAtUtc { get; set; }
+
+    public Course? Course { get; set; }
 }

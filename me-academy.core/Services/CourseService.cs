@@ -8,6 +8,7 @@ using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
 using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -95,27 +96,23 @@ public class CourseService : ICourseService
             return new ErrorResult("A course with this title already exist. Please choose another title.");
 
         // update the course object
-        course = model.Adapt(course);
-        course.Uid = await GetCourseUid(model.Title);
+        course.Title = model.Title;
+        course.Summary = model.Summary;
+        course.Description = model.Description;
+        course.Tags = string.Join(",", model.Tags);
+        //course.Uid = await GetCourseUid(model.Title);
         course.UpdatedById = _userSession.UserId;
         course.UpdatedOnUtc = DateTime.UtcNow;
         course.UsefulLinks = new();
 
-        // update the IsDeleted for the removed prices
-        var removedPrices = course.Prices
-            .Where(cp => model.Prices.All(p => p.DurationId != cp.DurationId))
-            .ToList();
-
-        _context.CoursePrices.RemoveRange(removedPrices);
-
-        // add new prices
+        // update the prices
         foreach (var price in model.Prices)
         {
             var existingPrice = course.Prices.FirstOrDefault(cp => cp.DurationId == price.DurationId);
-            if (existingPrice != null)
+            if (existingPrice is not null)
             {
                 existingPrice.Price = price.Price;
-                existingPrice.IsDeleted = false;
+                existingPrice.DurationId = price.DurationId;
             }
             else
             {
@@ -372,6 +369,14 @@ public class CourseService : ICourseService
         if (course is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
 
+        // delete existing video
+        if (course.Video is not null && course.Video.IsUploaded)
+        {
+            var videoDeleted = await _videoService.DeleteVideo(course.Video!.VideoId!);
+            if (!videoDeleted.Success)
+                return videoDeleted;
+        }
+
         var detailsSet = await _videoService.SetVideoDetails(model);
         if (!detailsSet.Success)
             return detailsSet;
@@ -393,12 +398,6 @@ public class CourseService : ICourseService
         var course = await _context.Courses
             .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
-            .Select(c => new Course
-            {
-                Id = c.Id,
-                Uid = c.Uid,
-                Title = c.Title
-            })
             .FirstOrDefaultAsync();
 
         if (course is null)
@@ -409,19 +408,18 @@ public class CourseService : ICourseService
         if (!fileSaved.Success)
             return new ErrorResult(fileSaved.Title, fileSaved.Message);
 
-        var newCourseDoc = new CourseDocument
+        course.Resources.Add(new CourseDocument
         {
-            CourseId = course.Id,
+            Course = course,
             Document = fileSaved.Content,
             CreatedById = _userSession.UserId
-        };
-
-        await _context.AddAsync(newCourseDoc);
+        });
 
         // add audit log
         AddCourseAuditLog(course,
             CourseAuditLogConstants.AddResource(course.Title, _userSession.Name, fileSaved.Content.Name));
 
+        _context.Update(course);
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
@@ -484,8 +482,9 @@ public class CourseService : ICourseService
             .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
 
         // get the next course number from sequence
-        var nextCourseNumber = await _context.GetNextCourseNumber();
-        return $"{trimmedTitle}-{nextCourseNumber}";
+        //var nextCourseNumber = await _context.GetNextCourseNumber();
+        //return $"{trimmedTitle}-{nextCourseNumber}";
+        return $"{trimmedTitle}";
     }
 
     private async void AddCourseAuditLog(Course course, string description)

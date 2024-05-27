@@ -80,7 +80,7 @@ public class SeriesService : ISeriesService
 
         // update series object
         series.Title = model.Title;
-        series.Uid = await GetSeriesUid(model.Title);
+        //series.Uid = await GetSeriesUid(model.Title);
         series.UpdatedById = _userSession.UserId;
         series.UpdatedOnUtc = DateTime.UtcNow;
 
@@ -564,8 +564,9 @@ public class SeriesService : ISeriesService
             .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
 
         // get the next series number from sequnce
-        var nextSeriesNumber = await _context.GetNextSeriesNumber();
-        return $"{trimmedTitle}-{nextSeriesNumber}";
+        //var nextSeriesNumber = await _context.GetNextSeriesNumber();
+        //return $"{trimmedTitle}-{nextSeriesNumber}";
+        return $"{trimmedTitle}";
     }
 
     private async Task<string> GetCourseUid(string title)

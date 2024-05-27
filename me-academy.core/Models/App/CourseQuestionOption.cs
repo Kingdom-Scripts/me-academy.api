@@ -10,6 +10,10 @@ public class CourseQuestionOption : BaseAppModel, ISoftDeletable
 
     public CourseQuestion? Question { get; set; }
 
+    public int CreatedById { get; set; }
+    public int? UpdatedById { get; set; }
+    public DateTime? UpdatedOnUtc { get; set; }
+
     public bool IsDeleted { get; set; }
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }

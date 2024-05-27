@@ -14,7 +14,6 @@ using me_academy.core.Models.Input.Series;
 using me_academy.core.Models.Input.SmeHub;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
-using me_academy.core.Models.View.Auth;
 using me_academy.core.Models.View.Courses;
 using me_academy.core.Models.View.Questions;
 using me_academy.core.Models.View.Series;
@@ -169,9 +168,11 @@ public static class ServiceExtensions
         TypeAdapterConfig<Course, CourseDetailView>
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList())
+            .Map(dest => dest.VideoIsUploaded, src => src.Video != null ? src.Video.IsUploaded : false)
             .Map(dest => dest.ThumbnailUrl, src => src.Video != null ? src.Video.ThumbnailUrl : "")
             .Map(dest => dest.PreviewVideoId, src => src.Video != null ? src.Video.PreviewVideoId : null)
-            .Map(dest => dest.Duration, src => src.Video == null ? "" : TimeSpan.FromSeconds(src.Video.VideoDuration).ToString("hh\\:mm\\:ss"));
+            .Map(dest => dest.Duration, src => src.Video == null ? "" : TimeSpan.FromSeconds(src.Video.VideoDuration).ToString("hh\\:mm\\:ss"))
+            .Ignore(dest => dest.Resources);
 
         TypeAdapterConfig<CoursePrice, PriceView>
             .NewConfig()

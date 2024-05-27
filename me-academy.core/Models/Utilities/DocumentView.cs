@@ -1,7 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using me_academy.core.Models.App.Constants;
-
-namespace me_academy.core.Models.Utilities;
+﻿namespace me_academy.core.Models.Utilities;
 
 public class DocumentView
 {

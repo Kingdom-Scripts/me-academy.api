@@ -3,6 +3,7 @@ using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

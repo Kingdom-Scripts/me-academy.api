@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240527130655_Thirty-Two")]
+    partial class ThirtyTwo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -383,19 +386,11 @@ namespace me_academy.api.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("UpdatedById");
 
                     b.ToTable("CourseQuestions", "dbo");
                 });
@@ -411,9 +406,6 @@ namespace me_academy.api.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<int?>("DeletedById")
                         .HasColumnType("int");
 
@@ -425,12 +417,6 @@ namespace me_academy.api.Migrations
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -1595,7 +1581,7 @@ namespace me_academy.api.Migrations
             modelBuilder.Entity("me_academy.core.Models.App.CourseDocument", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.Course", "Course")
-                        .WithMany("Resources")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1661,15 +1647,9 @@ namespace me_academy.api.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("me_academy.core.Models.App.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById");
-
                     b.Navigation("Course");
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.CourseQuestionOption", b =>
@@ -2048,8 +2028,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("Prices");
 
                     b.Navigation("QuestionAndAnswers");
-
-                    b.Navigation("Resources");
 
                     b.Navigation("SeriesCourses");
 

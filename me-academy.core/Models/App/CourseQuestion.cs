@@ -12,11 +12,15 @@ public class CourseQuestion : BaseAppModel, ISoftDeletable
 
     public int CreatedById { get; set; }
 
+    public int? UpdatedById { get; set; }
+    public DateTime? UpdatedOnUtc { get; set; }
+
     public bool IsDeleted { get; set; }
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
 
     public Course? Course { get; set; }
     public User? CreatedBy { get; set; }
+    public User? UpdatedBy { get; set; }
     public ICollection<CourseQuestionOption> Options { get; set; } = new List<CourseQuestionOption>();
 }

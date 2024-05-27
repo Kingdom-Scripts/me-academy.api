@@ -14,5 +14,6 @@ public class CourseDetailView : CourseView
     public ReferencedUserView? CreatedBy { get; set; }
     public ReferencedUserView? UpdatedBy { get; set; }
 
+    public bool VideoIsUploaded { get; set; }
     public string? PreviewVideoId { get; set; }
 }
