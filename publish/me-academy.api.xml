@@ -291,15 +291,31 @@
             <response code="404">Returns Not Found if order for which payment should be confirmed does not exist.</response>
             <response code="400">Returns an error if any occurred.</response>
         </member>
-        <member name="M:me_academy.api.Controllers.QuestionController.CreateQuestion(System.String,System.Collections.Generic.List{me_academy.core.Models.Input.Questions.QuestionAndAnswerModel})">
+        <member name="M:me_academy.api.Controllers.QuestionController.AddQuestionToCourse(System.String,me_academy.core.Models.Input.Questions.QuestionAndAnswerModel)">
             <summary>
-            Create a new question for a course
+            Add a question to a course
             </summary>
             <param name="courseUid"></param>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.QuestionController.ListQuestions(System.String)">
+        <member name="M:me_academy.api.Controllers.QuestionController.UpdateCourseQuestion(System.String,me_academy.core.Models.Input.Questions.QuestionAndAnswerModel)">
+            <summary>
+            Update the question of a course
+            </summary>
+            <param name="courseUid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.QuestionController.DeleteCourseQuestion(System.String,System.Int32)">
+            <summary>
+            Delete a question from course
+            </summary>
+            <param name="courseUid"></param>
+            <param name="questionId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.QuestionController.ListCourseQuestions(System.String)">
             <summary>
             List questions for a course
             </summary>
@@ -310,6 +326,7 @@
             <summary>
             Submit answers to a question
             </summary>
+            <param name="courseUid"></param>
             <param name="model"></param>
             <returns></returns>
         </member>
@@ -348,6 +365,7 @@
             <summary>
             Submit answers to a question for series
             </summary>
+            <param name="seriesUid"></param>
             <param name="model"></param>
             <returns></returns>
         </member>
@@ -970,6 +988,30 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.ThirtyOne.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.ThirtyTwo">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyTwo.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyTwo.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyTwo.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.ThirtyThree">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyThree.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyThree.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyThree.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
