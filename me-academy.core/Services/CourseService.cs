@@ -182,12 +182,11 @@ public class CourseService : ICourseService
             .AsQueryable();
 
         // include deleted ones if user is admin
-        if (!_userSession.IsAnyAdmin)
+        if (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
             course = course.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         var result = await course
             .Where(c => c.Uid == courseUid)
-            .OrderByDescending(c => c.CreatedAtUtc).ThenBy(c => c.UpdatedOnUtc)
             .ProjectToType<CourseDetailView>()
             .FirstOrDefaultAsync();
 
@@ -262,6 +261,7 @@ public class CourseService : ICourseService
             .Where(c => string.IsNullOrEmpty(request.SearchQuery)
                         || c.Title.ToLower().Contains(request.SearchQuery) || c.Summary.ToLower().Contains(request.SearchQuery))
             .Include(c => c.Video)
+            .OrderBy(c => c.Title).ThenBy(c => c.Summary)
             .ProjectToType<CourseView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
@@ -286,6 +286,7 @@ public class CourseService : ICourseService
             return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
 
         course.IsPublished = true;
+        course.IsActive = true;
         course.PublishedOnUtc = DateTime.UtcNow;
         course.PublishedById = _userSession.UserId;
 

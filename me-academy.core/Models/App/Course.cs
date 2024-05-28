@@ -19,7 +19,7 @@ public class Course : BaseAppModel, ISoftDeletable
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string? Tags { get; set; }
 
-    [Required] public bool IsActive { get; set; } = true;
+    [Required] public bool IsActive { get; set; } = false;
 
     public int CreatedById { get; set; }
     public int? UpdatedById { get; set; }

@@ -229,6 +229,7 @@ public class SeriesService : ISeriesService
             return new ErrorResult("Series preview video is not set.");
 
         series.IsPublished = true;
+        series.IsActive = true;
         series.PublishedOnUtc = DateTime.UtcNow;
         series.PublishedById = _userSession.UserId;
 
