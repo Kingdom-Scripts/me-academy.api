@@ -41,7 +41,8 @@ public class OrderService : IOrderService
         if (discountCode == null)
             return new ErrorResult(StatusCodes.Status400BadRequest, "Invalid discount code.");
 
-        var discount = await _context.Discounts.FirstOrDefaultAsync(d => d.Code == discountCode);
+        discountCode = discountCode.Trim();
+        var discount = await _context.Discounts.FirstOrDefaultAsync(d => d.Code.Trim() == discountCode);
 
         if (discount == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Discount code not found");
@@ -51,7 +52,7 @@ public class OrderService : IOrderService
 
         if (discount.IsSingleUse)
         {
-            var alreadyUsed = await _context.Orders.AnyAsync(x => x.Discount!.Code == discountCode && x.IsPaid);
+            var alreadyUsed = await _context.Orders.AnyAsync(x => x.Discount!.Code.Trim() == discountCode && x.IsPaid);
             if (alreadyUsed)
                 return new ErrorResult(StatusCodes.Status400BadRequest, "Discount code already used.");
         }
