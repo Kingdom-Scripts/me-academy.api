@@ -157,12 +157,11 @@ public class SmeHubService : ISmeHubService
 
     public async Task<Result> ListTypes()
     {
-        //var result = await _context.SmeHubTypes
-        //    .ProjectToType<SmeHubTypeView>()
-        //    .ToListAsync();
+        var result = await _context.SmeHubTypes
+            .ProjectToType<SmeHubTypeView>()
+            .ToListAsync();
 
-        //return new SuccessResult(result);
-        return new SuccessResult();
+        return new SuccessResult(result);
     }
 
     public async Task<Result> ActivateSmeHub(string uid)
