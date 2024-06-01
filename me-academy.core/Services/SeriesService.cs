@@ -143,7 +143,7 @@ public class SeriesService : ISeriesService
 
     public async Task<Result> ListSeries(SeriesSearchModel request)
     {
-        if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
+        if (_userSession.IsAuthenticated && (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)))
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)
@@ -153,7 +153,7 @@ public class SeriesService : ISeriesService
         var series = _context.Series.AsQueryable();
 
         // allow filters only for admin users or users who can manage courses
-        series = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
+        series = _userSession.IsAuthenticated && (_userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse))
             ? series.Where(s => !request.IsActive.HasValue || s.IsActive == request.IsActive)
                 .Where(s => request.WithDeleted || !s.IsDeleted)
             : series.Where(s => s.IsActive && s.IsPublished && !s.IsDeleted);
@@ -161,8 +161,18 @@ public class SeriesService : ISeriesService
         var result = await series
             .Where(s => string.IsNullOrWhiteSpace(request.SearchQuery) ||
                         s.Title.ToLower().Contains(request.SearchQuery) || s.Summary.ToLower().Contains(request.SearchQuery))
-            .ProjectToType<SeriesView>()
-            .ToPaginatedListAsync(request.PageIndex, request.PageSize);
+            .Select(s => new SeriesView
+            {
+                Uid = s.Uid,
+                Title = s.Title,
+                Summary = s.Summary,
+                CreatedById = s.CreatedById,
+                IsActive = s.IsActive,
+                IsPublished = s.IsPublished,
+                CreatedAtUtc = s.CreatedAtUtc,
+                PublishedOnUtc = s.PublishedOnUtc,
+                Preview = s.Preview.Adapt<VideoView>()
+            }).ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
         return new SuccessResult(result);
     }
@@ -306,21 +316,22 @@ public class SeriesService : ISeriesService
                 .Select(c => c.Id)
                 .FirstOrDefaultAsync();
 
-            if (preview is not null) {
-              preview.UploadToken = uploadToken!.Token;
-
-              _context.Update(preview);
-            }
-            else 
+            if (preview is not null)
             {
-              var newUploadData = new SeriesPreview
-              {
-                  SeriesId = seriesId,
-                  UploadToken = uploadToken!.Token
-              };
-              await _context.AddAsync(newUploadData);
+                preview.UploadToken = uploadToken!.Token;
+
+                _context.Update(preview);
             }
-            
+            else
+            {
+                var newUploadData = new SeriesPreview
+                {
+                    SeriesId = seriesId,
+                    UploadToken = uploadToken!.Token
+                };
+                await _context.AddAsync(newUploadData);
+            }
+
             await _context.SaveChangesAsync();
             return new SuccessResult(uploadToken);
         }
@@ -391,7 +402,7 @@ public class SeriesService : ISeriesService
 
         var course = await _context.Courses
             .Where(c => c.Uid == courseUid)
-            .Select(c => new Course { Id = c.Id, IsActive = c.IsActive, Title =c.Title, Summary = c.Summary})
+            .Select(c => new Course { Id = c.Id, IsActive = c.IsActive, Title = c.Title, Summary = c.Summary })
             .FirstOrDefaultAsync();
 
         if (course is null)
@@ -410,7 +421,7 @@ public class SeriesService : ISeriesService
             SeriesId = series.Id,
             CourseId = course.Id,
             Order = _context.SeriesCourses.Count(sc => sc.SeriesId == series.Id && !sc.IsDeleted) + 1,
-            CreatedById =  _userSession.UserId
+            CreatedById = _userSession.UserId
         };
 
         await _context.AddAsync(seriesCourse);

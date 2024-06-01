@@ -6,7 +6,7 @@ namespace me_academy.core.Models.App;
 public class Discount : BaseAppModel
 {
     [Required]
-    [MaxLength(15)]
+    [MaxLength(255)]
     public required string Code { get; set; }
     [Column(TypeName = "decimal(18, 2)")]
     public decimal Amount { get; set; }

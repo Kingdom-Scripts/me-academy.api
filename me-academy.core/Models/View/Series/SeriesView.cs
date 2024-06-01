@@ -10,7 +10,6 @@ public class SeriesView
     public required string Title { get; set; }
     public required string Summary { get; set; }
     public int CreatedById { get; set; }
-    public required bool IsDraft { get; set; }
     public bool IsActive { get; set; }
     public bool IsPublished { get; set; }
     public DateTime CreatedAtUtc { get; set; }
