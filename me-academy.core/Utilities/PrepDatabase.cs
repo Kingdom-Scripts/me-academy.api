@@ -19,6 +19,10 @@ public static class PrepDatabase
 
     private static void SeedData(MeAcademyContext context, bool isProd)
     {
+        // ensure db is created
+        Log.Information("--> Attempting to apply migrations...");
+        context.Database.Migrate();
+
         // run migration when in prod
         if (isProd)
         {
