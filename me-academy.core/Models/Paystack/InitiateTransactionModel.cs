@@ -8,15 +8,20 @@ public class InitiateTransactionModel
     /// <summary>
     /// Email associated with the transaction initiation.
     /// </summary>
-    public string email { get; set; }
+    public required string email { get; set; }
 
     /// <summary>
     /// Amount for the transaction initiation.
     /// </summary>
-    public string amount { get; set; }
+    public required string amount { get; set; }
+
+    /// <summary>
+    /// The URL that will be called upon successful payment
+    /// </summary>
+    public required string callback_url { get; set; }
 
     /// <summary>
     /// Additional metadata information for the transaction initiation.
     /// </summary>
-    public string metadata { get; set; }
+    public required string metadata { get; set; }
 }

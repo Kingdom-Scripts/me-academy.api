@@ -55,8 +55,8 @@ public class AnnotatedAgreementService : IAnnotatedAgreementService
     public async Task<Result> UpdateAnnotatedAgreement(string uid, AnnotatedAgreementModel model)
     {
         var annotatedAgreement = await _context.AnnotatedAgreements
-            .Where(sh => sh.Uid == uid)
-            .Include(sh => sh.Document)
+            .Where(ang => ang.Uid == uid)
+            .Include(ang => ang.Document)
             .FirstOrDefaultAsync();
 
         if (annotatedAgreement == null)
@@ -95,7 +95,7 @@ public class AnnotatedAgreementService : IAnnotatedAgreementService
     public async Task<Result> RemoveAnnotatedAgreement(string uid)
     {
         var annotatedAgreement = await _context.AnnotatedAgreements
-            .Where(sh => sh.Uid == uid)
+            .Where(ang => ang.Uid == uid)
             .FirstOrDefaultAsync();
 
         if (annotatedAgreement is null)
@@ -112,7 +112,7 @@ public class AnnotatedAgreementService : IAnnotatedAgreementService
 
     public async Task<Result> ListAnnotatedAgreements(AnnotatedAgreementSearchModel request)
     {
-        if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && !_userSession.IsAnyAdmin)
+        if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)
@@ -123,13 +123,13 @@ public class AnnotatedAgreementService : IAnnotatedAgreementService
 
         // allow filters only for admin users or users who can manage courses
         annotatedAgreements = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
-            ? annotatedAgreements.Where(sh => !request.IsActive.HasValue || sh.IsActive == request.IsActive.Value)
-                .Where(sh => request.WithDeleted || !sh.IsDeleted)
-            : annotatedAgreements.Where(sh => sh.IsActive && !sh.IsDeleted);
+            ? annotatedAgreements.Where(ang => !request.IsActive.HasValue || ang.IsActive == request.IsActive.Value)
+                .Where(ang => request.WithDeleted || !ang.IsDeleted)
+            : annotatedAgreements.Where(ang => ang.IsActive && !ang.IsDeleted);
 
         var result = await annotatedAgreements
-            .Where(sh => string.IsNullOrEmpty(request.SearchQuery)
-                || sh.Title.ToLower().Contains(request.SearchQuery))
+            .Where(ang => string.IsNullOrEmpty(request.SearchQuery)
+                || ang.Title.ToLower().Contains(request.SearchQuery) || ang.Summary.ToLower().Contains(request.SearchQuery))
             .ProjectToType<AnnotatedAgreementView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
@@ -139,10 +139,10 @@ public class AnnotatedAgreementService : IAnnotatedAgreementService
     public async Task<Result> GetAnnotatedAgreement(string uid)
     {
         var annotatedAgreement = _context.AnnotatedAgreements
-            .Where(sh => sh.Uid == uid).AsQueryable();
+            .Where(ang => ang.Uid == uid).AsQueryable();
 
-        if (!_userSession.IsAnyAdmin)
-            annotatedAgreement = annotatedAgreement.Where(sh => !sh.IsDeleted && sh.IsActive);
+        if (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
+            annotatedAgreement = annotatedAgreement.Where(ang => !ang.IsDeleted && ang.IsActive);
 
         var result = await annotatedAgreement
             .ProjectToType<AnnotatedAgreementDetailView>()

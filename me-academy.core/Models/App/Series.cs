@@ -16,7 +16,7 @@ public class Series : BaseAppModel, ISoftDeletable
 
     [StringLength(255)]
     public string Summary { get; set; } = null!;
-    [Required] public bool IsActive { get; set; } = true;
+    [Required] public bool IsActive { get; set; } = false;
     public string? Tags { get; set; }
 
     public int CreatedById { get; set; }

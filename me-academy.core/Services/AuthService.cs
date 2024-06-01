@@ -21,19 +21,16 @@ public class AuthService : IAuthService
     private readonly ITokenGenerator _tokenGenerator;
     private readonly UserSession _userSession;
     private readonly IEmailService _emailService;
-    private readonly BaseURLs _baseUrls;
 
     public AuthService(MeAcademyContext context, ITokenGenerator tokenGenerator, UserSession userSession,
-        IEmailService emailService, IOptions<AppConfig> options)
+        IEmailService emailService)
     {
-        if (options is null) throw new ArgumentNullException(nameof(options));
 
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _tokenGenerator = tokenGenerator ?? throw new ArgumentNullException(nameof(tokenGenerator));
         _userSession = userSession ?? throw new ArgumentNullException(nameof(userSession));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
 
-        _baseUrls = options.Value.BaseURLs;
     }
 
     public async Task<Result> Register(RegisterModel model)
@@ -160,13 +157,13 @@ public class AuthService : IAuthService
         return new SuccessResult();
     }
 
-    public async Task<Result> RequestForPasswordReset(string email)
+    public async Task<Result> RequestForPasswordReset(ForgotPasswordModel model)
     {
         string responseMessage = "If this email is associated with an account, you will receive a password reset email shortly.";
 
         // validate user
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email.ToLower().Trim() == email.ToLower().Trim());
+            .FirstOrDefaultAsync(u => u.Email.ToLower().Trim() == model.Email.ToLower().Trim());
         if (user is null)
             return new SuccessResult(responseMessage);
 
@@ -177,7 +174,7 @@ public class AuthService : IAuthService
         if (!saved)
             return new ErrorResult("Unable to send password reset email at the moment. Please try again.");
 
-        var emailRes = await _emailService.SendPasswordResetEmail(user.Email, token);
+        var emailRes = await _emailService.SendPasswordResetEmail(model, token);
         if (!emailRes.Success)
             return emailRes;
 
@@ -219,124 +216,6 @@ public class AuthService : IAuthService
         await _emailService.SendEmail(model.Email, "Your Password Was Just Reset - ME Academy", EmailTemplates.PasswordResetNotification);
 
         return new SuccessResult("Password reset successful.");
-    }
-
-    public async Task<Result> InviteUser(UserInvitationModel model)
-    {
-        // validate user
-        bool userExist = await _context.Users
-            .AnyAsync(u => u.Email.ToLower().Trim() == model.Email.ToLower().Trim());
-        if (userExist)
-            return new ErrorResult("User already exist in the system");
-
-        // validate invitation
-        bool invitationExist = await _context.InvitedUsers
-            .AnyAsync(i => i.Email.ToLower().Trim() == model.Email.Trim().ToLower());
-        if (invitationExist)
-            return new ErrorResult("User is already invited, kindly send a reminder instead.");
-
-        string token = CodeGenerator.GenerateCode(150);
-
-        // get and encode the url with token
-        string url =
-            $"{_baseUrls.AdminClient}/auth/accept-invitation/{model.Email}/{HttpUtility.UrlEncode(token)}";
-
-        // save invitation
-        var invitation = model.Adapt<InvitedUser>();
-        invitation.Token = token;
-        invitation.CreatedById = _userSession.UserId;
-
-        await _context.AddAsync(invitation);
-
-        int saved = await _context.SaveChangesAsync();
-
-        if (saved < 1)
-            return new ErrorResult("Unable to send invitation at the moment. Please try again.");
-
-        // send invitation email
-        var args = new Dictionary<string, string?> {
-            {
-                "url", url
-            },
-            {
-                "name", $"{model.FirstName} {model.LastName}"
-            },
-            {
-                "sender_name", _userSession.Name
-            }
-        };
-        var emailRes = await _emailService.SendEmail(model.Email, "Invitation to ME Academy", EmailTemplates.Invitation, args);
-
-        return emailRes.Success
-            ? new SuccessResult("Invitation sent successfully.")
-            : new ErrorResult("Invitation details saved successfully, but sending email failed. Kindly retry with a reminder;");
-    }
-
-    public async Task<Result> AcceptInvitation(AcceptInvitationModel model)
-    {
-        // validate invitation
-        var invitation = await _context.InvitedUsers
-            .Include(i => i.CreatedBy)
-            .FirstOrDefaultAsync(i => i.Email.ToLower().Trim() == model.Email.ToLower().Trim()
-                && i.Token == model.Token);
-        if (invitation == null)
-            return new ErrorResult("Invalid invitation.");
-
-        // validate user
-        bool userExist = await _context.Users
-            .AnyAsync(u => invitation.IsAccepted
-                || u.Email.ToLower().Trim() == model.Email.ToLower().Trim());
-        if (userExist)
-            return new ErrorResult("User already exist in the system");
-
-        // create user object
-        var user = invitation.Adapt<User>();
-        user.EmailConfirmed = true;
-        user.HashedPassword = model.Password.HashPassword();
-
-        // set up user roles
-        var userRoles = new List<UserRole> { new() { RoleId = (int)Roles.Manager} };
-        if (invitation.CanManageCourses)
-            userRoles.Add(new() { RoleId = (int)Roles.ManageCourse });
-        if (invitation.CanManageUsers)
-            userRoles.Add(new() { RoleId = (int)Roles.ManageUser });
-
-        user.UserRoles = userRoles;
-
-        // update invitation
-        invitation.IsAccepted = true;
-        invitation.DateAccepted = DateTime.UtcNow;
-
-        // save user
-        await _context.AddAsync(user);
-
-        int saved = await _context.SaveChangesAsync();
-        if (saved < 1)
-            return new ErrorResult("Unable to add user at the moment. Please try again");
-
-        // send invitation accepted email
-        var args = new Dictionary<string, string?>
-        {
-            {
-                "name", invitation.CreatedBy?.FirstName
-            },
-            {
-               "member", $"{user.FirstName} {user.LastName}"
-            },
-            {
-                "url", $"{_baseUrls.AdminClient}/auth/users"
-            }
-        };
-        await _emailService.SendEmail(user.Email, "Welcome on board", EmailTemplates.InvitationAccepted, args);
-
-        // create user token
-        var authData = await _tokenGenerator.GenerateJwtToken(user);
-
-        // return user token
-        if (!authData.Success)
-            return new SuccessResult(StatusCodes.Status201Created);
-
-        return new SuccessResult(StatusCodes.Status201Created, authData.Content);
     }
 
     #region Private Method

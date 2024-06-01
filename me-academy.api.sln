@@ -3,24 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "me-academy.api", "me-academy.api\me-academy.api.csproj", "{2B4C9474-0596-4547-8FC9-349E58E117C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "me-academy.api", "me-academy.api\me-academy.api.csproj", "{2B4C9474-0596-4547-8FC9-349E58E117C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "me-academy.core", "me-academy.core\me-academy.core.csproj", "{98FE2CE5-2C53-4D42-999F-05D483EC78AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "me-academy.core", "me-academy.core\me-academy.core.csproj", "{98FE2CE5-2C53-4D42-999F-05D483EC78AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Staging|Any CPU = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2B4C9474-0596-4547-8FC9-349E58E117C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2B4C9474-0596-4547-8FC9-349E58E117C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B4C9474-0596-4547-8FC9-349E58E117C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B4C9474-0596-4547-8FC9-349E58E117C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B4C9474-0596-4547-8FC9-349E58E117C8}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{2B4C9474-0596-4547-8FC9-349E58E117C8}.Staging|Any CPU.Build.0 = Staging|Any CPU
 		{98FE2CE5-2C53-4D42-999F-05D483EC78AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{98FE2CE5-2C53-4D42-999F-05D483EC78AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98FE2CE5-2C53-4D42-999F-05D483EC78AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98FE2CE5-2C53-4D42-999F-05D483EC78AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98FE2CE5-2C53-4D42-999F-05D483EC78AF}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{98FE2CE5-2C53-4D42-999F-05D483EC78AF}.Staging|Any CPU.Build.0 = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

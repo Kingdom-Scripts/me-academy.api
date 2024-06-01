@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace me_academy.core.Models.Input.Auth;
+namespace me_academy.core.Models.Input.Users;
 
 public class AcceptInvitationModel
 {

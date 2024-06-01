@@ -112,13 +112,13 @@ public class AuthController : BaseController
     /// </summary>
     /// <param name="email"></param>
     /// <returns></returns>
-    [HttpGet("request-password-reset")]
+    [HttpPost("request-password-reset")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> RequestPasswordReset([FromQuery] string email)
+    public async Task<IActionResult> RequestPasswordReset(ForgotPasswordModel model)
     {
-        var res = await _authService.RequestForPasswordReset(email);
+        var res = await _authService.RequestForPasswordReset(model);
         return ProcessResponse(res);
     }
 

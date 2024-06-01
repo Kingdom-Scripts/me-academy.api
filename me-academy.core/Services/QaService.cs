@@ -24,8 +24,11 @@ public class QuestionService : IQuestionService
 
 
     #region Course Questions
-    public async Task<Result> CreateCourseQuestion(string courseUid, List<QuestionAndAnswerModel> model)
+    public async Task<Result> AddQuestionToCourse(string courseUid, QuestionAndAnswerModel model)
     {
+        if (model.IsMultiple && !model.Options.Any())
+            return new ErrorResult("Multiple choice question must have options");
+
         int courseId = await _context.Courses
             .Where(c => c.Uid == courseUid && !c.IsDeleted)
             .Select(c => c.Id)
@@ -34,26 +37,110 @@ public class QuestionService : IQuestionService
         if (courseId == 0)
             return new ErrorResult("Course not found");
 
-        var newQuestion = model.Adapt<List<CourseQuestion>>();
-        newQuestion.ForEach(q =>
+        var newQuestion = model.Adapt<CourseQuestion>();
+        newQuestion.CourseId = courseId;
+        newQuestion.CreatedById = _userSession.UserId;
+        if (model.IsMultiple)
         {
-            q.CourseId = courseId;
-            q.CreatedById = _userSession.UserId;
-        });
+            newQuestion.Options = model.Options.Select(o => new CourseQuestionOption
+            {
+                Value = o.Value,
+                CreatedById = _userSession.UserId
+            }).ToList();
+        }
 
-        await _context.CourseQuestions.AddRangeAsync(newQuestion);
+        await _context.AddAsync(newQuestion);
 
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
-            ? new SuccessResult("Question created successfully")
-            : new ErrorResult("Failed to create question");
+            ? new SuccessResult("Question added to course successfully")
+            : new ErrorResult("Failed to add question to course");
+    }
+
+    public async Task<Result> UpdateCourseQuestion(string courseUid, QuestionAndAnswerModel model)
+    {
+        if (model.IsMultiple && !model.Options.Any())
+            return new ErrorResult("Multiple choice question must have options");
+
+        var question = await _context.CourseQuestions
+            .Include(q => q.Options)
+            .Where(q => q.Course!.Uid == courseUid && q.Id == model.Id && !q.IsDeleted)
+            .FirstOrDefaultAsync();
+
+        if (question == null)
+            return new ErrorResult("Question not found");
+
+        if (question.IsMultiple && !model.IsMultiple)
+        {
+            _context.CourseQuestionOptions.RemoveRange(question.Options);
+        }
+        else if (model.IsMultiple)
+        {
+            // add new options
+            foreach (var opt in model.Options)
+            {
+                var option = question.Options.FirstOrDefault(o => o.Id == opt.Id);
+                if (option == null)
+                {
+                    question.Options.Add(new CourseQuestionOption
+                    {
+                        Value = opt.Value,
+                        CreatedById = _userSession.UserId
+                    });
+                }
+                else
+                {
+                    option.Value = opt.Value;
+                    option.UpdatedById = _userSession.UserId;
+                    option.UpdatedOnUtc = DateTime.UtcNow;
+                }
+            }
+
+            // remove deleted options
+            var optionIds = model.Options.Select(o => o.Id);
+            var deletedOptions = question.Options.Where(o => !optionIds.Contains(o.Id)).ToList();
+            _context.CourseQuestionOptions.RemoveRange(deletedOptions);
+        }
+
+        // Update questions
+        question.Text = model.Text;
+        question.IsMultiple = model.IsMultiple;
+        question.IsRequired = model.IsRequired;
+
+        question.UpdatedById = _userSession.UserId;
+        question.UpdatedOnUtc = DateTime.UtcNow;
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult("Question updated successfully")
+            : new ErrorResult("Failed to update question");
+    }
+
+    public async Task<Result> DeleteCourseQuestion(string courseUid, int questionId)
+    {
+        var question = await _context.CourseQuestions
+            .Where(q => q.Course!.Uid == courseUid && q.Id == questionId && !q.IsDeleted)
+            .FirstOrDefaultAsync();
+
+        if (question == null)
+            return new ErrorResult("Question not found");
+
+        _context.CourseQuestions.Remove(question);
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult("Question deleted successfully")
+            : new ErrorResult("Failed to delete question");
     }
 
     public async Task<Result> ListCourseQuestions(string courseUid)
     {
         var questions = await _context.CourseQuestions
-            .Where(q => q.Course!.Uid == courseUid)
+            .Include(q => q.Options)
+            .Where(q => q.Course!.Uid == courseUid && !q.IsDeleted)
             .ProjectToType<CourseQuestionView>()
             .ToListAsync();
 

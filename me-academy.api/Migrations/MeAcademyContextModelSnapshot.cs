@@ -383,11 +383,19 @@ namespace me_academy.api.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
 
                     b.ToTable("CourseQuestions", "dbo");
                 });
@@ -403,6 +411,9 @@ namespace me_academy.api.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DeletedById")
                         .HasColumnType("int");
 
@@ -414,6 +425,12 @@ namespace me_academy.api.Migrations
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -482,6 +499,12 @@ namespace me_academy.api.Migrations
 
                     b.Property<bool>("IsUploaded")
                         .HasColumnType("bit");
+
+                    b.Property<int>("PreviewEnd")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PreviewStart")
+                        .HasColumnType("int");
 
                     b.Property<string>("PreviewVideoId")
                         .HasMaxLength(255)
@@ -562,9 +585,6 @@ namespace me_academy.api.Migrations
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedOnUtc")
-                        .HasColumnType("datetime2");
-
                     b.Property<int?>("DeletedById")
                         .HasColumnType("int");
 
@@ -589,7 +609,10 @@ namespace me_academy.api.Migrations
                     b.Property<decimal?>("MinAmount")
                         .HasColumnType("decimal(18, 2)");
 
-                    b.Property<int>("TotalLeft")
+                    b.Property<int>("TotalAvailable")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalUsed")
                         .HasColumnType("int");
 
                     b.Property<int?>("UpdatedById")
@@ -804,7 +827,7 @@ namespace me_academy.api.Migrations
                     b.Property<int?>("UpdateById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
@@ -812,9 +835,17 @@ namespace me_academy.api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AnnotatedAgreementId");
+
+                    b.HasIndex("CourseId");
+
                     b.HasIndex("DiscountId");
 
                     b.HasIndex("DurationId");
+
+                    b.HasIndex("SeriesId");
+
+                    b.HasIndex("SmeHubId");
 
                     b.ToTable("Orders", "dbo", t =>
                         {
@@ -1405,7 +1436,7 @@ namespace me_academy.api.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("OrderId")
@@ -1419,6 +1450,11 @@ namespace me_academy.api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
                     b.ToTable("UserContents", "dbo");
                 });
 
@@ -1430,31 +1466,27 @@ namespace me_academy.api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CompletedAtUtc")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("ExpiresAtUtc")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Progress")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsExpired")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("PurchasedAtUtc")
-                        .HasColumnType("datetime2");
+                    b.Property<decimal>("Progress")
+                        .HasColumnType("decimal(20, 12)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
 
                     b.ToTable("UserCourses", "dbo");
                 });
@@ -1570,7 +1602,7 @@ namespace me_academy.api.Migrations
             modelBuilder.Entity("me_academy.core.Models.App.CourseDocument", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.Course", "Course")
-                        .WithMany()
+                        .WithMany("Resources")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1636,9 +1668,15 @@ namespace me_academy.api.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("me_academy.core.Models.App.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
+
                     b.Navigation("Course");
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.CourseQuestionOption", b =>
@@ -1737,6 +1775,14 @@ namespace me_academy.api.Migrations
 
             modelBuilder.Entity("me_academy.core.Models.App.Order", b =>
                 {
+                    b.HasOne("me_academy.core.Models.App.AnnotatedAgreement", "AnnotatedAgreement")
+                        .WithMany()
+                        .HasForeignKey("AnnotatedAgreementId");
+
+                    b.HasOne("me_academy.core.Models.App.Course", "Course")
+                        .WithMany("Orders")
+                        .HasForeignKey("CourseId");
+
                     b.HasOne("me_academy.core.Models.App.Discount", "Discount")
                         .WithMany()
                         .HasForeignKey("DiscountId");
@@ -1745,9 +1791,25 @@ namespace me_academy.api.Migrations
                         .WithMany()
                         .HasForeignKey("DurationId");
 
+                    b.HasOne("me_academy.core.Models.App.Series", "Series")
+                        .WithMany()
+                        .HasForeignKey("SeriesId");
+
+                    b.HasOne("me_academy.core.Models.App.SmeHub", "SmeHub")
+                        .WithMany()
+                        .HasForeignKey("SmeHubId");
+
+                    b.Navigation("AnnotatedAgreement");
+
+                    b.Navigation("Course");
+
                     b.Navigation("Discount");
 
                     b.Navigation("Duration");
+
+                    b.Navigation("Series");
+
+                    b.Navigation("SmeHub");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.RefreshToken", b =>
@@ -1980,6 +2042,36 @@ namespace me_academy.api.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("me_academy.core.Models.App.UserContent", b =>
+                {
+                    b.HasOne("me_academy.core.Models.App.Order", "Order")
+                        .WithOne("UserContent")
+                        .HasForeignKey("me_academy.core.Models.App.UserContent", "OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("me_academy.core.Models.App.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.UserCourse", b =>
+                {
+                    b.HasOne("me_academy.core.Models.App.Course", "Course")
+                        .WithMany("UserCourses")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("me_academy.core.Models.App.UserRole", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.Role", "Role")
@@ -2003,13 +2095,19 @@ namespace me_academy.api.Migrations
                 {
                     b.Navigation("AuditLogs");
 
+                    b.Navigation("Orders");
+
                     b.Navigation("Prices");
 
                     b.Navigation("QuestionAndAnswers");
 
+                    b.Navigation("Resources");
+
                     b.Navigation("SeriesCourses");
 
                     b.Navigation("UsefulLinks");
+
+                    b.Navigation("UserCourses");
 
                     b.Navigation("Video");
                 });
@@ -2017,6 +2115,11 @@ namespace me_academy.api.Migrations
             modelBuilder.Entity("me_academy.core.Models.App.CourseQuestion", b =>
                 {
                     b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.Order", b =>
+                {
+                    b.Navigation("UserContent");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.Role", b =>

@@ -3,6 +3,7 @@ using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,15 +12,14 @@ namespace me_academy.api.Controllers;
 
 [ApiController]
 [Route("api/v1/courses")]
+[Authorize]
 public class CoursesController : BaseController
 {
     private readonly ICourseService _courseService;
-    private readonly IVideoService _videoService;
 
-    public CoursesController(ICourseService courseService, IVideoService videoService)
+    public CoursesController(ICourseService courseService)
     {
         _courseService = courseService ?? throw new ArgumentNullException(nameof(courseService));
-        _videoService = videoService ?? throw new ArgumentNullException(nameof(videoService));
     }
 
     /// <summary>
@@ -144,7 +144,8 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpPost("{courseUid}/view")]
+    [AllowAnonymous]
+    [HttpPatch("{courseUid}/view")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> AddCourseView(string courseUid)
@@ -158,6 +159,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
+    [AllowAnonymous]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<CourseView>>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
@@ -186,7 +188,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpPost("{courseUid}/activate")]
+    [HttpPut("{courseUid}/activate")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> ActivateCourse(string courseUid)
@@ -200,7 +202,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpPost("{courseUid}/deactivate")]
+    [HttpPut("{courseUid}/deactivate")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> DeactivateCourse(string courseUid)

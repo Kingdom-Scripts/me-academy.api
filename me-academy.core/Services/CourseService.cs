@@ -8,6 +8,7 @@ using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
+using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
 using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -95,27 +96,23 @@ public class CourseService : ICourseService
             return new ErrorResult("A course with this title already exist. Please choose another title.");
 
         // update the course object
-        course = model.Adapt(course);
-        course.Uid = await GetCourseUid(model.Title);   
+        course.Title = model.Title;
+        course.Summary = model.Summary;
+        course.Description = model.Description;
+        course.Tags = string.Join(",", model.Tags);
+        //course.Uid = await GetCourseUid(model.Title);
         course.UpdatedById = _userSession.UserId;
         course.UpdatedOnUtc = DateTime.UtcNow;
         course.UsefulLinks = new();
 
-        // update the IsDeleted for the removed prices
-        var removedPrices = course.Prices
-            .Where(cp => model.Prices.All(p => p.DurationId != cp.DurationId))
-            .ToList();
-
-        _context.CoursePrices.RemoveRange(removedPrices);
-
-        // add new prices
+        // update the prices
         foreach (var price in model.Prices)
         {
             var existingPrice = course.Prices.FirstOrDefault(cp => cp.DurationId == price.DurationId);
-            if (existingPrice != null)
+            if (existingPrice is not null)
             {
                 existingPrice.Price = price.Price;
-                existingPrice.IsDeleted = false;
+                existingPrice.DurationId = price.DurationId;
             }
             else
             {
@@ -185,12 +182,11 @@ public class CourseService : ICourseService
             .AsQueryable();
 
         // include deleted ones if user is admin
-        if (!_userSession.IsAnyAdmin)
+        if (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
             course = course.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         var result = await course
             .Where(c => c.Uid == courseUid)
-            .OrderByDescending(c => c.CreatedAtUtc).ThenBy(c => c.UpdatedOnUtc)
             .ProjectToType<CourseDetailView>()
             .FirstOrDefaultAsync();
 
@@ -242,12 +238,11 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListCourses(CourseSearchModel request)
     {
-        if (((request.IsActive.HasValue && request.IsActive.Value)
+        if (_userSession.IsAuthenticated && (((request.IsActive.HasValue && request.IsActive.Value)
              || request.WithDeleted)
-            && !_userSession.IsAnyAdmin
-            && !_userSession.InRole(RolesConstants.ManageCourse))
+            && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)))
             return new ForbiddenResult();
-
+        
         request.SearchQuery = !string.IsNullOrEmpty(request.SearchQuery)
             ? request.SearchQuery.ToLower().Trim()
             : null;
@@ -255,18 +250,38 @@ public class CourseService : ICourseService
         var courses = _context.Courses.Where(c => !c.ForSeriesOnly).AsQueryable();
 
         // allow filters only for admin users or users who can manage courses
-        courses = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
+        courses = _userSession.IsAuthenticated && (_userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse))
             ? courses
                 .Where(c => !request.IsActive.HasValue || c.IsActive == request.IsActive)
                 .Where(c => request.WithDeleted || !c.IsDeleted)
             : courses.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         // TODO: implement Full text search for description and title
+        var today = DateTime.UtcNow.Date;
         var result = await courses
             .Where(c => string.IsNullOrEmpty(request.SearchQuery)
-                        || c.Title.ToLower().Contains(request.SearchQuery))
+                        || c.Title.ToLower().Contains(request.SearchQuery) || c.Summary.ToLower().Contains(request.SearchQuery))
             .Include(c => c.Video)
-            .ProjectToType<CourseView>()
+            .OrderBy(c => c.Title).ThenBy(c => c.Summary)
+            .Select(c => new CourseView
+            {
+                Uid = c.Uid,
+                Title = c.Title,
+                Summary = c.Summary,
+                CreatedById = c.CreatedById,
+                IsPublished = c.IsPublished,
+                IsActive = c.IsActive,
+                CreatedAtUtc = c.CreatedAtUtc,
+                PublishedOnUtc = c.PublishedOnUtc,
+                ThumbnailUrl = c.Video != null ? c.Video.ThumbnailUrl : null,
+                Prices = c.Prices.Where(cp => !cp.IsDeleted).Select(cp => new PriceView
+                {
+                    Price = cp.Price,
+                    Name = cp.Duration!.Name
+                }).ToList(),
+                Duration = c.Video != null ? TimeSpan.FromSeconds(c.Video.VideoDuration).ToString("hh\\:mm\\:ss") : null,
+                HasBought = _userSession.IsAuthenticated && c.UserCourses.Any(o => o.CourseId == c.Id && o.UserId == _userSession.UserId && !o.IsExpired)
+            })
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
         return new SuccessResult(result);
@@ -287,9 +302,10 @@ public class CourseService : ICourseService
             return new ErrorResult("Course is already published.");
 
         if (!course.Video!.IsUploaded)
-          return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
-        
+            return new ErrorResult("Course video is not uploaded yet. Please upload the video first.");
+
         course.IsPublished = true;
+        course.IsActive = true;
         course.PublishedOnUtc = DateTime.UtcNow;
         course.PublishedById = _userSession.UserId;
 
@@ -373,6 +389,14 @@ public class CourseService : ICourseService
         if (course is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
 
+        // delete existing video
+        if (course.Video is not null && course.Video.IsUploaded)
+        {
+            var videoDeleted = await _videoService.DeleteVideo(course.Video!.VideoId!);
+            if (!videoDeleted.Success)
+                return videoDeleted;
+        }
+
         var detailsSet = await _videoService.SetVideoDetails(model);
         if (!detailsSet.Success)
             return detailsSet;
@@ -394,12 +418,6 @@ public class CourseService : ICourseService
         var course = await _context.Courses
             .Where(c => !c.ForSeriesOnly)
             .Where(c => c.Uid == courseUid)
-            .Select(c => new Course
-            {
-                Id = c.Id,
-                Uid = c.Uid,
-                Title = c.Title
-            })
             .FirstOrDefaultAsync();
 
         if (course is null)
@@ -410,19 +428,18 @@ public class CourseService : ICourseService
         if (!fileSaved.Success)
             return new ErrorResult(fileSaved.Title, fileSaved.Message);
 
-        var newCourseDoc = new CourseDocument
+        course.Resources.Add(new CourseDocument
         {
-            CourseId = course.Id,
+            Course = course,
             Document = fileSaved.Content,
             CreatedById = _userSession.UserId
-        };
-
-        await _context.AddAsync(newCourseDoc);
+        });
 
         // add audit log
         AddCourseAuditLog(course,
             CourseAuditLogConstants.AddResource(course.Title, _userSession.Name, fileSaved.Content.Name));
 
+        _context.Update(course);
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
@@ -485,8 +502,9 @@ public class CourseService : ICourseService
             .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
 
         // get the next course number from sequence
-        var nextCourseNumber = await _context.GetNextCourseNumber();
-        return $"{trimmedTitle}-{nextCourseNumber}";
+        //var nextCourseNumber = await _context.GetNextCourseNumber();
+        //return $"{trimmedTitle}-{nextCourseNumber}";
+        return $"{trimmedTitle}";
     }
 
     private async void AddCourseAuditLog(Course course, string description)

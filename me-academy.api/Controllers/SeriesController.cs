@@ -5,12 +5,14 @@ using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
 using me_academy.core.Models.View.Series;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace me_academy.api.Controllers
 {
     [ApiController]
     [Route("api/v1/series")]
+    [Authorize]
     public class SeriesController : BaseController
     {
         private readonly ISeriesService _seriesService;

@@ -19,7 +19,7 @@ public class Course : BaseAppModel, ISoftDeletable
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string? Tags { get; set; }
 
-    [Required] public bool IsActive { get; set; } = true;
+    [Required] public bool IsActive { get; set; } = false;
 
     public int CreatedById { get; set; }
     public int? UpdatedById { get; set; }
@@ -44,4 +44,7 @@ public class Course : BaseAppModel, ISoftDeletable
     public List<CoursePrice> Prices { get; set; } = new();
     public IQueryable<CourseQuestion> QuestionAndAnswers { get; set; } = new List<CourseQuestion>().AsQueryable();
     public List<SeriesCourse> SeriesCourses { get; set; } = new();
+    public List<CourseDocument> Resources { get; set; } = new();
+    public List<Order> Orders { get; set; } = new();
+    public List<UserCourse> UserCourses { get; set; } = new();
 }

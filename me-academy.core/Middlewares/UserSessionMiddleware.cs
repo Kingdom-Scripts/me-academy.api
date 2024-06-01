@@ -19,12 +19,17 @@ public class UserSessionMiddleware
         {
             int.TryParse(context.User.Claims.SingleOrDefault(c => c.Type == "sid")?.Value, out int UserId);
 
+            session.IsAuthenticated = true;
             session.UserId = UserId;
             session.Uid = context.User.Claims.SingleOrDefault(c => c.Type == "uid")?.Value;
             session.Name = context.User.Claims.SingleOrDefault(c => c.Type == "name")?.Value;
             session.Roles = context.User.Claims
                 .Where(c => c.Type == ClaimTypes.Role)
                 .Select(x => x.Value).ToList();
+        }
+        else
+        {
+            session.IsAuthenticated = false;
         }
 
         // Call the next delegate/middleware in the pipeline

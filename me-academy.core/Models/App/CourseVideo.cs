@@ -11,6 +11,8 @@ public class CourseVideo : BaseAppModel
     public int VideoDuration { get; set; }
 
     [MaxLength(255)] public string? PreviewVideoId { get; set; }
+    public int PreviewStart { get; set; }
+    public int PreviewEnd { get; set; }
     [MaxLength(255)] public string? ThumbnailUrl { get; set; }
     public bool IsUploaded { get; set; } = false;
 

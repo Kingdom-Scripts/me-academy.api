@@ -18,6 +18,7 @@ using me_academy.core.Models.View.Courses;
 using me_academy.core.Models.View.Questions;
 using me_academy.core.Models.View.Series;
 using me_academy.core.Models.View.SmeHub;
+using me_academy.core.Models.View.Users;
 using me_academy.core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -138,7 +139,7 @@ public static class ServiceExtensions
                 client.BaseAddress = new Uri("https://api.paystack.co/");
 
                 // Add a user-agent default request header.
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", paystackKey);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", paystackKey);
             });
 
         // Mapster global Setting. This can also be overwritten per transform
@@ -148,6 +149,11 @@ public static class ServiceExtensions
                         .AddDestinationTransform((string x) => x.Trim())
                         .AddDestinationTransform((string x) => x ?? "")
                         .AddDestinationTransform(DestinationTransform.EmptyCollectionIfNull);
+
+        // map user models
+        TypeAdapterConfig<User, UserProfileView>
+            .NewConfig()
+            .Map(dest => dest.Roles, src => src.UserRoles != null ? src.UserRoles.Select(ur => ur.Role!.Name) : new List<string>());
 
         // map courses models
         TypeAdapterConfig<CourseModel, Course>
@@ -162,9 +168,11 @@ public static class ServiceExtensions
         TypeAdapterConfig<Course, CourseDetailView>
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList())
+            .Map(dest => dest.VideoIsUploaded, src => src.Video != null ? src.Video.IsUploaded : false)
             .Map(dest => dest.ThumbnailUrl, src => src.Video != null ? src.Video.ThumbnailUrl : "")
             .Map(dest => dest.PreviewVideoId, src => src.Video != null ? src.Video.PreviewVideoId : null)
-            .Map(dest => dest.Duration, src => src.Video == null ? "" : TimeSpan.FromSeconds(src.Video.VideoDuration).ToString("hh\\:mm\\:ss"));
+            .Map(dest => dest.Duration, src => src.Video == null ? "" : TimeSpan.FromSeconds(src.Video.VideoDuration).ToString("hh\\:mm\\:ss"))
+            .Ignore(dest => dest.Resources);
 
         TypeAdapterConfig<CoursePrice, PriceView>
             .NewConfig()
@@ -233,6 +241,9 @@ public static class ServiceExtensions
         services.TryAddTransient<IQuestionService, QuestionService>();
         services.TryAddTransient<ISeriesService, SeriesService>();
         services.TryAddTransient<ISmeHubService, SmeHubService>();
+        services.TryAddTransient<IOrderService, OrderService>();
+        services.TryAddTransient<IUserService, UserService>();
+        services.TryAddTransient<IAnnotatedAgreementService, AnnotatedAgreementService>();
 
         return services;
     }

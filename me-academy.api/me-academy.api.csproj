@@ -7,6 +7,7 @@
     <RootNamespace>me_academy.api</RootNamespace>
     <Company>ME Academy</Company>
     <Product>ME Academy API</Product>
+    <Configurations>Debug;Release;Staging</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -15,6 +16,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>bin\Release\me-academy.api.xml</DocumentationFile>
+    <NoWarn>1701;1702;IL2121;1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Staging'">
     <DocumentationFile>bin\Release\me-academy.api.xml</DocumentationFile>
     <NoWarn>1701;1702;IL2121;1591</NoWarn>
   </PropertyGroup>

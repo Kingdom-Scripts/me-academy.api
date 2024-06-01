@@ -1,4 +1,5 @@
 using me_academy.core.Models.ApiVideo.Response;
+using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 
@@ -11,4 +12,7 @@ public interface IVideoService
     Task<Result> SetVideoDetails(VideoDetailModel model);
     Task<Result> SetVideoPreview(string courseUid, ApiVideoClipModel model);
     Task<Result> DeleteVideo(string videoId);
+    Task<Result> GetVideoPlayerDetails(string courseUid);
+    Task<Result> GetUserCourseProgress(string courseUid);
+    Task<Result> ReportCourseProgress(string courseUid, ProgressReportModel model);
 }

@@ -3,13 +3,13 @@ using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Config;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace me_academy.api.Controllers;
 
 [ApiController]
 [Route("api/v1/configs")]
+[Authorize]
 public class ConfigsController : BaseController
 {
     private readonly IConfigService _configService;

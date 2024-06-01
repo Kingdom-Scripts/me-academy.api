@@ -7,6 +7,7 @@ namespace me_academy.api.Controllers;
 
 [ApiController]
 [Route("api/v1/assets")]
+[Authorize]
 public class AssetsController : BaseController
 {
     private readonly IFileService _fileService;

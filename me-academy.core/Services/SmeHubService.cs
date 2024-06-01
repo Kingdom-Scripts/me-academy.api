@@ -113,7 +113,7 @@ public class SmeHubService : ISmeHubService
 
     public async Task<Result> ListSmeHubs(SmeHubSearchModel request)
     {
-        if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && !_userSession.IsAnyAdmin)
+        if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)
@@ -130,7 +130,7 @@ public class SmeHubService : ISmeHubService
 
         var result = await smeHubs
             .Where(sh => string.IsNullOrEmpty(request.SearchQuery)
-                || sh.Title.ToLower().Contains(request.SearchQuery))
+                || sh.Title.ToLower().Contains(request.SearchQuery) || sh.Summary.ToLower().Contains(request.SearchQuery))
             .ProjectToType<SmeHubView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
@@ -142,7 +142,7 @@ public class SmeHubService : ISmeHubService
         var smeHub = _context.SmeHubs
             .Where(sh => sh.Uid == uid).AsQueryable();
 
-        if (!_userSession.IsAnyAdmin)
+        if (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
             smeHub = smeHub.Where(sh => !sh.IsDeleted && sh.IsActive);
 
         var result = await smeHub

@@ -80,7 +80,7 @@ public class SeriesService : ISeriesService
 
         // update series object
         series.Title = model.Title;
-        series.Uid = await GetSeriesUid(model.Title);
+        //series.Uid = await GetSeriesUid(model.Title);
         series.UpdatedById = _userSession.UserId;
         series.UpdatedOnUtc = DateTime.UtcNow;
 
@@ -143,7 +143,7 @@ public class SeriesService : ISeriesService
 
     public async Task<Result> ListSeries(SeriesSearchModel request)
     {
-        if ((request.IsActive || request.WithDeleted) && !_userSession.IsAnyAdmin)
+        if (((request.IsActive.HasValue && request.IsActive.Value) || request.WithDeleted) && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)
@@ -154,13 +154,13 @@ public class SeriesService : ISeriesService
 
         // allow filters only for admin users or users who can manage courses
         series = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
-            ? series.Where(s => s.IsActive == request.IsActive)
+            ? series.Where(s => !request.IsActive.HasValue || s.IsActive == request.IsActive)
                 .Where(s => request.WithDeleted || !s.IsDeleted)
             : series.Where(s => s.IsActive && s.IsPublished && !s.IsDeleted);
 
         var result = await series
             .Where(s => string.IsNullOrWhiteSpace(request.SearchQuery) ||
-                        s.Title.ToLower().Contains(request.SearchQuery))
+                        s.Title.ToLower().Contains(request.SearchQuery) || s.Summary.ToLower().Contains(request.SearchQuery))
             .ProjectToType<SeriesView>()
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
@@ -172,7 +172,7 @@ public class SeriesService : ISeriesService
         var series = _context.Series.AsQueryable();
 
         // include deleted ones if user is admin
-        if (!_userSession.IsAnyAdmin)
+        if (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
             series = series.Where(s => !s.IsDeleted && s.IsActive && s.IsPublished);
 
         var result = await series
@@ -229,6 +229,7 @@ public class SeriesService : ISeriesService
             return new ErrorResult("Series preview video is not set.");
 
         series.IsPublished = true;
+        series.IsActive = true;
         series.PublishedOnUtc = DateTime.UtcNow;
         series.PublishedById = _userSession.UserId;
 
@@ -564,8 +565,9 @@ public class SeriesService : ISeriesService
             .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
 
         // get the next series number from sequnce
-        var nextSeriesNumber = await _context.GetNextSeriesNumber();
-        return $"{trimmedTitle}-{nextSeriesNumber}";
+        //var nextSeriesNumber = await _context.GetNextSeriesNumber();
+        //return $"{trimmedTitle}-{nextSeriesNumber}";
+        return $"{trimmedTitle}";
     }
 
     private async Task<string> GetCourseUid(string title)

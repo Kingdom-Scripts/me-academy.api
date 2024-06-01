@@ -24,8 +24,8 @@ public class MeAcademyContext : DbContext
     public required DbSet<InvitedUser> InvitedUsers { get; set; }
     public required DbSet<CourseQuestionOption> CourseQuestionOptions { get; set; }
     public required DbSet<CourseQuestionResponse> CourseQuestionResponses { get; set; }
-    public required DbSet<CourseQuestion> CourseQuestions  { get; set; }
-    public required DbSet<Order> Orders  { get; set; }
+    public required DbSet<CourseQuestion> CourseQuestions { get; set; }
+    public required DbSet<Order> Orders { get; set; }
     public required DbSet<RefreshToken> RefreshTokens { get; set; }
     public required DbSet<Role> Roles { get; set; }
     public required DbSet<Series> Series { get; set; }
@@ -154,6 +154,9 @@ public class MeAcademyContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Order>()
-            .ToTable(p => p.HasCheckConstraint("CK_Order_ItemType", "[ItemType] IN ('Course', 'Series', 'SmeHub', 'AnnotatedAgreement')"));
+            .ToTable(p => p.HasCheckConstraint("CK_Order_ItemType", "[ItemType] IN ('Course', 'Series', 'SmeHub', 'AnnotatedAgreement')"))
+             .HasOne(o => o.UserContent)
+            .WithOne(uc => uc.Order)
+            .HasForeignKey<UserContent>(uc => uc.OrderId);
     }
 }

@@ -82,6 +82,7 @@ try
 
     builder.Services.Configure<AppConfig>(builder.Configuration.GetSection("AppConfig"));
     builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+    builder.Services.Configure<PasystackConfig>(builder.Configuration.GetSection("Paystack"));
 
     // Set up CORS
     string allowedOrigins = "_meAllowedDomains";
@@ -109,8 +110,6 @@ try
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    app.UseMiddleware<ErrorHandlerMiddleware>();
-
     app.UseHttpsRedirection();
 
     app.UseCors(allowedOrigins);
@@ -120,6 +119,8 @@ try
 
     app.UseMiddleware<JWTMiddleware>();
     app.UseMiddleware<UserSessionMiddleware>();
+
+    app.UseMiddleware<ErrorHandlerMiddleware>();
 
     app.MapControllers();
 

@@ -11,6 +11,6 @@ public interface IAuthService
     Task<Result> AuthenticateUser(LoginModel model);
     Task<Result> RefreshToken(RefreshTokenModel model);
     Task<Result> Logout(string userReference);
-    Task<Result> RequestForPasswordReset(string email);
+    Task<Result> RequestForPasswordReset(ForgotPasswordModel model);
     Task<Result> ResetPassword(ResetPasswordModel model);
 }
