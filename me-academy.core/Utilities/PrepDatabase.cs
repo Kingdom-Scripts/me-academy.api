@@ -19,10 +19,6 @@ public static class PrepDatabase
 
     private static void SeedData(MeAcademyContext context, bool isProd)
     {
-        // ensure db is created
-        Log.Information("--> Attempting to apply migrations...");
-        context.Database.Migrate();
-
         // run migration when in prod
         if (isProd)
         {
@@ -55,18 +51,18 @@ public static class PrepDatabase
         }
 
         // create default sme hub types
-        if (!context.SmeHubTypes.Any())
-        {
-            Log.Information("--> Seeding Sme Hub Type Data...");
+        //if (!context.SmeHubTypes.Any())
+        //{
+        //    Log.Information("--> Seeding Sme Hub Type Data...");
 
-            context.SmeHubTypes.AddRange(
-                new SmeHubType { Name = "Resolutions" },
-                new SmeHubType { Name = "Employee and HR Documents" },
-                new SmeHubType { Name = "Agreements" },
-                new SmeHubType { Name = "Forms and Notices" },
-                new SmeHubType { Name = "Power of Attorney" }
-                                                                                       );
-        }
+        //    context.SmeHubTypes.AddRange(
+        //        new SmeHubType { Name = "Resolutions" },
+        //        new SmeHubType { Name = "Employee and HR Documents" },
+        //        new SmeHubType { Name = "Agreements" },
+        //        new SmeHubType { Name = "Forms and Notices" },
+        //        new SmeHubType { Name = "Power of Attorney" }
+        //                                                                               );
+        //}
 
         context.SaveChanges();
     }
