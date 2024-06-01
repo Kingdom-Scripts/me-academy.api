@@ -15,4 +15,9 @@ public interface IVideoService
     Task<Result> GetVideoPlayerDetails(string courseUid);
     Task<Result> GetUserCourseProgress(string courseUid);
     Task<Result> ReportCourseProgress(string courseUid, ProgressReportModel model);
+    Task<Result> CourseVideoCompleted(string courseUid);
+    Task<Result> GetUserSeriesProgress(string seriesUid);
+    Task<Result> GetSeriesCourseVideoDetail(string seriesUid, string courseUid);
+    Task<Result> ReportSeriesCourseProgress(string seriesUid, string courseUid, ProgressReportModel model);
+    Task<Result> SeriesCourseVideoCompleted(string seriesUid, string courseUid);
 }

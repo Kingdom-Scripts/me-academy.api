@@ -42,6 +42,8 @@ public class MeAcademyContext : DbContext
     public required DbSet<UserContent> UserContents { get; set; }
     public required DbSet<UserCourse> UserCourses { get; set; }
     public required DbSet<UserRole> UserRoles { get; set; }
+    public required DbSet<UserSeries> UserSeries { get; set; }
+    public required DbSet<SeriesProgress> SeriesProgress { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

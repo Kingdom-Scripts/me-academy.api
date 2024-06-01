@@ -39,4 +39,5 @@ public class Series : BaseAppModel, ISoftDeletable
     public SeriesPreview? Preview { get; set; }
     public List<SeriesPrice> Prices { get; set; } = new();
     public List<SeriesCourse> Courses { get; set; } = new();
+    public List<UserSeries> UserSeries { get; set; } = new();
 }
