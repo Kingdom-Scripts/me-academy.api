@@ -86,7 +86,7 @@ public class CoursesController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="documentId"></param>
     /// <returns></returns>
-    [HttpGet("{courseUid}/resources/{documentId}")]
+    [HttpGet("{courseUid}/resources/{documentId}/delete")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> RemoveResourceFromCourse(string courseUid, int documentId)
@@ -115,7 +115,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpGet("{courseUid}")]
+    [HttpGet("{courseUid}/delete")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> DeleteCourse(string courseUid)

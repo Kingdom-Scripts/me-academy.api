@@ -54,7 +54,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="seriesUid"></param>
         /// <returns></returns>
-        [HttpGet("{seriesUid}")]
+        [HttpGet("{seriesUid}/delete")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> DeleteSeries(string seriesUid)
@@ -210,7 +210,6 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="seriesUid"></param>
         /// <param name="courseUid"></param>
-        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("{seriesUid}/courses/{courseUid}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SeriesCourseView>))]
@@ -227,7 +226,7 @@ namespace me_academy.api.Controllers
         /// <param name="seriesUid"></param>
         /// <param name="seriesCourseId"></param>
         /// <returns></returns>
-        [HttpGet("{seriesUid}/courses/{seriesCourseId}")]
+        [HttpGet("{seriesUid}/courses/{seriesCourseId}/delete")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> RemoveCourseFromSeries(string seriesUid, string seriesCourseId)
