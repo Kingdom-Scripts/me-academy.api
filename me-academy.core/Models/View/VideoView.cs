@@ -12,6 +12,8 @@ public class VideoView
     public int PreviewStart { get; set; }
     public int PreviewEnd { get; set; }
 
+    public decimal Progress { get; set; }
+
     public string Duration
     {
         get

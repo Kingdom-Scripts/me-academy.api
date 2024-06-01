@@ -4,6 +4,7 @@ using Fluid;
 using Fluid.Values;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.Configurations;
+using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -102,7 +103,7 @@ public class EmailService : IEmailService
         return SendMessage(to, "Confirm Your Email Address", output);
     }
 
-    public async Task<Result> SendPasswordResetEmail(string email, string token)
+    public async Task<Result> SendPasswordResetEmail(ForgotPasswordModel model, string token)
     {
         // get template file
         string templatePath =
@@ -128,7 +129,7 @@ public class EmailService : IEmailService
 
         // get and encode the url with token
         string url =
-            $"{_appConfig.BaseURLs.Client}/auth/reset-password/{email}/{HttpUtility.UrlEncode(token)}";
+            $"{model.Origin}/auth/reset-password/{model.Email}/{HttpUtility.UrlEncode(token)}";
 
         // parse template using Fluid
         var context = new TemplateContext
@@ -147,7 +148,7 @@ public class EmailService : IEmailService
         string output = await fluidTemplate.RenderAsync(context);
 
         // send email
-        return SendMessage(email, "Reset Your Password", output);
+        return SendMessage(model.Email, "Reset Your Password", output);
     }
 
         public async Task<Result> SendEmail(string to, string subject, string template,

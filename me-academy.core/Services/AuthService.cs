@@ -157,13 +157,13 @@ public class AuthService : IAuthService
         return new SuccessResult();
     }
 
-    public async Task<Result> RequestForPasswordReset(string email)
+    public async Task<Result> RequestForPasswordReset(ForgotPasswordModel model)
     {
         string responseMessage = "If this email is associated with an account, you will receive a password reset email shortly.";
 
         // validate user
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email.ToLower().Trim() == email.ToLower().Trim());
+            .FirstOrDefaultAsync(u => u.Email.ToLower().Trim() == model.Email.ToLower().Trim());
         if (user is null)
             return new SuccessResult(responseMessage);
 
@@ -174,7 +174,7 @@ public class AuthService : IAuthService
         if (!saved)
             return new ErrorResult("Unable to send password reset email at the moment. Please try again.");
 
-        var emailRes = await _emailService.SendPasswordResetEmail(user.Email, token);
+        var emailRes = await _emailService.SendPasswordResetEmail(model, token);
         if (!emailRes.Success)
             return emailRes;
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240531215416_Thirty-Four")]
+    partial class ThirtyFour
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -830,6 +833,9 @@ namespace me_academy.api.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("UserContentId")
+                        .HasColumnType("int");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -1466,20 +1472,26 @@ namespace me_academy.api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsExpired")
-                        .HasColumnType("bit");
+                    b.Property<int>("Progress")
+                        .HasColumnType("int");
 
-                    b.Property<decimal>("Progress")
-                        .HasColumnType("decimal(10, 10)");
+                    b.Property<DateTime>("PurchasedAtUtc")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -2064,7 +2076,7 @@ namespace me_academy.api.Migrations
             modelBuilder.Entity("me_academy.core.Models.App.UserCourse", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.Course", "Course")
-                        .WithMany("UserCourses")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2106,8 +2118,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("SeriesCourses");
 
                     b.Navigation("UsefulLinks");
-
-                    b.Navigation("UserCourses");
 
                     b.Navigation("Video");
                 });

@@ -144,6 +144,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
+    [AllowAnonymous]
     [HttpPatch("{courseUid}/view")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
@@ -158,6 +159,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
+    [AllowAnonymous]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<CourseView>>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]

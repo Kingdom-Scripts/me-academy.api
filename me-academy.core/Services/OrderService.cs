@@ -270,23 +270,51 @@ public class OrderService : IOrderService
         if (!verifyTransaction.status) return new ErrorResult(verifyTransaction.message);
         if (!verifyTransaction.status || verifyTransaction.data.status != "success") return new ErrorResult("Payment not completed");
 
+        var today = DateTime.UtcNow;
         order.IsPaid = true;
+        order.PaidAt = today;
         order.UpdateById = _userSession.UserId;
-        order.UpdatedAt = DateTime.UtcNow;
+        order.UpdatedAt = today;
         if (order.DiscountId.HasValue)
         {
             order.Discount!.TotalUsed++;
         }
 
-        var today = DateTime.UtcNow;
         var userContent = new UserContent
         {
             UserId = order.UserId,
-            OrderId = order.Id,
+            //OrderId = order.Id,
             StartDate = today,
             EndDate = today.AddMonths(order.Duration!.Count)
         };
-        await _context.AddAsync(userContent);
+        order.UserContent = userContent;
+        _context.Orders.Update(order);
+
+        // Add Course progress
+        if (order.ItemType == OrderItemType.Course)
+        {
+            var userCourse = await _context.UserCourses
+                .Where(x => x.UserId == order.UserId && x.CourseId == order.CourseId)
+                .FirstOrDefaultAsync();
+
+            if (userCourse != null)
+            {
+                userCourse.Progress = 0;
+                userCourse.IsCompleted = false;
+                userCourse.IsExpired = false;
+
+                _context.UserCourses.Update(userCourse);
+            }
+            else
+            {
+                userCourse = new UserCourse
+                {
+                    UserId = order.UserId,
+                    CourseId = order.CourseId!.Value,
+                };
+                await _context.AddAsync(userCourse);
+            }
+        }
 
         int saved = await _context.SaveChangesAsync();
 

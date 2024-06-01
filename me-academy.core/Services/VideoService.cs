@@ -6,6 +6,7 @@ using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.App;
 using me_academy.core.Models.Configurations;
 using me_academy.core.Models.Input.Auth;
+using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
@@ -188,19 +189,15 @@ public class VideoService : IVideoService
         return new ErrorResult("Failed to delete video.");
     }
 
-    // TODO: when implementing this, remember to set up an authentication mechanism
-    // to validate that the user actually has paid to see this video or the video is
-    // part of a series the user has paid for.
     public async Task<Result> GetVideoPlayerDetails(string courseUid)
     {
         // validate user has paid for course if not a super admin, admin or course manager
         bool shouldHaveUnrestrictedAccess = _userSession.IsAnyAdmin || _userSession.IsCourseManager;
         if (!shouldHaveUnrestrictedAccess)
         {
-            var today = DateTime.UtcNow;
             var coursePaid = await _context.UserCourses
                 .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
-                .Where(cp => cp.ExpiresAtUtc >= today)
+                .Where(cp => !cp.IsExpired)
                 .AnyAsync();
             if (!coursePaid)
                 return new ForbiddenResult();
@@ -239,4 +236,70 @@ public class VideoService : IVideoService
 
         return new SuccessResult(result);
     }
+
+    public async Task<Result> GetUserCourseProgress(string courseUid)
+    {
+        // validate user has paid for course if not a super admin, admin or course manager
+            var courseProgress = await _context.UserCourses
+                .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
+                .Where(cp => !cp.IsExpired)
+                .FirstOrDefaultAsync();
+
+            if (courseProgress is null)
+                return new ForbiddenResult();
+
+        var courseVideo = await _context.CourseVideos
+            .Where(cv => cv.Course!.Uid == courseUid)
+            .FirstOrDefaultAsync();
+
+        if (courseVideo is null || !courseVideo.IsUploaded)
+            return new SuccessResult(StatusCodes.Status204NoContent, "Video information not found.");
+
+        string videoId = courseVideo.VideoId!;
+        if (string.IsNullOrWhiteSpace(videoId))
+            return new ErrorResult("Video not uploaded.");
+
+        var response = await _client.GetAsync($"videos/{videoId}");
+        if (!response.IsSuccessStatusCode)
+            return new ErrorResult("Failed to get video details.");
+
+        string content = await response.Content.ReadAsStringAsync();
+        var apiResult = JsonConvert.DeserializeObject<ApiVideoDetail>(content);
+
+        // extract the token from the result
+        string token = apiResult!.Assets.Player.Split("?token=").Last();
+
+        var result = new VideoView
+        {
+            VideoId = videoId,
+            Token = token,
+            PreviewVideoId = courseVideo.PreviewVideoId,
+            ThumbnailUrl = courseVideo.ThumbnailUrl,
+            VideoDuration = courseVideo.VideoDuration,
+            Progress = courseProgress.Progress
+        };
+
+        return new SuccessResult(result);
+    }
+
+    public async Task<Result> ReportCourseProgress(string courseUid, ProgressReportModel model)
+    {
+        var courseProgress = await _context.UserCourses
+               .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
+               .Where(cp => !cp.IsExpired)
+               .FirstOrDefaultAsync();
+
+        if (courseProgress is null)
+            return new ForbiddenResult();
+
+        courseProgress.Progress = model.Progress;
+
+        _context.UserCourses.Update(courseProgress);
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult()
+            : new ErrorResult("Unable to save video progress");
+    } 
 }

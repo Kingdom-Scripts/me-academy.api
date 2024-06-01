@@ -238,11 +238,11 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListCourses(CourseSearchModel request)
     {
-        if (((request.IsActive.HasValue && request.IsActive.Value)
+        if (_userSession.IsAuthenticated && (((request.IsActive.HasValue && request.IsActive.Value)
              || request.WithDeleted)
-            && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
+            && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)))
             return new ForbiddenResult();
-
+        
         request.SearchQuery = !string.IsNullOrEmpty(request.SearchQuery)
             ? request.SearchQuery.ToLower().Trim()
             : null;
@@ -250,19 +250,38 @@ public class CourseService : ICourseService
         var courses = _context.Courses.Where(c => !c.ForSeriesOnly).AsQueryable();
 
         // allow filters only for admin users or users who can manage courses
-        courses = _userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse)
+        courses = _userSession.IsAuthenticated && (_userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse))
             ? courses
                 .Where(c => !request.IsActive.HasValue || c.IsActive == request.IsActive)
                 .Where(c => request.WithDeleted || !c.IsDeleted)
             : courses.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         // TODO: implement Full text search for description and title
+        var today = DateTime.UtcNow.Date;
         var result = await courses
             .Where(c => string.IsNullOrEmpty(request.SearchQuery)
                         || c.Title.ToLower().Contains(request.SearchQuery) || c.Summary.ToLower().Contains(request.SearchQuery))
             .Include(c => c.Video)
             .OrderBy(c => c.Title).ThenBy(c => c.Summary)
-            .ProjectToType<CourseView>()
+            .Select(c => new CourseView
+            {
+                Uid = c.Uid,
+                Title = c.Title,
+                Summary = c.Summary,
+                CreatedById = c.CreatedById,
+                IsPublished = c.IsPublished,
+                IsActive = c.IsActive,
+                CreatedAtUtc = c.CreatedAtUtc,
+                PublishedOnUtc = c.PublishedOnUtc,
+                ThumbnailUrl = c.Video != null ? c.Video.ThumbnailUrl : null,
+                Prices = c.Prices.Where(cp => !cp.IsDeleted).Select(cp => new PriceView
+                {
+                    Price = cp.Price,
+                    Name = cp.Duration!.Name
+                }).ToList(),
+                Duration = c.Video != null ? TimeSpan.FromSeconds(c.Video.VideoDuration).ToString("hh\\:mm\\:ss") : null,
+                HasBought = _userSession.IsAuthenticated && c.UserCourses.Any(o => o.CourseId == c.Id && o.UserId == _userSession.UserId && !o.IsExpired)
+            })
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
         return new SuccessResult(result);

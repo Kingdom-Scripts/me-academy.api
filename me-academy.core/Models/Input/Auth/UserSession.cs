@@ -4,6 +4,7 @@ namespace me_academy.core.Models.Input.Auth;
 
 public class UserSession
 {
+    public bool IsAuthenticated { get; set; }
     public int UserId { get; set; }
     public string Uid { get; set; } = null!;
     public string Name { get; set; } = null!;

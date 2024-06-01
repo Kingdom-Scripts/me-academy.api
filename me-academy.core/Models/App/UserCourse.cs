@@ -1,15 +1,18 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace me_academy.core.Models.App;
 
 public class UserCourse : BaseAppModel
 {
     public int UserId { get; set; }
     public int CourseId { get; set; }
-    public int Progress { get; set; }
-    public bool IsCompleted { get; set; }
-    public DateTime? CompletedAtUtc { get; set; }
+    [Column(TypeName = "decimal(10, 10)")]
+    public decimal Progress { get; set; } = 0;
+    public bool IsCompleted { get; set; } = false;
+    public bool IsExpired { get; set; } = false; // TODO: create a job that expires user's courses
 
-    public DateTime PurchasedAtUtc { get; set; }
-    public DateTime ExpiresAtUtc { get; set; }
+    //public DateTime PurchasedAtUtc { get; set; }
+    //public DateTime ExpiresAtUtc { get; set; }
 
     public Course? Course { get; set; }
 }
