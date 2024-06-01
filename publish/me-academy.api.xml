@@ -119,7 +119,7 @@
             <param name="userReference"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.AuthController.RequestPasswordReset(System.String)">
+        <member name="M:me_academy.api.Controllers.AuthController.RequestPasswordReset(me_academy.core.Models.Input.Auth.ForgotPasswordModel)">
             <summary>
             Request password reset email
             </summary>
@@ -606,6 +606,28 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:me_academy.api.Controllers.VideosController.GetVideoPlayerDetails(System.String)">
+            <summary>
+            Get the video player details
+            </summary>
+            <param name="courseUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.VideosController.GetUserCourseProgress(System.String)">
+            <summary>
+            Get the course progress and player details for the logged in user.
+            </summary>
+            <param name="courseUid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.VideosController.ReportCourseProgress(System.String,me_academy.core.Models.Input.Courses.ProgressReportModel)">
+            <summary>
+            Report course progress for the logged in user.
+            </summary>
+            <param name="courseUid"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:me_academy.api.Migrations.InitialCreate">
             <inheritdoc />
         </member>
@@ -1012,6 +1034,42 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.ThirtyThree.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.ThirtyFour">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyFour.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyFour.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyFour.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.ThirtyFive">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyFive.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyFive.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtyFive.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.ThirtySix">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtySix.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtySix.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtySix.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
