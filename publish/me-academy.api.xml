@@ -1072,5 +1072,17 @@
         <member name="M:me_academy.api.Migrations.ThirtySix.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:me_academy.api.Migrations.ThirtySeven">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtySeven.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtySeven.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.ThirtySeven.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>
