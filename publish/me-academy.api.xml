@@ -469,7 +469,6 @@
             </summary>
             <param name="seriesUid"></param>
             <param name="courseUid"></param>
-            <param name="model"></param>
             <returns></returns>
         </member>
         <member name="M:me_academy.api.Controllers.SeriesController.RemoveCourseFromSeries(System.String,System.String)">
