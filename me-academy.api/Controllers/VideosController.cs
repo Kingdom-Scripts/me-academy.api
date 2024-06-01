@@ -1,9 +1,11 @@
+using iText.Layout.Renderer;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.ApiVideo.Response;
 using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
+using me_academy.core.Models.View.Series;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -106,4 +108,49 @@ public class VideosController : BaseController
         var res = await _videoService.ReportCourseProgress(courseUid, model);
         return ProcessResponse(res);
     }
-}
+
+    [HttpPost("course/{courseUid}/complete")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> CourseVideoCompleted(string courseUid)
+    {
+        var res = await _videoService.CourseVideoCompleted(courseUid);
+        return ProcessResponse(res);
+    }
+
+    [HttpGet("series/{seriesUid}/progress")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SeriesProgressView>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> GetUserSeriesProgress(string seriesUid)
+    {
+        var res = await _videoService.GetUserSeriesProgress(seriesUid);
+        return ProcessResponse(res);
+    }
+
+    [HttpGet("series/{seriesUid}/course/{courseUid}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<VideoView>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> GetSeriesCourseVideoDetail(string seriesUid, string courseUid)
+    {
+        var res = await _videoService.GetSeriesCourseVideoDetail(seriesUid, courseUid);
+        return ProcessResponse(res);
+    }
+
+    [HttpPost("series/{seriesUid}/course/{courseUid}/progress-report")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> ReportSeriesProgress(string seriesUid, string courseUid, [FromBody] ProgressReportModel model)
+    {
+        var res = await _videoService.ReportSeriesCourseProgress(seriesUid, courseUid, model);
+        return ProcessResponse(res);
+    }
+
+    [HttpPost("series/{seriesUid}/course/{courseUid}/complte")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> SeriesCourseVideoCompleted(string seriesUid, string courseUid)
+    {
+        var res = await _videoService.SeriesCourseVideoCompleted(seriesUid, courseUid);
+        return ProcessResponse(res);
+    }
+    }

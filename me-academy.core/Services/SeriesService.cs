@@ -171,7 +171,9 @@ public class SeriesService : ISeriesService
                 IsPublished = s.IsPublished,
                 CreatedAtUtc = s.CreatedAtUtc,
                 PublishedOnUtc = s.PublishedOnUtc,
-                Preview = s.Preview.Adapt<VideoView>()
+                Preview = s.Preview.Adapt<VideoView>(),
+                Duration = TimeSpan.FromSeconds(s.Courses.Select(c => c.Course!.Video != null ? c.Course.Video.VideoDuration : 0).Sum()).ToString("hh\\:mm\\:ss"),
+                HasBought = _userSession.IsAuthenticated && s.UserSeries.Any(us => us.UserId == _userSession.UserId && !us.IsExpired)
             }).ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
         return new SuccessResult(result);
@@ -402,11 +404,11 @@ public class SeriesService : ISeriesService
 
         var course = await _context.Courses
             .Where(c => c.Uid == courseUid)
-            .Select(c => new Course { Id = c.Id, IsActive = c.IsActive, Title = c.Title, Summary = c.Summary })
+            .Select(c => new Course { Id = c.Id, Uid = c.Uid, IsActive = c.IsActive, Title = c.Title, Summary = c.Summary })
             .FirstOrDefaultAsync();
 
-        if (course is null)
-            return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
+        if (course is null || course.IsDeleted)
+            return new ErrorResult(StatusCodes.Status404NotFound, "Course not found or cannot be added because it has been deleted.");
         if (!course.IsActive)
             return new ErrorResult("Cannot add a deactivated course.");
 
@@ -466,7 +468,8 @@ public class SeriesService : ISeriesService
         {
             SeriesId = series.Id,
             Course = newCourse,
-            Order = _context.SeriesCourses.Count() + 1
+            Order = _context.SeriesCourses.Count(sc => sc.SeriesId == series.Id && !sc.IsDeleted) + 1,
+            CreatedById = _userSession.UserId
         };
 
         await _context.AddAsync(seriesCourse);
@@ -481,7 +484,7 @@ public class SeriesService : ISeriesService
     public async Task<Result> RemoveCourseFromSeries(string seriesUid, string seriesCourseId)
     {
         var seriesCourse = await _context.SeriesCourses
-            .FirstOrDefaultAsync(sc => sc.Course!.Uid == seriesCourseId && sc.Series!.Uid == seriesUid && !sc.IsDeleted);
+            .FirstOrDefaultAsync(sc => sc.Course!.Uid == seriesCourseId && sc.Series!.Uid == seriesUid);
 
         if (seriesCourse is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found in this series.");
