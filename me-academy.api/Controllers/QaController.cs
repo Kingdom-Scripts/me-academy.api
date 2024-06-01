@@ -38,7 +38,7 @@ public class QuestionController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="model"></param>
     /// <returns></returns>
-    [HttpPatch("courses/{courseUid}")]
+    [HttpPost("courses/{courseUid}")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> UpdateCourseQuestion(string courseUid, QuestionAndAnswerModel model)
@@ -53,7 +53,7 @@ public class QuestionController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="questionId"></param>
     /// <returns></returns>
-    [HttpDelete("courses/{courseUid}/{questionId}")]
+    [HttpGet("courses/{courseUid}/{questionId}")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> DeleteCourseQuestion(string courseUid, int questionId)
@@ -113,7 +113,7 @@ public class QuestionController : BaseController
     /// <param name="seriesUid"></param>
     /// <param name="model"></param>
     /// <returns></returns>
-    [HttpPatch("series/{seriesUid}")]
+    [HttpPost("series/{seriesUid}")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> UpdateSeriesQuestion(string seriesUid, QuestionAndAnswerModel model)
@@ -128,7 +128,7 @@ public class QuestionController : BaseController
     /// <param name="seriesUid"></param>
     /// <param name="questionId"></param>
     /// <returns></returns>
-    [HttpDelete("series/{seriesUid}/{questionId}")]
+    [HttpGet("series/{seriesUid}/{questionId}")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> DeleteSeriesQuestion(string seriesUid, int questionId)

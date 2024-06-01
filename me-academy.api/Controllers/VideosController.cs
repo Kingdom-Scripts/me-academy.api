@@ -54,7 +54,7 @@ public class VideosController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="model"></param>
     /// <returns></returns>
-    [HttpPatch("course/{courseUid}/preview")]
+    [HttpPost("course/{courseUid}/preview")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> SetVideoPreview(string courseUid, ApiVideoClipModel model)
@@ -98,7 +98,7 @@ public class VideosController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="model"></param>
     /// <returns></returns>
-    [HttpPatch("course/{courseUid}/progress-report")]
+    [HttpPost("course/{courseUid}/progress-report")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> ReportCourseProgress(string courseUid, ProgressReportModel model)
