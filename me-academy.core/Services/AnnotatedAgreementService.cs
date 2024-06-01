@@ -141,7 +141,7 @@ public class AnnotatedAgreementService : IAnnotatedAgreementService
         var annotatedAgreement = _context.AnnotatedAgreements
             .Where(ang => ang.Uid == uid).AsQueryable();
 
-        if (!_userSession.IsAnyAdmin)
+        if (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
             annotatedAgreement = annotatedAgreement.Where(ang => !ang.IsDeleted && ang.IsActive);
 
         var result = await annotatedAgreement

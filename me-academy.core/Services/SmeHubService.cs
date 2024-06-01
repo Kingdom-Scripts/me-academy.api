@@ -142,7 +142,7 @@ public class SmeHubService : ISmeHubService
         var smeHub = _context.SmeHubs
             .Where(sh => sh.Uid == uid).AsQueryable();
 
-        if (!_userSession.IsAnyAdmin)
+        if (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
             smeHub = smeHub.Where(sh => !sh.IsDeleted && sh.IsActive);
 
         var result = await smeHub

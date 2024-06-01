@@ -172,7 +172,7 @@ public class SeriesService : ISeriesService
         var series = _context.Series.AsQueryable();
 
         // include deleted ones if user is admin
-        if (!_userSession.IsAnyAdmin)
+        if (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
             series = series.Where(s => !s.IsDeleted && s.IsActive && s.IsPublished);
 
         var result = await series
