@@ -301,5 +301,10 @@ public class VideoService : IVideoService
         return saved > 0
             ? new SuccessResult()
             : new ErrorResult("Unable to save video progress");
-    } 
+    }
+
+    //public async Task<Result> CourseVideoCompleted(string courseUid)
+    //{
+
+    //}
 }
