@@ -38,7 +38,7 @@ namespace me_academy.api.Controllers
         /// <param name="uid"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPatch("{uid}")]
+        [HttpPost("{uid}")]
         [Authorize(Roles = $"{nameof(Roles.SuperAdmin)},{nameof(Roles.Admin)},{nameof(Roles.ManageCourse)}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SmeHubDetailView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
@@ -53,7 +53,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
-        [HttpDelete("{uid}")]
+        [HttpGet("{uid}/delete")]
         [Authorize(Roles = $"{nameof(Roles.SuperAdmin)},{nameof(Roles.Admin)},{nameof(Roles.ManageCourse)}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
@@ -112,7 +112,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
-        [HttpPatch("{uid}/activate")]
+        [HttpPost("{uid}/activate")]
         [Authorize(Roles = $"{nameof(Roles.SuperAdmin)},{nameof(Roles.Admin)},{nameof(Roles.ManageCourse)}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
@@ -127,7 +127,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
-        [HttpPatch("{uid}/deactivate")]
+        [HttpPost("{uid}/deactivate")]
         [Authorize(Roles = $"{nameof(Roles.SuperAdmin)},{nameof(Roles.Admin)},{nameof(Roles.ManageCourse)}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]

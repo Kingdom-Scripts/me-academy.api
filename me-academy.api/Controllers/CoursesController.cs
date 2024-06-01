@@ -42,7 +42,7 @@ public class CoursesController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="model"></param>
     /// <returns></returns>
-    [HttpPatch("{courseUid}/video-details")]
+    [HttpPost("{courseUid}/video-details")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> SetVideoDetails(string courseUid, VideoDetailModel model)
@@ -86,7 +86,7 @@ public class CoursesController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="documentId"></param>
     /// <returns></returns>
-    [HttpDelete("{courseUid}/resources/{documentId}")]
+    [HttpGet("{courseUid}/resources/{documentId}/delete")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> RemoveResourceFromCourse(string courseUid, int documentId)
@@ -101,7 +101,7 @@ public class CoursesController : BaseController
     /// <param name="courseUid"></param>
     /// <param name="model"></param>
     /// <returns></returns>
-    [HttpPut("{courseUid}")]
+    [HttpPost("{courseUid}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseDetailView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> UpdateCourse(string courseUid, CourseModel model)
@@ -115,7 +115,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpDelete("{courseUid}")]
+    [HttpGet("{courseUid}/delete")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> DeleteCourse(string courseUid)
@@ -145,7 +145,7 @@ public class CoursesController : BaseController
     /// <param name="courseUid"></param>
     /// <returns></returns>
     [AllowAnonymous]
-    [HttpPatch("{courseUid}/view")]
+    [HttpPost("{courseUid}/view")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> AddCourseView(string courseUid)
@@ -174,7 +174,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpPut("{courseUid}/publish")]
+    [HttpPost("{courseUid}/publish")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> PublishCourse(string courseUid)
@@ -188,7 +188,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpPut("{courseUid}/activate")]
+    [HttpPost("{courseUid}/activate")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> ActivateCourse(string courseUid)
@@ -202,7 +202,7 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpPut("{courseUid}/deactivate")]
+    [HttpPost("{courseUid}/deactivate")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> DeactivateCourse(string courseUid)

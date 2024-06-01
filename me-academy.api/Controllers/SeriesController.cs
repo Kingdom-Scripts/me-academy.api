@@ -40,7 +40,7 @@ namespace me_academy.api.Controllers
         /// <param name="seriesUid"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPatch("{seriesUid}")]
+        [HttpPost("{seriesUid}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SeriesView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> UpdateSeries(string seriesUid, SeriesModel model)
@@ -54,7 +54,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="seriesUid"></param>
         /// <returns></returns>
-        [HttpDelete("{seriesUid}")]
+        [HttpGet("{seriesUid}/delete")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> DeleteSeries(string seriesUid)
@@ -96,7 +96,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="seriesUid"></param>
         /// <returns></returns>
-        [HttpPatch("{seriesUid}/view")]
+        [HttpPost("{seriesUid}/view")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> ViewSeries(string seriesUid)
@@ -110,7 +110,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="seriesUid"></param>
         /// <returns></returns>
-        [HttpPatch("{seriesUid}/publish")]
+        [HttpPost("{seriesUid}/publish")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> PublishSeries(string seriesUid)
@@ -124,7 +124,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="seriesUid"></param>
         /// <returns></returns>
-        [HttpPatch("{seriesUid}/activate")]
+        [HttpPost("{seriesUid}/activate")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> ActivateSeries(string seriesUid)
@@ -138,7 +138,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="seriesUid"></param>
         /// <returns></returns>
-        [HttpPatch("{seriesUid}/deactivate")]
+        [HttpPost("{seriesUid}/deactivate")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> DeactivateSeries(string seriesUid)
@@ -152,7 +152,7 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="seriesUid"></param>
         /// <returns></returns>
-        [HttpPatch("{seriesUid}/preview-token")]
+        [HttpPost("{seriesUid}/preview-token")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<ApiVideoToken>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> GetPreviewToken(string seriesUid)
@@ -167,7 +167,7 @@ namespace me_academy.api.Controllers
         /// <param name="seriesUid"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPatch("{seriesUid}/preview")]
+        [HttpPost("{seriesUid}/preview")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> SetPreview(string seriesUid, VideoDetailModel model)
@@ -210,7 +210,6 @@ namespace me_academy.api.Controllers
         /// </summary>
         /// <param name="seriesUid"></param>
         /// <param name="courseUid"></param>
-        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("{seriesUid}/courses/{courseUid}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SeriesCourseView>))]
@@ -227,7 +226,7 @@ namespace me_academy.api.Controllers
         /// <param name="seriesUid"></param>
         /// <param name="seriesCourseId"></param>
         /// <returns></returns>
-        [HttpDelete("{seriesUid}/courses/{seriesCourseId}")]
+        [HttpGet("{seriesUid}/courses/{seriesCourseId}/delete")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> RemoveCourseFromSeries(string seriesUid, string seriesCourseId)
@@ -257,7 +256,7 @@ namespace me_academy.api.Controllers
         /// <param name="courseUid"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPatch("{seriesUid}/courses/{courseUid}/order")]
+        [HttpPost("{seriesUid}/courses/{courseUid}/order")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> ChangeCourseOrder(string seriesUid, string courseUid, SeriesCourseOrderModel model)
