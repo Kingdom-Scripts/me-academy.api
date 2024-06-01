@@ -1372,7 +1372,7 @@ namespace me_academy.api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SmeHubTypes", "dbo");
+                    b.ToTable("SmeHubTypess", "dbo");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.User", b =>

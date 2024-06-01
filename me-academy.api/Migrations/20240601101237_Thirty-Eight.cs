@@ -10,63 +10,13 @@ namespace me_academy.api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_SmeHubs_SmeHubTypes_TypeId",
-                schema: "dbo",
-                table: "SmeHubs");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_SmeHubTypes",
-                schema: "dbo",
-                table: "SmeHubTypes");
-
-            migrationBuilder.RenameTable(
-                name: "SmeHubTypes",
-                schema: "dbo",
-                newName: "SmeHubTypess",
-                newSchema: "dbo");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_SmeHubTypess",
-                schema: "dbo",
-                table: "SmeHubTypess",
-                column: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_SmeHubs_SmeHubTypess_TypeId",
+            migrationBuilder.AddColumn<int>(
+                name: "TypeId",
                 schema: "dbo",
                 table: "SmeHubs",
-                column: "TypeId",
-                principalSchema: "dbo",
-                principalTable: "SmeHubTypess",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_SmeHubs_SmeHubTypess_TypeId",
-                schema: "dbo",
-                table: "SmeHubs");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_SmeHubTypess",
-                schema: "dbo",
-                table: "SmeHubTypess");
-
-            migrationBuilder.RenameTable(
-                name: "SmeHubTypess",
-                schema: "dbo",
-                newName: "SmeHubTypes",
-                newSchema: "dbo");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_SmeHubTypes",
-                schema: "dbo",
-                table: "SmeHubTypes",
-                column: "Id");
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_SmeHubs_SmeHubTypes_TypeId",
@@ -77,6 +27,20 @@ namespace me_academy.api.Migrations
                 principalTable: "SmeHubTypes",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropForeignKey(
+                name: "FK_SmeHubs_SmeHubTypes_TypeId",
+                schema: "dbo",
+                table: "SmeHubs");
+
+            migrationBuilder.DropColumn(
+                name: "TypeId",
+                schema: "dbo",
+                table: "SmeHubs");
         }
     }
 }
