@@ -238,9 +238,7 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListCourses(CourseSearchModel request)
     {
-        if (_userSession.IsAuthenticated && (((request.IsActive.HasValue && request.IsActive.Value)
-             || request.WithDeleted)
-            && (!_userSession.IsAnyAdmin && !_userSession.IsCourseManager)))
+        if (_userSession.IsAuthenticated && (request.WithDeleted && !_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
             return new ForbiddenResult();
         
         request.SearchQuery = !string.IsNullOrEmpty(request.SearchQuery)
