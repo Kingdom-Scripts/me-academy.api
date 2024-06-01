@@ -108,7 +108,7 @@ public class VideoService : IVideoService
 
         string contentString = await response.Content.ReadAsStringAsync();
         object? error = JsonConvert.DeserializeObject<object>(contentString);
-        _logger.Error("Failed to set video details. {@Error}", error);
+        _logger.Error("Failed to set video details. {@Error}", contentString);
         return new ErrorResult("Failed to set video details.");
     }
 
