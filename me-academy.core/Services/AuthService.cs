@@ -46,7 +46,7 @@ public class AuthService : IAuthService
         var user = model.Adapt<User>();
         user.HashedPassword = model.Password.HashPassword();
 
-        var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == (int)Roles.Customer);
+        var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == RolesConstants.Customer);
         var userRole = new UserRole { User = user, Role = role };
 
         // save user

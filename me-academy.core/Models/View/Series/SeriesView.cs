@@ -10,10 +10,11 @@ public class SeriesView
     public required string Title { get; set; }
     public required string Summary { get; set; }
     public int CreatedById { get; set; }
-    public required bool IsDraft { get; set; }
     public bool IsActive { get; set; }
     public bool IsPublished { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? PublishedOnUtc { get; set; }
     public VideoView? Preview { get; set; }
+    public string? Duration { get; set; }
+    public bool HasBought { get; set; }
 }

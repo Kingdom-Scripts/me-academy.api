@@ -22,6 +22,7 @@ public class ConfigsController : BaseController
     /// </summary>
     /// <returns></returns>
     [HttpGet("durations")]
+        [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<DurationView>>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> ListDurations()

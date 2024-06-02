@@ -41,7 +41,8 @@ public class OrderService : IOrderService
         if (discountCode == null)
             return new ErrorResult(StatusCodes.Status400BadRequest, "Invalid discount code.");
 
-        var discount = await _context.Discounts.FirstOrDefaultAsync(d => d.Code == discountCode);
+        discountCode = discountCode.Trim();
+        var discount = await _context.Discounts.FirstOrDefaultAsync(d => d.Code.Trim() == discountCode);
 
         if (discount == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Discount code not found");
@@ -51,7 +52,7 @@ public class OrderService : IOrderService
 
         if (discount.IsSingleUse)
         {
-            var alreadyUsed = await _context.Orders.AnyAsync(x => x.Discount!.Code == discountCode && x.IsPaid);
+            var alreadyUsed = await _context.Orders.AnyAsync(x => x.Discount!.Code.Trim() == discountCode && x.IsPaid);
             if (alreadyUsed)
                 return new ErrorResult(StatusCodes.Status400BadRequest, "Discount code already used.");
         }
@@ -283,7 +284,6 @@ public class OrderService : IOrderService
         var userContent = new UserContent
         {
             UserId = order.UserId,
-            //OrderId = order.Id,
             StartDate = today,
             EndDate = today.AddMonths(order.Duration!.Count)
         };
@@ -313,6 +313,62 @@ public class OrderService : IOrderService
                     CourseId = order.CourseId!.Value,
                 };
                 await _context.AddAsync(userCourse);
+            }
+        }
+
+        // Add Series progress
+        else if (order.ItemType == OrderItemType.Series)
+        {
+            var userSeries = await _context.UserSeries
+                .Where(x => x.UserId == order.UserId && x.SeriesId == order.SeriesId)
+                .FirstOrDefaultAsync();
+
+            var series = await _context.Series
+                .Where(x => x.Id == order.SeriesId)
+                .Include(x => x.Courses)
+                .FirstOrDefaultAsync();
+
+            if (userSeries != null)
+            {
+                userSeries.IsCompleted = false;
+                userSeries.IsExpired = false;
+
+                _context.UserSeries.Update(userSeries);
+            }
+            else
+            {
+                userSeries = new UserSeries
+                {
+                    UserId = order.UserId,
+                    SeriesId = order.SeriesId!.Value,
+                };
+                await _context.AddAsync(userSeries);
+            }
+
+            foreach (var item in series!.Courses)
+            {
+                var seriesProgress = _context.SeriesProgress
+                    .Where(x => x.UserSeriesId == userSeries.Id && x.CourseId == item.CourseId)
+                    .FirstOrDefault();
+
+                if (seriesProgress != null)
+                {
+                    seriesProgress.Progress = 0;
+                    seriesProgress.Order = item.Order;
+                    seriesProgress.IsCompleted = false;
+
+                    _context.SeriesProgress.Update(seriesProgress);
+                }
+                else
+                {
+                    seriesProgress = new SeriesProgress
+                    {
+                        UserSeriesId = userSeries.Id,
+                        CourseId = item.CourseId,
+                        Order = item.Order
+                    };
+                    await _context.AddAsync(seriesProgress);
+                }
             }
         }
 

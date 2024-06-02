@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using me_academy.core.Models.App;
 
@@ -11,9 +12,11 @@ using me_academy.core.Models.App;
 namespace me_academy.api.Migrations
 {
     [DbContext(typeof(MeAcademyContext))]
-    partial class MeAcademyContextModelSnapshot : ModelSnapshot
+    [Migration("20240601135743_Thirty-Nine")]
+    partial class ThirtyNine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1137,39 +1140,6 @@ namespace me_academy.api.Migrations
                     b.ToTable("SeriesPrices", "dbo");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.SeriesProgress", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Progress")
-                        .HasColumnType("decimal(20, 12)");
-
-                    b.Property<int>("UserSeriesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("SeriesProgress", "dbo");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.SeriesQuestion", b =>
                 {
                     b.Property<int>("Id")
@@ -1546,36 +1516,6 @@ namespace me_academy.api.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserRoles", "dbo");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.UserSeries", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsExpired")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("SeriesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SeriesId");
-
-                    b.ToTable("UserSeries", "dbo");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.AnnotatedAgreement", b =>
@@ -1997,17 +1937,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("Series");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.SeriesProgress", b =>
-                {
-                    b.HasOne("me_academy.core.Models.App.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.SeriesQuestion", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
@@ -2165,17 +2094,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.UserSeries", b =>
-                {
-                    b.HasOne("me_academy.core.Models.App.Series", "Series")
-                        .WithMany("UserSeries")
-                        .HasForeignKey("SeriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Series");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.Course", b =>
                 {
                     b.Navigation("AuditLogs");
@@ -2219,8 +2137,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("Preview");
 
                     b.Navigation("Prices");
-
-                    b.Navigation("UserSeries");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.SeriesQuestion", b =>

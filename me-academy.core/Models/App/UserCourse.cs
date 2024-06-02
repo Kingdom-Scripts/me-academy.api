@@ -13,8 +13,5 @@ public class UserCourse : BaseAppModel
     public bool IsCompleted { get; set; } = false;
     public bool IsExpired { get; set; } = false; // TODO: create a job that expires user's courses
 
-    //public DateTime PurchasedAtUtc { get; set; }
-    //public DateTime ExpiresAtUtc { get; set; }
-
     public Course? Course { get; set; }
 }

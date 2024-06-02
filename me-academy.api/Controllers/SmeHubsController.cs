@@ -69,7 +69,7 @@ namespace me_academy.api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet]
-        //[AllowAnonymous]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<SmeHubView>>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> ListSmeHubs([FromQuery] SmeHubSearchModel request)

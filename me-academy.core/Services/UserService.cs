@@ -117,18 +117,29 @@ public class UserService : IUserService
             return new ErrorResult("User already exist in the system");
 
         // set up user roles
-        var roleIds = new List<int> {
-            (int)Roles.Manager
+        var roles = _context.Roles.ToList();
+        var userRoles = new List<UserRole>
+        {
+            new UserRole
+            {
+                RoleId = roles.FirstOrDefault(r => r.Name == nameof(Roles.Manager)).Id,
+                Role = roles.FirstOrDefault(r => r.Name == nameof(Roles.Manager))
+            }
         };
-        if (invitation.CanManageCourses)
-            roleIds.Add((int)Roles.ManageCourse);
-        if (invitation.CanManageUsers)
-            roleIds.Add((int)Roles.ManageUser);
-
-        var userRoles = _context.Roles
-            .Where(r => roleIds.Contains(r.Id))
-            .Select(r => new UserRole { RoleId = r.Id, Role = r })
-            .ToList();
+        foreach (var role in roles)
+        {
+            if (invitation.CanManageCourses)
+            {
+                if (role.Name == nameof(Roles.ManageCourse))
+                {
+                    userRoles.Add(new UserRole
+                    {
+                        RoleId = role.Id,
+                        Role = role
+                    });
+                }
+            }
+        }
 
         // create user object
         var user = new User

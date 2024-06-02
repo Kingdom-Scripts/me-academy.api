@@ -10,6 +10,7 @@ using me_academy.core.Models.Input.Courses;
 using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
+using me_academy.core.Models.View.Series;
 using me_academy.core.Models.View.Videos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,7 @@ public class VideoService : IVideoService
     }
 
     public async Task<Result<ApiVideoToken>> GetUploadToken(int expiresInSec = 0)
-    { 
+    {
         HttpResponseMessage response = new HttpResponseMessage();
         if (expiresInSec == 0)
         {
@@ -239,14 +240,14 @@ public class VideoService : IVideoService
 
     public async Task<Result> GetUserCourseProgress(string courseUid)
     {
-        // validate user has paid for course if not a super admin, admin or course manager
-            var courseProgress = await _context.UserCourses
-                .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
-                .Where(cp => !cp.IsExpired)
-                .FirstOrDefaultAsync();
+        // validate user has paid for course
+        var courseProgress = await _context.UserCourses
+            .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
+            .Where(cp => !cp.IsExpired)
+            .FirstOrDefaultAsync();
 
-            if (courseProgress is null)
-                return new ForbiddenResult();
+        if (courseProgress is null)
+            return new ForbiddenResult();
 
         var courseVideo = await _context.CourseVideos
             .Where(cv => cv.Course!.Uid == courseUid)
@@ -303,8 +304,186 @@ public class VideoService : IVideoService
             : new ErrorResult("Unable to save video progress");
     }
 
-    //public async Task<Result> CourseVideoCompleted(string courseUid)
-    //{
+    public async Task<Result> CourseVideoCompleted(string courseUid)
+    {
+        var courseProgress = await _context.UserCourses
+            .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
+            .Where(cp => !cp.IsExpired)
+            .FirstOrDefaultAsync();
 
-    //}
+        if (courseProgress is null)
+            return new ForbiddenResult();
+
+        courseProgress.IsCompleted = true;
+
+        _context.UserCourses.Update(courseProgress);
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult()
+            : new ErrorResult("Unable to save video progress");
+    }
+
+    public async Task<Result> GetUserSeriesProgress(string seriesUid)
+    {
+        var userSeries = await _context.UserSeries
+            .Where(sp => sp.Series!.Uid == seriesUid && sp.UserId == _userSession.UserId)
+            .Where(sp => !sp.IsExpired)
+            .FirstOrDefaultAsync();
+
+        if (userSeries is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The resource you requested for cannot be found.");
+
+        var progress = _context.SeriesProgress
+            .Where(sp => sp.UserSeriesId == userSeries.Id)
+            .Select(sp => new SeriesProgressView
+            {
+                CourseUid = sp.Course!.Uid,
+                Order = sp.Order,
+                Progress = sp.Progress,
+                IsCompleted = sp.IsCompleted
+            });
+
+        return new SuccessResult(progress);
+    }
+
+    public async Task<Result> GetSeriesCourseVideoDetail(string seriesUid, string courseUid)
+    {
+        var userSeries = await _context.UserSeries
+            .Where(sp => sp.Series!.Uid == seriesUid && sp.UserId == _userSession.UserId)
+            .Where(sp => !sp.IsExpired)
+            .FirstOrDefaultAsync();
+
+        if (userSeries is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The resource you requested for cannot be found.");
+
+        var seriesProgress = await _context.SeriesProgress
+            .Where(sp => sp.UserSeriesId == userSeries.Id)
+            .Where(sp => sp.Course!.Uid == courseUid)
+            .FirstOrDefaultAsync();
+
+        if (seriesProgress is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The resource you requested for cannot be found.");
+
+        // validate that the user has finished the previous video if any
+        var previousCourse = await _context.SeriesProgress
+            .Where(sp => sp.UserSeriesId == userSeries.Id)
+            .Where(sp => sp.Order == seriesProgress.Order - 1)
+            .FirstOrDefaultAsync();
+
+        // if the video is the first in the series, then it can be completed
+        if ((previousCourse is null && seriesProgress.Order == 1) || !previousCourse!.IsCompleted)
+            return new ErrorResult(StatusCodes.Status303SeeOther, "Previous course not completed");
+
+        var courseVideo = await _context.CourseVideos
+            .Where(cv => cv.Course!.Uid == courseUid)
+            .FirstOrDefaultAsync();
+
+        if (courseVideo is null || !courseVideo.IsUploaded)
+            return new SuccessResult(StatusCodes.Status204NoContent, "Video information not found.");
+
+        string videoId = courseVideo.VideoId!;
+
+        var response = await _client.GetAsync($"videos/{videoId}");
+        if (!response.IsSuccessStatusCode)
+            return new ErrorResult("Failed to get video details.");
+
+        string content = await response.Content.ReadAsStringAsync();
+        var apiResult = JsonConvert.DeserializeObject<ApiVideoDetail>(content);
+
+        // extract the token from the result
+        string token = apiResult!.Assets.Player.Split("?token=").Last();
+
+        var result = new VideoView
+        {
+            VideoId = videoId,
+            Token = token,
+            PreviewVideoId = courseVideo.PreviewVideoId,
+            ThumbnailUrl = courseVideo.ThumbnailUrl,
+            VideoDuration = courseVideo.VideoDuration,
+            Progress = seriesProgress.Progress
+        };
+
+        return new SuccessResult(result);
+    }
+
+    public async Task<Result> ReportSeriesCourseProgress(string seriesUid, string courseUid, ProgressReportModel model)
+    {
+        var userSeries = await _context.UserSeries
+            .Where(sp => sp.Series!.Uid == seriesUid && sp.UserId == _userSession.UserId)
+            .Where(sp => !sp.IsExpired)
+            .FirstOrDefaultAsync();
+
+        if (userSeries is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The resource you requested for cannot be found.");
+
+        var seriesProgress = await _context.SeriesProgress
+            .Where(sp => sp.UserSeriesId == userSeries.Id)
+            .Where(sp => sp.Course!.Uid == courseUid)
+            .FirstOrDefaultAsync();
+
+        if (seriesProgress is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The resource you requested for cannot be found.");
+
+        seriesProgress.Progress = model.Progress;
+
+        _context.SeriesProgress.Update(seriesProgress);
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult()
+            : new ErrorResult("Unable to save video progress");
+    }
+
+    public async Task<Result> SeriesCourseVideoCompleted(string seriesUid, string courseUid)
+    {
+        var userSeries = await _context.UserSeries
+            .Where(sp => sp.Series!.Uid == seriesUid && sp.UserId == _userSession.UserId)
+            .Where(sp => !sp.IsExpired)
+            .FirstOrDefaultAsync();
+
+        if (userSeries is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The resource you requested for cannot be found.");
+
+        var seriesProgress = await _context.SeriesProgress
+            .Where(sp => sp.UserSeriesId == userSeries.Id)
+            .Where(sp => sp.Course!.Uid == courseUid)
+            .FirstOrDefaultAsync();
+
+        if (seriesProgress is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "The resource you requested for cannot be found.");
+
+        seriesProgress.IsCompleted = true;
+
+        _context.SeriesProgress.Update(seriesProgress);
+
+        // check if video is the last in the series and if all other course has been completed
+        var seriesProgresses = await _context.SeriesProgress
+            .Where(sp => sp.UserSeriesId == userSeries.Id)
+            .ToListAsync();
+
+        bool allCompleted = seriesProgresses.All(sp => sp.IsCompleted);
+
+        if (allCompleted)
+        {
+            userSeries.IsCompleted = true;
+            _context.UserSeries.Update(userSeries);
+        }
+        else
+        {
+            // get the first un completed course if the last is already completed
+            var nextCourse = seriesProgresses
+                .Where(sp => !sp.IsCompleted)
+                .OrderBy(sp => sp.Order)
+                .FirstOrDefault();
+        }
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult()
+            : new ErrorResult("Unable to save video progress");
+    }
 }

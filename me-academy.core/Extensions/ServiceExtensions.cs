@@ -1,3 +1,13 @@
+/* 
+ * TODOs:
+ * Implement a background service using Quartz to expire user's courses.
+ * Implement a background service using Quartz to expire user's series.
+ * Implement a background service using Quartz to send email reminders to users.
+ * Implement a background service using Quartz to find stale videos and delete them from api.video
+ * Implement a background service using Quartz to find stale documents and delete them from the file system
+ */
+
+
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
@@ -210,7 +220,7 @@ public static class ServiceExtensions
             .NewConfig()
             .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
 
-                
+
         TypeAdapterConfig<SmeHub, SmeHubDetailView>
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList());
