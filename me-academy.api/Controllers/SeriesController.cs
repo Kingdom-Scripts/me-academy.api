@@ -69,6 +69,7 @@ namespace me_academy.api.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<SeriesView>>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> ListSeries([FromQuery] SeriesSearchModel model)
@@ -83,6 +84,7 @@ namespace me_academy.api.Controllers
         /// <param name="seriesUid"></param>
         /// <returns></returns>
         [HttpGet("{seriesUid}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<SeriesDetailView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> GetSeries(string seriesUid)
@@ -97,6 +99,7 @@ namespace me_academy.api.Controllers
         /// <param name="seriesUid"></param>
         /// <returns></returns>
         [HttpPost("{seriesUid}/view")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> ViewSeries(string seriesUid)
@@ -182,6 +185,7 @@ namespace me_academy.api.Controllers
         /// <param name="seriesUid"></param>
         /// <returns></returns>
         [HttpGet("{seriesUid}/preview")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<VideoView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> GetPreview(string seriesUid)
@@ -241,6 +245,7 @@ namespace me_academy.api.Controllers
         /// <param name="seriesUid"></param>
         /// <returns></returns>
         [HttpGet("{seriesUid}/courses")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<SeriesCourseView>>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> ListCoursesInSeries(string seriesUid)

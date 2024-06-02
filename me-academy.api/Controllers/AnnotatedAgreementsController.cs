@@ -69,6 +69,7 @@ namespace me_academy.api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<AnnotatedAgreementView>>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
         public async Task<IActionResult> ListAnnotatedAgreements([FromQuery] AnnotatedAgreementSearchModel request)

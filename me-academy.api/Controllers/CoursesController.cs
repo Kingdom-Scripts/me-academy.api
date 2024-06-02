@@ -72,6 +72,7 @@ public class CoursesController : BaseController
     /// <param name="courseUid"></param>
     /// <returns></returns>
     [HttpGet("{courseUid}/resources")]
+        [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<DocumentView>>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> ListResources(string courseUid)
@@ -129,8 +130,8 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [AllowAnonymous]
     [HttpGet("{courseUid}")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<CourseDetailView>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> GetCourse(string courseUid)
@@ -144,8 +145,8 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="courseUid"></param>
     /// <returns></returns>
-    [AllowAnonymous]
     [HttpPost("{courseUid}/view")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> AddCourseView(string courseUid)
@@ -159,8 +160,8 @@ public class CoursesController : BaseController
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [AllowAnonymous]
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<CourseView>>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     public async Task<IActionResult> ListCourses([FromQuery] CourseSearchModel request)
