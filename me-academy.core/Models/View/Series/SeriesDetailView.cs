@@ -9,6 +9,5 @@ public class SeriesDetailView : SeriesView
     public bool IsDeleted { get; set; }
     public ReferencedUserView? CreatedBy { get; set; }
     public ReferencedUserView? UpdatedBy { get; set; }
-    public VideoView? Preview { get; set; } = new();
-    public List<PriceView> SeriesPrices { get; set; } = new();
+    public List<PriceView> Prices { get; set; } = new();
 }

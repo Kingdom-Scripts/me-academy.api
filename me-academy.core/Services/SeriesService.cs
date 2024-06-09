@@ -36,7 +36,11 @@ public class SeriesService : ISeriesService
             .AnyAsync(x => x.Title.ToLower().Trim() == model.Title.ToLower().Trim());
 
         if (seriesExists)
-            return new ErrorResult("Series with the same title already exists.");
+        {
+            // return validation error
+
+        }
+        //return new ErrorResult(StatusCodes.Status400BadRequest, "Series with the same title already exists.");
 
         // create new series object
         var series = model.Adapt<Series>();
@@ -65,7 +69,7 @@ public class SeriesService : ISeriesService
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
-            ? new SuccessResult(StatusCodes.Status201Created, series.Adapt<SeriesView>())
+            ? new SuccessResult(StatusCodes.Status201Created, series.Adapt<SeriesDetailView>())
             : new ErrorResult("Failed to create series.");
     }
 
@@ -114,7 +118,7 @@ public class SeriesService : ISeriesService
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
-            ? new SuccessResult(StatusCodes.Status200OK, series.Adapt<SeriesView>())
+            ? new SuccessResult(StatusCodes.Status200OK, series.Adapt<SeriesDetailView>())
             : new ErrorResult("Failed to update series.");
     }
 
@@ -143,7 +147,7 @@ public class SeriesService : ISeriesService
 
     public async Task<Result> ListSeries(SeriesSearchModel request)
     {
-        if (_userSession.IsAuthenticated && (request.WithDeleted && !_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
+        if (_userSession.IsAuthenticated && request.WithDeleted && !_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
             return new ForbiddenResult();
 
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)
@@ -196,7 +200,7 @@ public class SeriesService : ISeriesService
             return new ErrorResult(StatusCodes.Status404NotFound, "Series is not found.");
 
         // remove the deleted prices
-        result.SeriesPrices = result.SeriesPrices.Where(x => !x.IsDeleted).ToList();
+        result.Prices = result.Prices.Where(x => !x.IsDeleted).ToList();
 
         return new SuccessResult(result);
     }
@@ -379,6 +383,42 @@ public class SeriesService : ISeriesService
         return saved > 0
             ? new SuccessResult()
             : new ErrorResult("Failed to save video details to server.");
+    }
+
+    public async Task<Result> DeletePreviewVideo(string seriesUid)
+    {
+        var preview = await _context.Series
+            .Where(c => c.Uid == seriesUid)
+            .Include(series => series.Preview)
+            .Select(c => c.Preview)
+            .FirstOrDefaultAsync();
+
+        if (preview is null)
+            return new ErrorResult(StatusCodes.Status404NotFound, "Series not found.");
+
+        // delete video
+        if (!string.IsNullOrEmpty(preview!.VideoId))
+        {
+            var deletedRes = await _videoService.DeleteVideo(preview.VideoId);
+            if (!deletedRes.Success)
+            {
+                Log.Error("Failed to delete existing video for series: {SeriesUid}, videoId: {VideoId}", seriesUid, preview.VideoId);
+                return deletedRes;
+            }
+        }
+
+        preview.VideoId = null;
+        preview.ThumbnailUrl = null;
+        preview.VideoDuration = 0;
+        preview.IsUploaded = false;
+
+        _context.Update(preview);
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult()
+            : new ErrorResult("Failed to delete video details.");
     }
 
     public async Task<Result> GetPreviewDetails(string seriesUid)

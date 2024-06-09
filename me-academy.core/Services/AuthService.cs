@@ -18,11 +18,11 @@ namespace me_academy.core.Services;
 public class AuthService : IAuthService
 {
     private readonly MeAcademyContext _context;
-    private readonly ITokenGenerator _tokenGenerator;
+    private readonly ITokenHandler _tokenGenerator;
     private readonly UserSession _userSession;
     private readonly IEmailService _emailService;
 
-    public AuthService(MeAcademyContext context, ITokenGenerator tokenGenerator, UserSession userSession,
+    public AuthService(MeAcademyContext context, ITokenHandler tokenGenerator, UserSession userSession,
         IEmailService emailService)
     {
 
