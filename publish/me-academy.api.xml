@@ -307,11 +307,10 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.QuestionController.DeleteCourseQuestion(System.String,System.Int32)">
+        <member name="M:me_academy.api.Controllers.QuestionController.DeleteCourseQuestion(System.Int32)">
             <summary>
-            Delete a question from course
+            Delete a question for a course
             </summary>
-            <param name="courseUid"></param>
             <param name="questionId"></param>
             <returns></returns>
         </member>
@@ -346,26 +345,27 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.QuestionController.DeleteSeriesQuestion(System.String,System.Int32)">
+        <member name="M:me_academy.api.Controllers.QuestionController.DeleteSeriesQuestion(System.Int32)">
             <summary>
-            Delete a question from series
+            Delete a question in series
             </summary>
-            <param name="seriesUid"></param>
             <param name="questionId"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.QuestionController.ListSeriesQuestions(System.String)">
+        <member name="M:me_academy.api.Controllers.QuestionController.ListSeriesQuestions(System.String,System.String)">
             <summary>
             List questions for a series
             </summary>
             <param name="seriesUid"></param>
+            <param name="courseUid"></param>
             <returns></returns>
         </member>
-        <member name="M:me_academy.api.Controllers.QuestionController.AddSeriesAnswers(System.String,System.Collections.Generic.List{me_academy.core.Models.Input.Questions.QuestionResponseModel})">
+        <member name="M:me_academy.api.Controllers.QuestionController.AddSeriesAnswers(System.String,System.String,System.Collections.Generic.List{me_academy.core.Models.Input.Questions.QuestionResponseModel})">
             <summary>
             Submit answers to a question for series
             </summary>
             <param name="seriesUid"></param>
+            <param name="courseUid"></param>
             <param name="model"></param>
             <returns></returns>
         </member>
@@ -446,6 +446,13 @@
             </summary>
             <param name="seriesUid"></param>
             <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:me_academy.api.Controllers.SeriesController.DeletePreview(System.String)">
+            <summary>
+            Delete preview details for a series
+            </summary>
+            <param name="seriesUid"></param>
             <returns></returns>
         </member>
         <member name="M:me_academy.api.Controllers.SeriesController.GetPreview(System.String)">
@@ -1117,6 +1124,30 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.Fourty.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.FourtyOne">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtyOne.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtyOne.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtyOne.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.FourtyTwo">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtyTwo.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtyTwo.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtyTwo.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
