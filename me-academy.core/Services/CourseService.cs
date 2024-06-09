@@ -10,7 +10,6 @@ using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
 using me_academy.core.Models.View.Courses;
-using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -238,9 +237,9 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListCourses(CourseSearchModel request)
     {
-        if (_userSession.IsAuthenticated && (request.WithDeleted && !_userSession.IsAnyAdmin && !_userSession.IsCourseManager))
+        if (_userSession.IsAuthenticated && request.WithDeleted && !_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
             return new ForbiddenResult();
-        
+
         request.SearchQuery = !string.IsNullOrEmpty(request.SearchQuery)
             ? request.SearchQuery.ToLower().Trim()
             : null;

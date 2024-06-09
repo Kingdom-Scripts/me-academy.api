@@ -33,6 +33,15 @@ public class UsersController : BaseController
         var res = await _userService.UserProfile();
         return ProcessResponse(res);
     }
+    
+    [HttpPost("profile")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<UserProfileView>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+    public async Task<IActionResult> UpdateProfile(ProfileModel model)
+    {
+        var res = await _userService.UpdateProfile(model);
+        return ProcessResponse(res);
+    }
 
     /// <summary>
     /// Invite a user

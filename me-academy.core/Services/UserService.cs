@@ -22,9 +22,9 @@ public class UserService : IUserService
     private readonly UserSession _userSession;
     private readonly IEmailService _emailService;
     private readonly BaseURLs _baseUrls;
-    private readonly ITokenGenerator _tokenGenerator;
+    private readonly ITokenHandler _tokenGenerator;
 
-    public UserService(MeAcademyContext context, UserSession userSession, IEmailService emailService, IOptions<AppConfig> options, ITokenGenerator tokenGenerator)
+    public UserService(MeAcademyContext context, UserSession userSession, IEmailService emailService, IOptions<AppConfig> options, ITokenHandler tokenGenerator)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
         _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -46,6 +46,26 @@ public class UserService : IUserService
         var userView = user.Adapt<UserProfileView>();
 
         return new SuccessResult(userView);
+    }
+
+    public async Task<Result> UpdateProfile(ProfileModel model)
+    {
+        var user = await _context.Users.FindAsync(_userSession.UserId);
+
+        if (user is null)
+            return new ErrorResult("An unkonwn error occurrend, could not find account");
+
+        user.FirstName = model.FirstName;
+        user.LastName = model.LastName;
+        user.Phone = model.Phone;
+
+        _context.Users.Update(user);
+
+        int saved = await _context.SaveChangesAsync();
+
+        return saved > 0
+            ? new SuccessResult("Profile updated successfully.", user.Adapt<UserProfileView>())
+            : new ErrorResult("An error occurred while updating profile.");
     }
 
     public async Task<Result> InviteUser(UserInvitationModel model)

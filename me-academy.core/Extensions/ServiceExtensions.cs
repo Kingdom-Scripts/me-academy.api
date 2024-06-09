@@ -163,6 +163,7 @@ public static class ServiceExtensions
         // map user models
         TypeAdapterConfig<User, UserProfileView>
             .NewConfig()
+            .Map(dest => dest.LastLoginDate, src => src.Login.CreatedAtUtc)
             .Map(dest => dest.Roles, src => src.UserRoles != null ? src.UserRoles.Select(ur => ur.Role!.Name) : new List<string>());
 
         // map courses models
@@ -239,7 +240,7 @@ public static class ServiceExtensions
 
         services.TryAddScoped<SoftDeleteInterceptor>();
         services.TryAddScoped<UserSession>();
-        services.TryAddScoped<ITokenGenerator, TokenGenerator>();
+        services.TryAddScoped<ITokenHandler, Services.TokenHandler>();
         services.TryAddScoped<IFileService, FileService>();
         services.TryAddScoped<IEmailService, EmailService>();
 
