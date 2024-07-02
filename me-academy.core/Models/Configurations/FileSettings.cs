@@ -2,7 +2,6 @@
 
 public class FileSettings
 {
-    public required string FullPath { get; set; }
     public required string BaseFolder { get; set; }
     public required string RequestPath { get; set; }
     public  int MaxSizeLength { get; set; }
