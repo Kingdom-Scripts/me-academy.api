@@ -373,7 +373,7 @@ public class VideoService : IVideoService
             .FirstOrDefaultAsync();
 
         // if the video is the first in the series, then it can be completed
-        if ((previousCourse is null && seriesProgress.Order == 1) || !previousCourse!.IsCompleted)
+        if (previousCourse is null && seriesProgress.Order == 1 || !previousCourse!.IsCompleted)
             return new ErrorResult(StatusCodes.Status303SeeOther, "Previous course not completed");
 
         var courseVideo = await _context.CourseVideos

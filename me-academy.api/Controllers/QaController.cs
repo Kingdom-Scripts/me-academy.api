@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace me_academy.api.Controllers;
 
 [ApiController]
-[Route("api/v1/question")]
+[Route("api/v1/questions")]
 [Authorize]
 public class QuestionController : BaseController
 {
@@ -48,17 +48,16 @@ public class QuestionController : BaseController
     }
 
     /// <summary>
-    /// Delete a question from course
+    /// Delete a question for a course
     /// </summary>
-    /// <param name="courseUid"></param>
     /// <param name="questionId"></param>
     /// <returns></returns>
-    [HttpGet("courses/{courseUid}/{questionId}/delete")]
+    [HttpGet("courses/{questionId}/delete")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> DeleteCourseQuestion(string courseUid, int questionId)
+    public async Task<IActionResult> DeleteCourseQuestion(int questionId)
     {
-        var res = await _questionService.DeleteCourseQuestion(courseUid, questionId);
+        var res = await _questionService.DeleteCourseQuestion(questionId);
         return ProcessResponse(res);
     }
 
@@ -122,33 +121,34 @@ public class QuestionController : BaseController
         return ProcessResponse(res);
     }
 
+
+
     /// <summary>
-    /// Delete a question from series
+    /// Delete a question in series
     /// </summary>
-    /// <param name="seriesUid"></param>
     /// <param name="questionId"></param>
     /// <returns></returns>
-    [HttpGet("series/{seriesUid}/{questionId}/delete")]
+    [HttpGet("series/{questionId}/delete")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> DeleteSeriesQuestion(string seriesUid, int questionId)
+    public async Task<IActionResult> DeleteSeriesQuestion(int questionId)
     {
-        var res = await _questionService.DeleteSeriesQuestion(seriesUid, questionId);
+        var res = await _questionService.DeleteSeriesQuestion(questionId);
         return ProcessResponse(res);
     }
-
 
     /// <summary>
     /// List questions for a series
     /// </summary>
     /// <param name="seriesUid"></param>
+    /// <param name="courseUid"></param>
     /// <returns></returns>
-    [HttpGet("series/{seriesUid}")]
+    [HttpGet("series/{seriesUid}/{courseUid}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<SeriesQuestionView>>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> ListSeriesQuestions(string seriesUid)
+    public async Task<IActionResult> ListSeriesQuestions(string seriesUid, string courseUid)
     {
-        var res = await _questionService.ListSeriesQuestions(seriesUid);
+        var res = await _questionService.ListSeriesQuestions(seriesUid, courseUid);
         return ProcessResponse(res);
     }
 
@@ -156,14 +156,15 @@ public class QuestionController : BaseController
     /// Submit answers to a question for series
     /// </summary>
     /// <param name="seriesUid"></param>
+    /// <param name="courseUid"></param>
     /// <param name="model"></param>
     /// <returns></returns>
-    [HttpPost("series/{seriesUid}/answers")]
+    [HttpPost("series/{seriesUid}/{courseUid}/answers")]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SuccessResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> AddSeriesAnswers(string seriesUid, List<QuestionResponseModel> model)
+    public async Task<IActionResult> AddSeriesAnswers(string seriesUid, string courseUid, List<QuestionResponseModel> model)
     {
-        var res = await _questionService.AddAnswersForSeries(seriesUid, model);
+        var res = await _questionService.AddAnswersForSeries(seriesUid, courseUid, model);
         return ProcessResponse(res);
     }
 }

@@ -27,8 +27,6 @@ public class User : BaseAppModel
     public bool IsActive { get; set; } = true;
     public bool EmailConfirmed { get; set; } = false;
 
-    [Required]
-    public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
-
+    public Login? Login { get; set; }
     public ICollection<UserRole>? UserRoles { get; set; }
 }

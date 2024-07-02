@@ -178,6 +178,20 @@ namespace me_academy.api.Controllers
             var res = await _seriesService.SetPreviewDetails(seriesUid, model);
             return ProcessResponse(res);
         }
+        
+        /// <summary>
+        /// Delete preview details for a series
+        /// </summary>
+        /// <param name="seriesUid"></param>
+        /// <returns></returns>
+        [HttpGet("{seriesUid}/preview/delete")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
+        public async Task<IActionResult> DeletePreview(string seriesUid)
+        {
+            var res = await _seriesService.DeletePreviewVideo(seriesUid);
+            return ProcessResponse(res);
+        }
 
         /// <summary>
         /// Get preview details for a series

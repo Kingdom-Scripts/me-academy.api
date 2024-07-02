@@ -47,7 +47,7 @@ public class OrderService : IOrderService
         if (discount == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Discount code not found");
 
-        if ((discount.TotalAvailable != -1) && (discount.TotalUsed > discount.TotalAvailable))
+        if (discount.TotalAvailable != -1 && discount.TotalUsed > discount.TotalAvailable)
             return new ErrorResult(StatusCodes.Status400BadRequest, "Discount code not available.");
 
         if (discount.IsSingleUse)

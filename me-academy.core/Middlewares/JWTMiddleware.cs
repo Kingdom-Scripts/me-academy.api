@@ -9,26 +9,26 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 namespace me_academy.core.Middlewares;
 
 public class JWTMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<JWTMiddleware> _logger;
+    private ITokenHandler? _tokenHandler;
 
-    public JWTMiddleware(RequestDelegate next, ICacheService cacheService)
+    public JWTMiddleware(RequestDelegate next)
     {
         _next = next;
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
-    public async Task Invoke(HttpContext context, IOptions<JwtConfig> jwtConfig)
+    public async Task Invoke(HttpContext context, IOptions<JwtConfig> jwtConfig, ITokenHandler tokenHandler)
     {
+        _tokenHandler = tokenHandler ?? throw new ArgumentNullException(nameof(tokenHandler));
+
         // continue if action called is anonymous.
         if (IsAnonymous(context))
         {
@@ -101,8 +101,8 @@ public class JWTMiddleware
             string domain = context.Request.Headers["Origin"].ToString();
 
             //check if token is string in the cache
-            string sToken = await _cacheService.GetToken($"{AuthKeys.TokenCacheKey}:{domain}:{uid}");
-            if (string.IsNullOrEmpty(sToken) || sToken != token)
+            bool isValid = await _tokenHandler!.ValidateToken(uid, token, domain);
+            if (!isValid)
             {
                 context.Items["User"] = null;
                 context.User = null;
@@ -118,15 +118,13 @@ public class JWTMiddleware
                 Roles = jwtToken.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList()
             };
 
-            // attach jwt to user context
-            //context.User = new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims));
-
             return true;
         }
         catch (Exception ex)
         {
             // do nothing if jwt validation fails
             // account is not attached to context so request won't have access to secure routes
+            Log.Error(ex, "JWT validation failed.");
         }
 
         return false;

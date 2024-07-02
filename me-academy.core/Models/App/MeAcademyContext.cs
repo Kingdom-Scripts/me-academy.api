@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace me_academy.core.Models.App;
 
@@ -22,6 +23,7 @@ public class MeAcademyContext : DbContext
     public required DbSet<Document> Documents { get; set; }
     public required DbSet<Duration> Durations { get; set; }
     public required DbSet<InvitedUser> InvitedUsers { get; set; }
+    public required DbSet<Login> Logins { get; set; }
     public required DbSet<CourseQuestionOption> CourseQuestionOptions { get; set; }
     public required DbSet<CourseQuestionResponse> CourseQuestionResponses { get; set; }
     public required DbSet<CourseQuestion> CourseQuestions { get; set; }
@@ -55,6 +57,12 @@ public class MeAcademyContext : DbContext
         {
             entity.HasKey(t => new { t.RoleId, t.UserId });
         });
+
+        builder.Entity<User>()
+           .HasOne(u => u.Login)
+           .WithOne(l => l.User)
+           .HasForeignKey<Login>(l => l.UserId)
+           .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Duration>()
             .ToTable(p => p.HasCheckConstraint("CK_DurationType_Type", "[Type] IN ('Days', 'Weeks', 'Months', 'Years')"));
@@ -110,16 +118,16 @@ public class MeAcademyContext : DbContext
             .HasForeignKey(cal => cal.CreatedById)
             .OnDelete(DeleteBehavior.NoAction);
 
+        builder.Entity<SeriesQuestion>()
+            .HasOne(cal => cal.Course)
+            .WithMany()
+            .HasForeignKey(cal => cal.CourseId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         builder.Entity<SeriesQuestionResponse>()
             .HasOne(cal => cal.CreatedBy)
             .WithMany()
             .HasForeignKey(cal => cal.CreatedById)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<SeriesQuestionResponse>()
-            .HasOne(cal => cal.Series)
-            .WithMany()
-            .HasForeignKey(cal => cal.SeriesId)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<SeriesAuditLog>()

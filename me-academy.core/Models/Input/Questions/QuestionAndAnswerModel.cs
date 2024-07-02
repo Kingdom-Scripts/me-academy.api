@@ -5,6 +5,7 @@ namespace me_academy.core.Models.Input.Questions;
 public class QuestionAndAnswerModel
 {
     public int Id { get; set; }
+    public required string CourseUid { get; set; }
     public string Text { get; set; } = null!;
     public bool IsMultiple { get; set; }
     public bool IsRequired { get; set; }

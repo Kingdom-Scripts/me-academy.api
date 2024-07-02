@@ -39,6 +39,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using me_academy.core.Utilities;
 
 namespace me_academy.core.Extensions;
 
@@ -163,6 +164,7 @@ public static class ServiceExtensions
         // map user models
         TypeAdapterConfig<User, UserProfileView>
             .NewConfig()
+            .Map(dest => dest.LastLoginDate, src => src.Login.CreatedAtUtc)
             .Map(dest => dest.Roles, src => src.UserRoles != null ? src.UserRoles.Select(ur => ur.Role!.Name) : new List<string>());
 
         // map courses models
@@ -200,9 +202,17 @@ public static class ServiceExtensions
             .NewConfig()
             .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
 
+        TypeAdapterConfig<SeriesPrice, PriceView>
+           .NewConfig()
+           .Map(dest => dest.Name, src => src.Duration!.Name);
+
         TypeAdapterConfig<Series, SeriesDetailView>
             .NewConfig()
-            .Map(dest => dest.Tags, src => src!.Tags.Split(",", StringSplitOptions.None).ToList());
+            .Map(dest => dest.Tags, src => src!.Tags.Split(",", StringSplitOptions.None).ToList())
+            .Map(dest => dest.Duration, src => Utilities.Extensions.FormatDuration(TimeSpan.FromSeconds(src.Courses
+                        .Where(c => !c.IsDeleted)
+                        .Select(c => c.Course!.Video != null ? c.Course.Video.VideoDuration : 0)
+                        .Sum())));
 
         TypeAdapterConfig<SeriesCourse, SeriesCouresView>
             .NewConfig()
@@ -239,7 +249,7 @@ public static class ServiceExtensions
 
         services.TryAddScoped<SoftDeleteInterceptor>();
         services.TryAddScoped<UserSession>();
-        services.TryAddScoped<ITokenGenerator, TokenGenerator>();
+        services.TryAddScoped<ITokenHandler, Services.TokenHandler>();
         services.TryAddScoped<IFileService, FileService>();
         services.TryAddScoped<IEmailService, EmailService>();
 

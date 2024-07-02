@@ -76,7 +76,7 @@ public class FileService : IFileService
             : new ErrorResult("Failed to delete file");
     }
 
-    public async Task<Result> DeleteFileInternal (int documentId) => await Delete(documentId);
+    public async Task<Result> DeleteFileInternal(int documentId) => await Delete(documentId);
 
     private async Task<Result<Document>> Upload(string folder, IFormFile file)
     {
