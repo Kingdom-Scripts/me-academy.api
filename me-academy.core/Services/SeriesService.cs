@@ -176,7 +176,10 @@ public class SeriesService : ISeriesService
                 CreatedAtUtc = s.CreatedAtUtc,
                 PublishedOnUtc = s.PublishedOnUtc,
                 Preview = s.Preview.Adapt<VideoView>(),
-                Duration = TimeSpan.FromSeconds(s.Courses.Select(c => c.Course!.Video != null ? c.Course.Video.VideoDuration : 0).Sum()).ToString("hh\\:mm\\:ss"),
+                Duration = Utilities.Extensions.FormatDuration(TimeSpan.FromSeconds(s.Courses
+                    .Where(c => !c.IsDeleted)
+                    .Select(c => c.Course!.Video != null ? c.Course.Video.VideoDuration : 0)
+                    .Sum())),
                 HasBought = _userSession.IsAuthenticated && s.UserSeries.Any(us => us.UserId == _userSession.UserId && !us.IsExpired)
             }).ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
@@ -528,6 +531,17 @@ public class SeriesService : ISeriesService
 
         if (seriesCourse is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found in this series.");
+
+        // Remove video if it belongs to this series only
+        if (seriesCourse.Course!.ForSeriesOnly)
+        {
+            if (!string.IsNullOrEmpty(seriesCourse.Course.Video!.VideoId))
+            {
+                var deletedRes = await _videoService.DeleteVideo(seriesCourse.Course.Video.VideoId);
+                if (!deletedRes.Success)
+                    Log.Error("Failed to delete existing video for series course: {SeriesCourseId}, videoId: {VideoId}", seriesCourseId, seriesCourse.Course.Video.VideoId);
+            }
+        }
 
         _context.Remove(seriesCourse);
 
