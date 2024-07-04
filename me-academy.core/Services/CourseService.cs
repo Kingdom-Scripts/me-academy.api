@@ -161,6 +161,8 @@ public class CourseService : ICourseService
         if (course == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found.");
 
+        // TODO: Implement garbage collector to delete the video from API.Video using the background task
+
         // delete the course
         _context.Remove(course);
 
@@ -170,7 +172,7 @@ public class CourseService : ICourseService
         int deleted = await _context.SaveChangesAsync();
 
         return deleted > 0
-            ? new SuccessResult(StatusCodes.Status200OK, "Course deleted successfully.")
+            ? new SuccessResult("Course deleted successfully.")
             : new ErrorResult("Failed to delete course. Please try again.");
     }
 
@@ -237,20 +239,17 @@ public class CourseService : ICourseService
 
     public async Task<Result> ListCourses(CourseSearchModel request)
     {
-        if (_userSession.IsAuthenticated && request.WithDeleted && !_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
-            return new ForbiddenResult();
-
         request.SearchQuery = !string.IsNullOrEmpty(request.SearchQuery)
             ? request.SearchQuery.ToLower().Trim()
             : null;
 
-        var courses = _context.Courses.Where(c => !c.ForSeriesOnly).AsQueryable();
+        var courses = _context.Courses
+            .Where(c => !c.IsDeleted && !c.ForSeriesOnly).AsQueryable();
 
         // allow filters only for admin users or users who can manage courses
         courses = _userSession.IsAuthenticated && (_userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse))
             ? courses
                 .Where(c => !request.IsActive.HasValue || c.IsActive == request.IsActive)
-                .Where(c => request.WithDeleted || !c.IsDeleted)
             : courses.Where(c => !c.IsDeleted && c.IsActive && c.IsPublished);
 
         // TODO: implement Full text search for description and title

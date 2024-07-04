@@ -130,14 +130,45 @@ public class SeriesService : ISeriesService
         if (series == null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Series not found.");
 
+        // TODO: Allow garbage collector to delete the video from API.Video using the background task
+        // delete preview video
+        //var preview = await _context.SeriesPreviews
+        //    .FirstOrDefaultAsync(x => x.SeriesId == series.Id);
+        //if (preview is not null && !string.IsNullOrEmpty(preview.VideoId))
+        //{
+        //    var deletedRes = await _videoService.DeleteVideo(series.Preview.VideoId);
+        //    if (deletedRes.Success)
+        //    {
+        //        preview.VideoId = null;
+        //        preview.ThumbnailUrl = null;
+        //        preview.VideoDuration = 0;
+        //        preview.IsUploaded = false;
+        //    }
+        //    else
+        //    {
+        //        Log.Error("Failed to delete preview video for series: {SeriesUid}, videoId: {VideoId}", seriesUid, series.Preview.VideoId);
+        //    }
+        //}
+
+        // TODO: Allow garbage collector to delete the video from API.Video using the background task
+        // delete videos that belong to only this series
+        //var courseVideoIds = _context.SeriesCourses
+        //    .Where(sc => sc.Course!.ForSeriesOnly && sc.SeriesId == series.Id)
+        //    .Select(sc => sc.Course!.Video!.VideoId);
+
+        //foreach (var videoId in courseVideoIds)
+        //{
+        //    var deletedRes = await _videoService.DeleteVideo(videoId!);
+        //    if (!deletedRes.Success)
+        //        Log.Error("Failed to delete existing video for series: {SeriesUid}, videoId: {VideoId}", seriesUid, videoId);
+        //}
+
         // delete the series
         _context.Remove(series);
 
         // add audit log
         AddSeriesAuditLog(series, SeriesAuditLogConstants.Deleted(series.Title, _userSession.Name));
 
-        // save the data
-        _context.Update(series);
         int saved = await _context.SaveChangesAsync();
 
         return saved > 0
@@ -147,19 +178,16 @@ public class SeriesService : ISeriesService
 
     public async Task<Result> ListSeries(SeriesSearchModel request)
     {
-        if (_userSession.IsAuthenticated && request.WithDeleted && !_userSession.IsAnyAdmin && !_userSession.IsCourseManager)
-            return new ForbiddenResult();
-
         request.SearchQuery = !string.IsNullOrWhiteSpace(request.SearchQuery)
             ? request.SearchQuery.ToLower().Trim()
             : null;
 
-        var series = _context.Series.AsQueryable();
+        var series = _context.Series
+            .Where(s => !s.IsDeleted).AsQueryable();
 
         // allow filters only for admin users or users who can manage courses
         series = _userSession.IsAuthenticated && (_userSession.IsAnyAdmin || _userSession.InRole(RolesConstants.ManageCourse))
             ? series.Where(s => !request.IsActive.HasValue || s.IsActive == request.IsActive)
-                .Where(s => request.WithDeleted || !s.IsDeleted)
             : series.Where(s => s.IsActive && s.IsPublished && !s.IsDeleted);
 
         var result = await series
@@ -527,21 +555,32 @@ public class SeriesService : ISeriesService
     public async Task<Result> RemoveCourseFromSeries(string seriesUid, string seriesCourseId)
     {
         var seriesCourse = await _context.SeriesCourses
+            .Include(sc => sc.Course).ThenInclude(c => c.Video)
             .FirstOrDefaultAsync(sc => sc.Course!.Uid == seriesCourseId && sc.Series!.Uid == seriesUid);
 
         if (seriesCourse is null)
             return new ErrorResult(StatusCodes.Status404NotFound, "Course not found in this series.");
 
+        // TODO: Allow garbage collector to delete the video from API.Video using the background task
         // Remove video if it belongs to this series only
-        if (seriesCourse.Course!.ForSeriesOnly)
-        {
-            if (!string.IsNullOrEmpty(seriesCourse.Course.Video!.VideoId))
-            {
-                var deletedRes = await _videoService.DeleteVideo(seriesCourse.Course.Video.VideoId);
-                if (!deletedRes.Success)
-                    Log.Error("Failed to delete existing video for series course: {SeriesCourseId}, videoId: {VideoId}", seriesCourseId, seriesCourse.Course.Video.VideoId);
-            }
-        }
+        //if (seriesCourse.Course!.ForSeriesOnly)
+        //{
+        //    if (!string.IsNullOrEmpty(seriesCourse.Course.Video!.VideoId))
+        //    {
+        //        var deletedRes = await _videoService.DeleteVideo(seriesCourse.Course.Video.VideoId);
+        //        if (deletedRes.Success)
+        //        {
+        //            seriesCourse.Course.Video.VideoId = null;
+        //            seriesCourse.Course.Video.ThumbnailUrl = null;
+        //            seriesCourse.Course.Video.VideoDuration = 0;
+        //            seriesCourse.Course.Video.IsUploaded = false;
+        //        }
+        //        else
+        //        {
+        //            Log.Error("Failed to delete existing video for series course: {SeriesCourseId}, videoId: {VideoId}", seriesCourseId, seriesCourse.Course.Video.VideoId);
+        //        }
+        //    }
+        //}
 
         _context.Remove(seriesCourse);
 
