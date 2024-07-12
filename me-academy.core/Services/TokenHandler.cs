@@ -42,7 +42,7 @@ public class TokenHandler : ITokenHandler
 
         // store the token
         var encryptedToken = token.HashPassword();
-        var login = await _context.Logins.FirstOrDefaultAsync(l => l.UserId == user.Id);
+        var login = await _context.Logins.FirstOrDefaultAsync(l => l.UserId == user.Id && l.Domain == requestDomain);
         if (login != null)
         {
             login.HashedToken = encryptedToken;
