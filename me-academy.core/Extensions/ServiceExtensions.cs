@@ -5,6 +5,7 @@
  * Implement a background service using Quartz to send email reminders to users.
  * Implement a background service using Quartz to find stale videos and delete them from api.video
  * Implement a background service using Quartz to find stale documents and delete them from the file system
+ * Implement a background service using Quartz to find and delete expired coupons
  */
 
 
@@ -40,6 +41,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using me_academy.core.Utilities;
+using me_academy.core.Models.View.Coupons;
+using me_academy.core.Models.App.Constants;
+using me_academy.core.Models.Input.Coupons;
 
 namespace me_academy.core.Extensions;
 
@@ -241,12 +245,12 @@ public static class ServiceExtensions
             .Map(dest => dest.Tags, src => string.Join(",", src.Tags));
 
 
+        // map annotated agreement models
         TypeAdapterConfig<AnnotatedAgreement, AnnotatedAgreementDetailView>
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList());
 
-        services.AddSingleton<ICacheService, CacheService>();
-
+        // Add Services
         services.TryAddScoped<SoftDeleteInterceptor>();
         services.TryAddScoped<UserSession>();
         services.TryAddScoped<ITokenHandler, Services.TokenHandler>();
@@ -264,6 +268,7 @@ public static class ServiceExtensions
         services.TryAddTransient<IOrderService, OrderService>();
         services.TryAddTransient<IUserService, UserService>();
         services.TryAddTransient<IAnnotatedAgreementService, AnnotatedAgreementService>();
+        services.TryAddTransient<ICouponService, CouponService>();
 
         return services;
     }

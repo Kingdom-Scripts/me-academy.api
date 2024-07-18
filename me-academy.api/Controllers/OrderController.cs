@@ -20,26 +20,6 @@ public class OrderController : BaseController
     }
 
     /// <summary>
-    /// Validates a discount code.
-    /// </summary>
-    /// <remarks>
-    /// This endpoint validates a discount code and returns the discount information. <br/>
-    /// Requires authentication.
-    /// </remarks>
-    /// <param name="discountCode">The discount code to validate.</param>
-    /// <param name="totalAmount">The total amount of the order.</param>
-    /// <response code="200">Returns the discount information.</response>
-    /// <response code="400">Returns an error if any occurred.</response>
-    [HttpGet("validate-discount/{discountCode}/{totalAmount}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<DiscountView>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
-    public async Task<IActionResult> ValidateDiscount(string discountCode, decimal totalAmount)
-    {
-        var result = await _orderService.ValidateDiscount(discountCode, totalAmount);
-        return ProcessResponse(result);
-    }
-
-    /// <summary>
     /// Creates a new order.
     /// </summary>
     /// <remarks>

@@ -19,7 +19,7 @@ public class MeAcademyContext : DbContext
     public required DbSet<CoursePrice> CoursePrices { get; set; }
     public required DbSet<CourseVideo> CourseVideos { get; set; }
     public required DbSet<CourseViewCount> CourseViewCounts { get; set; }
-    public required DbSet<Discount> Discounts { get; set; }
+    public required DbSet<Coupon> Coupons { get; set; }
     public required DbSet<Document> Documents { get; set; }
     public required DbSet<Duration> Durations { get; set; }
     public required DbSet<InvitedUser> InvitedUsers { get; set; }

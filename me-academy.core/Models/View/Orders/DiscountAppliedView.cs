@@ -1,6 +1,6 @@
 ﻿namespace me_academy.core.Models.View.Orders;
 
-public class DiscountView
+public class DiscountAppliedView
 {
     public int Id { get; set; }
     public decimal TotalAmount { get; set; }

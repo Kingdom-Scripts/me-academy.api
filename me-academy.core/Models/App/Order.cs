@@ -14,9 +14,9 @@ public class Order : BaseAppModel
 
     public required string BillingAddress { get; set; }
     public int? DurationId { get; set; }
-    public int? DiscountId { get; set; }
+    public int? CouponId { get; set; }
     [Column(TypeName = "decimal(18, 2)")]
-    public decimal DiscountApplied { get; set; } = 0m;
+    public decimal CouponApplied { get; set; } = 0m;
     [Column(TypeName = "decimal(18, 2)")]
     public decimal ItemAmount { get; set; }
     [Column(TypeName = "decimal(18, 2)")]
@@ -32,7 +32,7 @@ public class Order : BaseAppModel
     public string? Reference { get; set; }
 
     public Duration? Duration { get; set; }
-    public Discount? Discount { get; set; }
+    public Coupon? Coupon { get; set; }
     public UserContent? UserContent { get; set; }
 
     public Course? Course { get; set; }

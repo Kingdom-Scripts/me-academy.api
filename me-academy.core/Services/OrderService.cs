@@ -1,5 +1,7 @@
-﻿using Mapster;
+﻿using LazyCache;
+using Mapster;
 using me_academy.core.Constants;
+using me_academy.core.Constants.CacheKeys;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.App;
 using me_academy.core.Models.Configurations;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Saharaviewpoint.Core.Utilities;
 
 namespace me_academy.core.Services;
 
@@ -22,8 +25,10 @@ public class OrderService : IOrderService
     private readonly UserSession _userSession;
     private readonly HttpClient _paystackClient;
     private readonly BaseURLs _baseUrls;
+    private readonly ICouponService _couponService;
+    private readonly IAppCache _cache;
 
-    public OrderService(MeAcademyContext context, UserSession userSession, IHttpClientFactory httpClientFactory, IOptions<PasystackConfig> paystackConfig, IOptions<AppConfig> appConfig)
+    public OrderService(MeAcademyContext context, UserSession userSession, IHttpClientFactory httpClientFactory, IOptions<PasystackConfig> paystackConfig, IOptions<AppConfig> appConfig, ICouponService couponService, IAppCache cache)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _userSession = userSession ?? throw new ArgumentNullException(nameof(userSession));
@@ -34,53 +39,8 @@ public class OrderService : IOrderService
 
         _paystackClient = httpClientFactory.CreateClient(paystackConfig.Value.HttpClientName);
         _baseUrls = appConfig.Value.BaseURLs;
-    }
-
-    public async Task<Result> ValidateDiscount(string discountCode, decimal totalAmount)
-    {
-        if (discountCode == null)
-            return new ErrorResult(StatusCodes.Status400BadRequest, "Invalid discount code.");
-
-        discountCode = discountCode.Trim();
-        var discount = await _context.Discounts.FirstOrDefaultAsync(d => d.Code.Trim() == discountCode);
-
-        if (discount == null)
-            return new ErrorResult(StatusCodes.Status404NotFound, "Discount code not found");
-
-        if (discount.TotalAvailable != -1 && discount.TotalUsed > discount.TotalAvailable)
-            return new ErrorResult(StatusCodes.Status400BadRequest, "Discount code not available.");
-
-        if (discount.IsSingleUse)
-        {
-            var alreadyUsed = await _context.Orders.AnyAsync(x => x.Discount!.Code.Trim() == discountCode && x.IsPaid);
-            if (alreadyUsed)
-                return new ErrorResult(StatusCodes.Status400BadRequest, "Discount code already used.");
-        }
-
-        bool isValid = discount.IsActive && !discount.IsDeleted && discount.ExpiryDate > DateTime.UtcNow;
-        if (!isValid)
-            return new ErrorResult(StatusCodes.Status404NotFound, "Discount code is not valid.");
-
-        if (discount.MinAmount.HasValue && totalAmount < discount.MinAmount)
-            return new ErrorResult(StatusCodes.Status400BadRequest, "Discount code is not valid for this amount.");
-
-        var result = new DiscountView { Id = discount.Id, TotalAmount = totalAmount };
-
-        // calculate discount
-        if (discount.IsPercentage)
-        {
-            result.Discount = totalAmount * discount.Amount / 100;
-            result.DiscountedAmount = totalAmount - result.Discount;
-            result.Message = $"Discount of {discount.Amount}% applied, you have saved {result.Discount}";
-        }
-        else
-        {
-            result.Discount = discount.Amount;
-            result.DiscountedAmount = totalAmount - result.Discount;
-            result.Message = $"Discount applied, you have saved {result.Discount}";
-        }
-
-        return new SuccessResult(result);
+        _couponService = couponService;
+        _cache = cache;
     }
 
     public async Task<Result> PlaceOrder(NewOrderModel model)
@@ -174,19 +134,19 @@ public class OrderService : IOrderService
             return new ErrorResult("Invalid item selected.");
         }
 
-        // attach discount
+        // attach coupon
         order.TotalAmount = order.ItemAmount;
 
-        if (!string.IsNullOrEmpty(model.DiscountCode))
+        if (!string.IsNullOrEmpty(model.CouponCode))
         {
-            var discountRes = await ValidateDiscount(model.DiscountCode, order.ItemAmount);
-            if (discountRes is ErrorResult)
-                return discountRes;
+            var couponRes = await _couponService.ValidateCoupon(model.CouponCode, order.ItemAmount);
+            if (couponRes is ErrorResult)
+                return couponRes;
 
-            var discount = (DiscountView)discountRes.Content;
-            order.DiscountId = discount.Id;
-            order.TotalAmount = order.ItemAmount - discount.Discount;
-            order.DiscountApplied = discount.Discount;
+            var coupon = (DiscountAppliedView)couponRes.Content;
+            order.CouponId = coupon.Id;
+            order.TotalAmount = order.ItemAmount - coupon.Discount;
+            order.CouponApplied = coupon.Discount;
         }
 
         await _context.AddAsync(order);
@@ -226,7 +186,7 @@ public class OrderService : IOrderService
     {
         var order = await _context.Orders
             .Where(x => x.Id == orderId)
-            .Include(x => x.Discount)
+            .Include(x => x.Coupon)
             .FirstOrDefaultAsync();
 
         if (order is null)
@@ -234,12 +194,12 @@ public class OrderService : IOrderService
 
         if (order.IsPaid) return new ErrorResult("Payment has been completed.");
 
-        // validate discount
-        if (order!.DiscountId.HasValue)
+        // validate coupon
+        if (order!.CouponId.HasValue)
         {
-            var discountRes = await ValidateDiscount(order.Discount!.Code, order.ItemAmount);
-            if (discountRes is ErrorResult)
-                return new ErrorResult("Discount applied to order is no longer valid. Please try again.");
+            var couponRes = await _couponService.ValidateCoupon(order.Coupon!.Code, order.ItemAmount);
+            if (couponRes is ErrorResult)
+                return new ErrorResult("Coupon applied to order is no longer valid. Please try again.");
         }
 
         var paymentData = new PaymentRequestView
@@ -257,7 +217,7 @@ public class OrderService : IOrderService
         var order = await _context.Orders
             .Where(x => x.Id == orderId)
             .Include(x => x.Duration)
-            .Include(x => x.Discount)
+            .Include(x => x.Coupon)
             .FirstOrDefaultAsync();
 
         if (order == null) return new NotFoundErrorResult("Invalid order.");
@@ -276,9 +236,9 @@ public class OrderService : IOrderService
         order.PaidAt = today;
         order.UpdateById = _userSession.UserId;
         order.UpdatedAt = today;
-        if (order.DiscountId.HasValue)
+        if (order.CouponId.HasValue)
         {
-            order.Discount!.TotalUsed++;
+            order.Coupon!.TotalUsed++;
         }
 
         var userContent = new UserContent
@@ -374,9 +334,13 @@ public class OrderService : IOrderService
 
         int saved = await _context.SaveChangesAsync();
 
-        return saved > 0
-            ? new SuccessResult("Payment completed successfully.")
-            : new ErrorResult("Payment aknowleded successfully, however an issue occurred while saving your order details, kindly contact the support team.");
+        if (saved < 1)
+            return new ErrorResult("An error occurred while saving your order details, kindly contact the support team.");
+
+        // clear caches
+        _cache.ClearCaches(CouponCacheKeys.CouponUserList());
+
+        return new SuccessResult("Payment completed successfully.");
     }
 
 
