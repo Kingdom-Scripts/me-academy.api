@@ -73,6 +73,11 @@
             The page size to return or how many items to return. Defaults to 15
             </summary>
         </member>
+        <member name="P:me_academy.core.Models.Input.PagingOptionModel.SearchQuery">
+            <summary>
+            The search query to filter the results
+            </summary>
+        </member>
         <member name="T:me_academy.core.Models.Paystack.InitiateTransactionModel">
             <summary>
             Represents the model for initiating a transaction.

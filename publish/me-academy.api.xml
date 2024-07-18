@@ -146,6 +146,131 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.CheckCouponCodeUniqueness(System.Int32,System.String)">
+            <summary>
+            Checks the uniqueness of a coupon code.
+            </summary>
+            <remarks>
+            This endpoint checks the uniqueness of a coupon code when creating or updating a coupon. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="id">The identifier of the coupon to exclude from the uniqueness check.</param>
+            <param name="code">The coupon code to check for uniqueness.</param>
+            <response code="200">Returns true if the coupon code is unique; otherwise, false.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.AddCoupon(me_academy.core.Models.Input.Coupons.CouponModel)">
+            <summary>
+            Adds a new coupon.
+            </summary>
+            <remarks>
+            This endpoint adds a new coupon with the specified details. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="model">The details of the coupon to add.</param>
+            <response code="201">Returns the coupon information.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.UpdateCoupon(System.Int32,me_academy.core.Models.Input.Coupons.CouponModel)">
+            <summary>
+            Updates an existing coupon.
+            </summary>
+            <remarks>
+            This endpoint updates an existing coupon with the specified details. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="id">The identifier of the coupon to update.</param>
+            <param name="model">The details of the coupon to update.</param>
+            <response code="200">Returns the updated coupon information.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.GetCoupon(System.Int32)">
+            <summary>
+            Gets a coupon by identifier.
+            </summary>
+            <remarks>
+            This endpoint gets a coupon by its identifier. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="id">The identifier of the coupon to get.</param>
+            <response code="200">Returns the coupon information.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.GetCoupons(me_academy.core.Models.Input.Coupons.CouponSearchModel)">
+            <summary>
+            Retrieves a list of all coupons.
+            </summary>
+            <remarks>
+            This endpoint returns a list of all available coupons. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="request">The search parameters for filtering the list of coupons.</param>
+            <response code="200">Returns a list of coupons.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.DeleteCoupon(System.Int32)">
+            <summary>
+            Deletes a coupon by its identifier.
+            </summary>
+            <remarks>
+            This endpoint deletes a specific coupon by its identifier. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="id">The identifier of the coupon to delete.</param>
+            <response code="200">Indicates successful deletion of the coupon.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.ActivateCoupon(System.Int32)">
+            <summary>
+            Activates a coupon by its identifier.
+            </summary>
+            <remarks>
+            This endpoint activates a specific coupon by its identifier. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="id">The identifier of the coupon to activate.</param>
+            <response code="200">Indicates successful activation of the coupon.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.DeactivateCoupon(System.Int32)">
+            <summary>
+            Deactivates a coupon by its identifier.
+            </summary>
+            <remarks>
+            This endpoint deactivates a specific coupon by its identifier. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="id">The identifier of the coupon to deactivate.</param>
+            <response code="200">Indicates successful deactivation of the coupon.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.ValidateDiscount(System.String,System.Decimal)">
+            <summary>
+            Validates a discount code.
+            </summary>
+            <remarks>
+            This endpoint validates a discount code and returns the discount information. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="code">The discount code to validate.</param>
+            <param name="totalAmount">The total amount of the order.</param>
+            <response code="200">Returns the discount information.</response>
+            <response code="400">Returns an error if any occurred.</response>
+        </member>
+        <member name="M:me_academy.api.Controllers.CouponsController.GetCouponUsers(System.Int32,me_academy.core.Models.Input.PagingOptionModel)">
+            <summary>
+            Gets a list of users who have used a coupon.
+            </summary>
+            <remarks>
+            This endpoint returns a list of users who have used a specific coupon. <br/>
+            Requires authentication.
+            </remarks>
+            <param name="id">The identifier of the coupon for which to get users.</param>
+            <param name="request">The search parameters for filtering the list of users.</param>
+            <response code="200">Returns a list of users who have used the coupon.</response>
+            <response code="400">Returns an error if any occurred.</response>
+            <response code="404">Returns Not Found if the coupon does not exist.</response>
+        </member>
         <member name="M:me_academy.api.Controllers.CoursesController.CreateCourse(me_academy.core.Models.Input.Courses.CourseModel)">
             <summary>
             Create a new course
@@ -240,19 +365,6 @@
             </summary>
             <param name="courseUid"></param>
             <returns></returns>
-        </member>
-        <member name="M:me_academy.api.Controllers.OrderController.ValidateDiscount(System.String,System.Decimal)">
-            <summary>
-            Validates a discount code.
-            </summary>
-            <remarks>
-            This endpoint validates a discount code and returns the discount information. <br/>
-            Requires authentication.
-            </remarks>
-            <param name="discountCode">The discount code to validate.</param>
-            <param name="totalAmount">The total amount of the order.</param>
-            <response code="200">Returns the discount information.</response>
-            <response code="400">Returns an error if any occurred.</response>
         </member>
         <member name="M:me_academy.api.Controllers.OrderController.CreateOrder(me_academy.core.Models.Input.Orders.NewOrderModel)">
             <summary>
@@ -1148,6 +1260,18 @@
             <inheritdoc />
         </member>
         <member name="M:me_academy.api.Migrations.FourtyTwo.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:me_academy.api.Migrations.FourtyThree">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtyThree.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtyThree.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtyThree.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>
