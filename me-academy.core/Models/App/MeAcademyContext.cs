@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace me_academy.core.Models.App;
 
@@ -63,6 +62,11 @@ public class MeAcademyContext : DbContext
            .WithOne(l => l.User)
            .HasForeignKey<Login>(l => l.UserId)
            .OnDelete(DeleteBehavior.Cascade);
+
+        // Make both UserId and Domain unique in Login
+        builder.Entity<Login>()
+            .HasIndex(l => new { l.UserId, l.Domain })
+            .IsUnique();
 
         builder.Entity<Duration>()
             .ToTable(p => p.HasCheckConstraint("CK_DurationType_Type", "[Type] IN ('Days', 'Weeks', 'Months', 'Years')"));

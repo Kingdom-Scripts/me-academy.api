@@ -7,5 +7,5 @@ public class Login : BaseAppModel
     public required string Domain { get; set; }
     public required DateTime ExpiresAt { get; set; }
 
-    public User? User { get; set; }
+    public User User { get; set; }
 }

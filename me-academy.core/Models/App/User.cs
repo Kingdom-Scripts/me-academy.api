@@ -27,6 +27,6 @@ public class User : BaseAppModel
     public bool IsActive { get; set; } = true;
     public bool EmailConfirmed { get; set; } = false;
 
-    public Login? Login { get; set; }
+    public Login Login { get; set; }
     public ICollection<UserRole>? UserRoles { get; set; }
 }

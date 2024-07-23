@@ -1,9 +1,5 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+using LazyCache;
 using Mapster;
-using me_academy.core.Constants;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.App;
 using me_academy.core.Models.Configurations;
@@ -15,6 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace me_academy.core.Services;
 
@@ -23,12 +23,14 @@ public class TokenHandler : ITokenHandler
     private readonly JwtConfig _jwtConfig;
     private readonly MeAcademyContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IAppCache _cache;
 
-    public TokenHandler(IOptions<JwtConfig> jwtConfig, MeAcademyContext context, IHttpContextAccessor httpContextAccessor)
+    public TokenHandler(IOptions<JwtConfig> jwtConfig, MeAcademyContext context, IHttpContextAccessor httpContextAccessor, IAppCache cache)
     {
         _jwtConfig = jwtConfig.Value;
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+        _cache = cache;
     }
 
     public async Task<Result> GenerateJwtToken(User user)
@@ -150,15 +152,47 @@ public class TokenHandler : ITokenHandler
 
     public async Task<bool> ValidateToken(string uid, string token, string domain)
     {
-        var today = DateTime.UtcNow;
-        var hashedToken = await _context.Logins
-            .Where(l => l.User!.Uid.ToString() == uid && l.Domain == domain && l.ExpiresAt > today)
-            .Select(l => l.HashedToken)
-            .FirstOrDefaultAsync();
+        try
+        {
+            string cacheKey = $"ValidateToken-{uid}-{domain}";
+            var cachedData = await _cache.GetAsync<(string HashedToken, DateTime ExpiresAt)>(cacheKey);
 
-        if (hashedToken is null) return false;
+            if (cachedData != default)
+            {
+                // Check if the cached token is expired
+                if (DateTime.UtcNow > cachedData.ExpiresAt)
+                {
+                    // Token is expired, remove it from cache
+                    _cache.Remove(cacheKey);
+                    return false;
+                }
 
-        return hashedToken.VerifyPassword(token);
+                // Validate the token using the cached hashed token
+                return cachedData.HashedToken.VerifyPassword(token);
+            }
+            else
+            {
+                // Token not in cache, perform database lookup
+                var login = await _context.Logins
+                    .Where(l => l.User!.Uid.ToString() == uid && l.Domain == domain && l.ExpiresAt > DateTime.UtcNow)
+                    .Select(l => new { l.HashedToken, l.ExpiresAt })
+                    .FirstOrDefaultAsync();
+
+                if (login is null)
+                    return false;
+
+                // Cache the hashed token and its expiration time
+                _cache.Add(cacheKey, (login.HashedToken, login.ExpiresAt), login.ExpiresAt - DateTime.UtcNow);
+
+                // Validate the token
+                return login.HashedToken.VerifyPassword(token);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error validating token");
+            return false;
+        }
     }
 
     private async Task<string> GenerateRefreshToken(int userId)
