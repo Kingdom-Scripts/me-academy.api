@@ -1298,5 +1298,17 @@
         <member name="M:me_academy.api.Migrations.FourtyFive.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:me_academy.api.Migrations.FourtySix">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtySix.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtySix.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:me_academy.api.Migrations.FourtySix.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>
