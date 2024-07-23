@@ -9,9 +9,6 @@
  */
 
 
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Text;
 using FluentValidation;
 using Mapster;
 using me_academy.core.Constants;
@@ -40,10 +37,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
-using me_academy.core.Utilities;
-using me_academy.core.Models.View.Coupons;
-using me_academy.core.Models.App.Constants;
-using me_academy.core.Models.Input.Coupons;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Text;
 
 namespace me_academy.core.Extensions;
 
@@ -168,7 +164,7 @@ public static class ServiceExtensions
         // map user models
         TypeAdapterConfig<User, UserProfileView>
             .NewConfig()
-            .Map(dest => dest.LastLoginDate, src => src.Login.CreatedAtUtc)
+            .Map(dest => dest.LastLoginDate, src => src.Logins.Last().CreatedAtUtc)
             .Map(dest => dest.Roles, src => src.UserRoles != null ? src.UserRoles.Select(ur => ur.Role!.Name) : new List<string>());
 
         // map courses models
@@ -184,7 +180,7 @@ public static class ServiceExtensions
         TypeAdapterConfig<Course, CourseDetailView>
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList())
-            .Map(dest => dest.VideoIsUploaded, src => src.Video != null ? src.Video.IsUploaded : false)
+            .Map(dest => dest.VideoIsUploaded, src => src.Video != null && src.Video.IsUploaded)
             .Map(dest => dest.ThumbnailUrl, src => src.Video != null ? src.Video.ThumbnailUrl : "")
             .Map(dest => dest.PreviewVideoId, src => src.Video != null ? src.Video.PreviewVideoId : null)
             .Map(dest => dest.Duration, src => src.Video == null ? "" : TimeSpan.FromSeconds(src.Video.VideoDuration).ToString("hh\\:mm\\:ss"))

@@ -38,9 +38,9 @@ public class TokenHandler : ITokenHandler
         DateTime expiresAt = DateTime.UtcNow.AddDays(_jwtConfig.Expires);
 
         // get the request domain
-        string? requestDomain = _httpContextAccessor.HttpContext!.Request.Headers["Origin"].ToString();
+        string requestDomain = _httpContextAccessor.HttpContext!.Request.Headers["Origin"].ToString();
 
-        string? token = GenerateAccessToken(user, requestDomain, expiresAt);
+        string token = GenerateAccessToken(user, requestDomain, expiresAt);
 
         // store the token
         var encryptedToken = token.HashPassword();

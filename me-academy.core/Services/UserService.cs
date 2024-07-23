@@ -38,14 +38,14 @@ public class UserService : IUserService
     public async Task<Result> UserProfile()
     {
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Id == _userSession.UserId);
+            .Include(u => u.Logins)
+            .Where(u => u.Id == _userSession.UserId)
+            .ProjectToType<UserProfileView>()
+            .FirstOrDefaultAsync();
 
-        if (user == null)
-            return new ErrorResult(StatusCodes.Status404NotFound, "User not found.");
-
-        var userView = user.Adapt<UserProfileView>();
-
-        return new SuccessResult(userView);
+        return user == null
+            ? new ErrorResult(StatusCodes.Status404NotFound, "User not found.")
+            : new SuccessResult(user);
     }
 
     public async Task<Result> UpdateProfile(ProfileModel model)
@@ -140,8 +140,7 @@ public class UserService : IUserService
         var roles = _context.Roles.ToList();
         var userRoles = new List<UserRole>
         {
-            new UserRole
-            {
+            new() {
                 RoleId = roles.FirstOrDefault(r => r.Name == nameof(Roles.Manager)).Id,
                 Role = roles.FirstOrDefault(r => r.Name == nameof(Roles.Manager))
             }

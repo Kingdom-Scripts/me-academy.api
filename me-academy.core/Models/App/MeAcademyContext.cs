@@ -57,11 +57,10 @@ public class MeAcademyContext : DbContext
             entity.HasKey(t => new { t.RoleId, t.UserId });
         });
 
-        builder.Entity<User>()
-           .HasOne(u => u.Login)
-           .WithOne(l => l.User)
-           .HasForeignKey<Login>(l => l.UserId)
-           .OnDelete(DeleteBehavior.Cascade);
+        //builder.Entity<Login>()
+        //   .HasOne(l => l.User)
+        //   .WithMany(u => u.Logins)
+        //   .HasForeignKey(l => l.UserId);
 
         // Make both UserId and Domain unique in Login
         builder.Entity<Login>()
