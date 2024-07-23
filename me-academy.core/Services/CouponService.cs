@@ -59,7 +59,9 @@ internal class CouponService : ICouponService
             MinOrderAmount = model.MinOrderAmount,
             ExpiryDate = model.ExpiryDate,
             CreatedById = _userSession.UserId,
-            AttachedEmails = string.Join(", ", model.AttachedEmails)
+            AttachedEmails = model.AttachedEmails.Any()
+                ? string.Join(", ", model.AttachedEmails)
+                : null
         };
 
         await _context.Coupons.AddAsync(coupon);
@@ -312,6 +314,14 @@ internal class CouponService : ICouponService
         bool isValid = coupon.IsActive && !coupon.IsDeleted && coupon.ExpiryDate > DateTime.UtcNow;
         if (!isValid)
             return new ErrorResult(StatusCodes.Status404NotFound, "Coupon code is not valid.");
+
+        // get user logged
+        string loggedInUserEmail = await _context.Users
+            .Where(u => u.Id == _userSession.UserId)
+            .Select(u => u.Email)
+            .FirstAsync();
+        if (coupon.AttachedEmails != null && !coupon.AttachedEmails.Split(new[] { ", " }, StringSplitOptions.None).Contains(loggedInUserEmail))
+            return new ErrorResult(StatusCodes.Status400BadRequest, "Coupon code is not valid.");
 
         if (totalAmount < coupon.MinOrderAmount)
             return new ErrorResult(StatusCodes.Status400BadRequest, "Coupon code is not valid for this amount.");

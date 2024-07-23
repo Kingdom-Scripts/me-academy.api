@@ -38,9 +38,18 @@ public class UserService : IUserService
     public async Task<Result> UserProfile()
     {
         var user = await _context.Users
-            .Include(u => u.Logins)
             .Where(u => u.Id == _userSession.UserId)
-            .ProjectToType<UserProfileView>()
+            .Select(u => new UserProfileView
+            {
+                Uid = u.Uid,
+                Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Phone = u.Phone,
+                EmailConfirmed = u.EmailConfirmed,
+                Roles = u.UserRoles.Select(r => r.Role.Name).ToList(),
+                LastLoginDate = u.Logins.OrderByDescending(l => l.CreatedAtUtc).Select(l => l.CreatedAtUtc).FirstOrDefault()
+            })
             .FirstOrDefaultAsync();
 
         return user == null
