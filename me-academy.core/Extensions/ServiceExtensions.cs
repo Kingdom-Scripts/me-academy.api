@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * TODOs:
  * Implement a background service using Quartz to expire user's courses.
  * Implement a background service using Quartz to expire user's series.
@@ -15,6 +15,7 @@ using me_academy.core.Constants;
 using me_academy.core.Interfaces;
 using me_academy.core.Middlewares;
 using me_academy.core.Models.App;
+using me_academy.core.Models.App.Constants;
 using me_academy.core.Models.Input.AnnotatedAgreements;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Input.Courses;
@@ -22,6 +23,7 @@ using me_academy.core.Models.Input.Series;
 using me_academy.core.Models.Input.SmeHub;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
+using me_academy.core.Models.View.Coupons;
 using me_academy.core.Models.View.Courses;
 using me_academy.core.Models.View.Questions;
 using me_academy.core.Models.View.Series;
@@ -238,6 +240,30 @@ public static class ServiceExtensions
         TypeAdapterConfig<AnnotatedAgreement, AnnotatedAgreementDetailView>
             .NewConfig()
             .Map(dest => dest.Tags, src => src.Tags.Split(",", StringSplitOptions.None).ToList());
+
+        // map coupon models
+        TypeAdapterConfig<Coupon, CouponView>
+            .NewConfig()
+            .Map(dest => dest.Description, src => $"{(src.Type == CouponTypes.Fixed ? "₦" : "")}{(src.Amount % 1 == 0
+                ? src.Amount.ToString("0")
+                : Math.Round(src.Amount, 2).ToString("0.00"))}{(src.Type == CouponTypes.Percentage ? "%" : "")} off")
+            .Map(dest => dest.Usage, src => src.TotalAvailable.HasValue && src.TotalAvailable.Value > 0
+                ? $"{src.TotalUsed} of {src.TotalAvailable}"
+                : $"{src.TotalUsed} of Unlimited used")
+            .Map(dest => dest.TotalAmountIncured, src => src.Orders.Sum(or => or.CouponApplied));
+
+        TypeAdapterConfig<Coupon, CouponDetailView>
+            .NewConfig()
+             .Map(dest => dest.Description, src => $"{(src.Type == CouponTypes.Fixed ? "₦" : "")}{(src.Amount % 1 == 0
+                ? src.Amount.ToString("0")
+                : Math.Round(src.Amount, 2).ToString("0.00"))}{(src.Type == CouponTypes.Percentage ? "%" : "")} off")
+            .Map(dest => dest.Usage, src => src.TotalAvailable.HasValue && src.TotalAvailable.Value > 0
+                ? $"{src.TotalUsed} of {src.TotalAvailable}"
+                : $"{src.TotalUsed} of Unlimited used")
+            .Map(dest => dest.AttachedEmails, src => !string.IsNullOrEmpty(src.AttachedEmails)
+                ? src.AttachedEmails.Split(",", StringSplitOptions.TrimEntries).ToList()
+                : new List<string>())
+            .Map(dest => dest.TotalAmountIncured, src => src.Orders.Sum(or => or.CouponApplied));
 
         // Add Services
         services.TryAddScoped<SoftDeleteInterceptor>();

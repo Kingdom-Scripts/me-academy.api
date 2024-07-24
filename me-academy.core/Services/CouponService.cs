@@ -123,46 +123,10 @@ internal class CouponService : ICouponService
         {
             var couponDetail = await _context.Coupons
                 .Where(c => c.Id == id && !c.IsDeleted)
-                .Select(c => new
-                {
-                    c.Id,
-                    c.Code,
-                    c.Type,
-                    c.Amount,
-                    c.MinOrderAmount,
-                    c.TotalAvailable,
-                    c.TotalUsed,
-                    c.ExpiryDate,
-                    c.IsActive,
-                    c.AttachedEmails,
-                    TotalAmountIncured = _context.Orders
-                        .Where(or => or.CouponId == c.Id).Sum(or => or.CouponApplied)
-                })
+                .ProjectToType<CouponDetailView>()
                 .FirstOrDefaultAsync();
 
-            if (couponDetail == null)
-                return null;
-
-            return new CouponDetailView
-            {
-                Id = couponDetail.Id,
-                Code = couponDetail.Code,
-                Type = couponDetail.Type,
-                Description = couponDetail.Type == CouponTypes.Percentage
-                    ? $"{couponDetail.Amount}% off"
-                    : $"₦{couponDetail.Amount} off",
-                MinOrderAmount = couponDetail.MinOrderAmount,
-                Usage = couponDetail.TotalAvailable.HasValue && couponDetail.TotalAvailable.Value > 0
-                    ? $"{couponDetail.TotalUsed} of {couponDetail.TotalAvailable} used"
-                    : $"{couponDetail.TotalUsed} of Unlimited used",
-                TotalAmountIncured = couponDetail.TotalAmountIncured,
-                ExpiryDate = couponDetail.ExpiryDate,
-                IsActive = couponDetail.IsActive,
-                Amount = couponDetail.Amount,
-                TotalAvailable = couponDetail.TotalAvailable,
-                TotalUsed = couponDetail.TotalUsed,
-                AttachedEmails = couponDetail.AttachedEmails.Split(new[] { ", " }, StringSplitOptions.None).ToList()
-            };
+            return couponDetail;
         }, new TimeSpan(0, 45, 0));
 
         if (coupon == null)
@@ -191,22 +155,23 @@ internal class CouponService : ICouponService
                                    || !c.ExpiryDate.HasValue
                                    || c.ExpiryDate.Value > request.StillActiveBy.Value)
                 .OrderByDescending(c => c.CreatedAtUtc).ThenBy(c => c.IsActive)
-                .Select(c => new CouponView
-                {
-                    Id = c.Id,
-                    Code = c.Code,
-                    Type = c.Type,
-                    Description = c.Type == CouponTypes.Percentage
-                        ? $"{c.Amount}% off"
-                        : $"₦{c.Amount} off",
-                    MinOrderAmount = c.MinOrderAmount,
-                    Usage = c.TotalAvailable.HasValue && c.TotalAvailable.Value > 0
-                        ? $"{c.TotalUsed} of {c.TotalAvailable} used"
-                        : $"{c.TotalUsed} of Unlimited used",
-                    TotalAmountIncured = c.Orders.Sum(or => or.CouponApplied),
-                    ExpiryDate = c.ExpiryDate,
-                    IsActive = c.IsActive
-                })
+                .ProjectToType<CouponView>()
+                //.Select(c => new CouponView
+                //{
+                //    Id = c.Id,
+                //    Code = c.Code,
+                //    Type = c.Type,
+                //    Description = c.Type == CouponTypes.Percentage
+                //        ? $"{c.Amount}% off"
+                //        : $"₦{c.Amount} off",
+                //    MinOrderAmount = c.MinOrderAmount,
+                //    Usage = c.TotalAvailable.HasValue && c.TotalAvailable.Value > 0
+                //        ? $"{c.TotalUsed} of {c.TotalAvailable} used"
+                //        : $"{c.TotalUsed} of Unlimited used",
+                //    TotalAmountIncured = c.Orders.Sum(or => or.CouponApplied),
+                //    ExpiryDate = c.ExpiryDate,
+                //    IsActive = c.IsActive
+                //})
                 .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
             return couponList;
