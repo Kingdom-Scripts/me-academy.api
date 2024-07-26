@@ -156,22 +156,6 @@ internal class CouponService : ICouponService
                                    || c.ExpiryDate.Value > request.StillActiveBy.Value)
                 .OrderByDescending(c => c.CreatedAtUtc).ThenBy(c => c.IsActive)
                 .ProjectToType<CouponView>()
-                //.Select(c => new CouponView
-                //{
-                //    Id = c.Id,
-                //    Code = c.Code,
-                //    Type = c.Type,
-                //    Description = c.Type == CouponTypes.Percentage
-                //        ? $"{c.Amount}% off"
-                //        : $"₦{c.Amount} off",
-                //    MinOrderAmount = c.MinOrderAmount,
-                //    Usage = c.TotalAvailable.HasValue && c.TotalAvailable.Value > 0
-                //        ? $"{c.TotalUsed} of {c.TotalAvailable} used"
-                //        : $"{c.TotalUsed} of Unlimited used",
-                //    TotalAmountIncured = c.Orders.Sum(or => or.CouponApplied),
-                //    ExpiryDate = c.ExpiryDate,
-                //    IsActive = c.IsActive
-                //})
                 .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
             return couponList;
@@ -327,6 +311,7 @@ internal class CouponService : ICouponService
         {
             return _context.Orders
                 .Where(o => o.CouponId == id && o.IsPaid)
+                .AsEnumerable()
                 .OrderByDescending(o => o.CreatedAtUtc)
                 .Select((o, index) => new UserCouponView
                 {
@@ -337,7 +322,7 @@ internal class CouponService : ICouponService
                     DiscountApplied = o.CouponApplied,
                     DatePurchased = o.PaidAt.Value
                 })
-                .ToPaginatedListAsync(request.PageIndex, request.PageSize);
+                .ToPaginatedList(request.PageIndex, request.PageSize);
 
         }, new TimeSpan(0, 45, 0));
 
