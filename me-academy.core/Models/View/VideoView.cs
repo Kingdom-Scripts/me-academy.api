@@ -2,12 +2,12 @@ namespace me_academy.core.Models.View;
 
 public class VideoView
 {
-    public string? VideoId { get; set; }
-    public string? ThumbnailUrl { get; set; }
+    public string VideoId { get; set; }
+    public string ThumbnailUrl { get; set; }
     public int VideoDuration { get; set; }
     public bool IsUploaded { get; set; }
-    public string? PreviewVideoId { get; set; }
-    public string? Token { get; set; }
+    public string PreviewVideoId { get; set; }
+    public string Token { get; set; }
 
     public int PreviewStart { get; set; }
     public int PreviewEnd { get; set; }

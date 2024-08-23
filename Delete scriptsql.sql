@@ -1,0 +1,11 @@
+delete AnnotatedAgreements
+
+delete SmeHubs
+
+delete CourseAuditLogs
+delete SeriesQuestionResponses
+delete SeriesQuestionOptions
+delete SeriesQuestions
+delete Courses
+
+delete Series

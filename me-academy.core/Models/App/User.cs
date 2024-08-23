@@ -11,13 +11,13 @@ public class User : BaseAppModel
     public required string Email { get; set; }
 
     [MaxLength(50)]
-    public string? FirstName { get; set; }
+    public string FirstName { get; set; }
 
     [MaxLength(50)]
-    public string? LastName { get; set; }
+    public string LastName { get; set; }
 
     [MaxLength(25)]
-    public string? Phone { get; set; }
+    public string Phone { get; set; }
 
     [Required]
     [MaxLength(255)]
@@ -28,5 +28,6 @@ public class User : BaseAppModel
     public bool EmailConfirmed { get; set; } = false;
 
     public List<Login> Logins { get; set; }
-    public ICollection<UserRole>? UserRoles { get; set; }
+    public ICollection<UserRole> UserRoles { get; set; }
+    public List<Order> Orders { get; set; }
 }

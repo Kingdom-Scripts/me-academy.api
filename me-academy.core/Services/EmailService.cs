@@ -1,6 +1,4 @@
-﻿using System.Net.Mail;
-using System.Web;
-using Fluid;
+﻿using Fluid;
 using Fluid.Values;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.Configurations;
@@ -9,6 +7,8 @@ using me_academy.core.Models.Utilities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net.Mail;
+using System.Web;
 
 namespace me_academy.core.Services;
 
@@ -26,13 +26,15 @@ public class EmailService : IEmailService
         _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         _appConfig = options.Value ?? throw new ArgumentNullException(nameof(options));
 
-        _smtpClient = new SmtpClient("plesk6700.is.cc");
-        _smtpClient.Port = 587;
-        _smtpClient.Credentials = new System.Net.NetworkCredential("test@kingdomscripts.com", "p6kIv33^4");
-        _smtpClient.EnableSsl = false;
+        _smtpClient = new SmtpClient("plesk6700.is.cc")
+        {
+            Port = 587,
+            Credentials = new System.Net.NetworkCredential("test@kingdomscripts.com", "p6kIv33^4"),
+            EnableSsl = false
+        };
     }
 
-    private Result SendMessage(string to, string subject, string body, Attachment? attachment = null)
+    private Result SendMessage(string to, string subject, string body, Attachment attachment = null)
     {
         var mail = new MailMessage();
         try
@@ -74,7 +76,7 @@ public class EmailService : IEmailService
 
         var fluidParser = new FluidParser();
         // return error on failure to parse input
-        if (!fluidParser.TryParse(sourceString, out var fluidTemplate, out string? fluidError))
+        if (!fluidParser.TryParse(sourceString, out var fluidTemplate, out string fluidError))
         {
             _logger.LogError("Error in parsing template: {FluidError}", fluidError);
             return new ErrorResult($"Error in parsing template: {fluidError}");
@@ -121,7 +123,7 @@ public class EmailService : IEmailService
 
         var fluidParser = new FluidParser();
         // return error on failure to parse input
-        if (!fluidParser.TryParse(sourceString, out var fluidTemplate, out string? fluidError))
+        if (!fluidParser.TryParse(sourceString, out var fluidTemplate, out string fluidError))
         {
             _logger.LogError("Error in parsing template: {FluidError}", fluidError);
             return new ErrorResult($"Error in parsing template: {fluidError}");
@@ -152,7 +154,7 @@ public class EmailService : IEmailService
     }
 
     public async Task<Result> SendEmail(string to, string subject, string template,
-        Dictionary<string, string?>? args = null)
+        Dictionary<string, string> args = null)
     {
         // get template file
         string templatePath = Path.Combine(_hostingEnvironment.ContentRootPath, "EmailTemplates", template);
@@ -169,7 +171,7 @@ public class EmailService : IEmailService
 
         var fluidParser = new FluidParser();
         // return error on failure to parse input
-        if (!fluidParser.TryParse(sourceString, out var fluidTemplate, out string? fluidError))
+        if (!fluidParser.TryParse(sourceString, out var fluidTemplate, out string fluidError))
         {
             _logger.LogError("Error in parsing template: {FluidError}", fluidError);
             return new ErrorResult($"Error in parsing template: {fluidError}");
@@ -184,7 +186,7 @@ public class EmailService : IEmailService
         context.Options.Filters.AddFilter("to_comma_separated", (input, arguments, ctx)
             => new StringValue($"{input.ToObjectValue():n}"));
 
-        args ??= new Dictionary<string, string?>();
+        args ??= new Dictionary<string, string>();
         foreach (var value in args)
         {
             context.SetValue(value.Key, value.Value ?? string.Empty);

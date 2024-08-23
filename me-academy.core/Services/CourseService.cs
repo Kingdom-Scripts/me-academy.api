@@ -1,4 +1,5 @@
 using Mapster;
+using me_academy.core.Constants;
 using me_academy.core.Extensions;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.App;
@@ -26,11 +27,11 @@ public class CourseService : ICourseService
     public CourseService(MeAcademyContext context, UserSession userSession, IFileService fileService,
         IHttpContextAccessor httpContextAccessor, IVideoService videoService)
     {
-        _context = context ?? throw new ArgumentException(nameof(context));
-        _userSession = userSession ?? throw new ArgumentException(nameof(userSession));
-        _fileService = fileService ?? throw new ArgumentException(nameof(fileService));
-        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentException(nameof(httpContextAccessor));
-        _videoService = videoService ?? throw new ArgumentException(nameof(videoService));
+        _context = context ?? throw new ArgumentException(null, nameof(context));
+        _userSession = userSession ?? throw new ArgumentException(null, nameof(userSession));
+        _fileService = fileService ?? throw new ArgumentException(null, nameof(fileService));
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentException(null, nameof(httpContextAccessor));
+        _videoService = videoService ?? throw new ArgumentException(null, nameof(videoService));
     }
 
     #region Courses
@@ -48,7 +49,7 @@ public class CourseService : ICourseService
         // create course object
         var course = model.Adapt<Course>();
         course.CreatedById = _userSession.UserId;
-        course.Uid = await GetCourseUid(model.Title);
+        course.Uid = GetCourseUid(model.Title);
 
         // add prices
         if (model.Prices.Any())
@@ -276,7 +277,7 @@ public class CourseService : ICourseService
                     Name = cp.Duration!.Name
                 }).ToList(),
                 Duration = c.Video != null ? TimeSpan.FromSeconds(c.Video.VideoDuration).ToString("hh\\:mm\\:ss") : null,
-                HasBought = _userSession.IsAuthenticated && c.UserCourses.Any(o => o.CourseId == c.Id && o.UserId == _userSession.UserId && !o.IsExpired)
+                HasBought = _userSession.IsAuthenticated && c.UserCourses.Any(o => o.CourseId == c.Id && o.UserId == _userSession.UserId && o.ExpiresOnUtc.Date <= today)
             })
             .ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
@@ -363,6 +364,11 @@ public class CourseService : ICourseService
         return deactivated > 0
             ? new SuccessResult(StatusCodes.Status200OK, "Course deactivated successfully.")
             : new ErrorResult("Failed to deactivate course. Please try again.");
+    }
+
+    public async Task<Result> RateCourse(string courseUid)
+    {
+        throw new NotImplementedException();
     }
 
     #endregion
@@ -491,23 +497,21 @@ public class CourseService : ICourseService
 
     #region Private Methods
 
-    private async Task<string> GetCourseUid(string title)
+    private static string GetCourseUid(string title)
     {
         var trimmedTitle = title.Trim()  // trim
             .ToLower().Replace("-", "", StringComparison.OrdinalIgnoreCase) // remove hyphens
             .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
 
-        // get the next course number from sequence
-        //var nextCourseNumber = await _context.GetNextCourseNumber();
-        //return $"{trimmedTitle}-{nextCourseNumber}";
         return $"{trimmedTitle}";
     }
 
     private async void AddCourseAuditLog(Course course, string description)
     {
-        var newLog = new CourseAuditLog
+        var newLog = new ContentLog
         {
-            Course = course,
+            Content = course,
+            ContentType = ContentTypes.Course,
             Description = description,
             CreatedById = _userSession.UserId
         };

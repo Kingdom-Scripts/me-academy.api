@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using me_academy.core.Constants;
 using me_academy.core.Extensions;
 using me_academy.core.Interfaces;
 using me_academy.core.Models.ApiVideo.Response;
@@ -10,7 +11,6 @@ using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
 using me_academy.core.Models.View.Series;
-using me_academy.core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -45,7 +45,7 @@ public class SeriesService : ISeriesService
         // create new series object
         var series = model.Adapt<Series>();
         series.CreatedById = _userSession.UserId;
-        series.Uid = await GetSeriesUid(model.Title);
+        series.Uid = GetSeriesUid(model.Title);
         series.Preview = new()
         {
             UploadToken = ""
@@ -190,6 +190,7 @@ public class SeriesService : ISeriesService
             ? series.Where(s => !request.IsActive.HasValue || s.IsActive == request.IsActive)
             : series.Where(s => s.IsActive && s.IsPublished && !s.IsDeleted);
 
+        var today = DateTime.UtcNow.Date;
         var result = await series
             .Where(s => string.IsNullOrWhiteSpace(request.SearchQuery) ||
                         s.Title.ToLower().Contains(request.SearchQuery) || s.Summary.ToLower().Contains(request.SearchQuery))
@@ -208,7 +209,7 @@ public class SeriesService : ISeriesService
                     .Where(c => !c.IsDeleted)
                     .Select(c => c.Course!.Video != null ? c.Course.Video.VideoDuration : 0)
                     .Sum())),
-                HasBought = _userSession.IsAuthenticated && s.UserSeries.Any(us => us.UserId == _userSession.UserId && !us.IsExpired)
+                HasBought = _userSession.IsAuthenticated && s.UserSeries.Any(us => us.UserId == _userSession.UserId && us.ExpiresOnUtc.Date <= today)
             }).ToPaginatedListAsync(request.PageIndex, request.PageSize);
 
         return new SuccessResult(result);
@@ -518,7 +519,7 @@ public class SeriesService : ISeriesService
 
         var newCourse = model.Adapt<Course>();
         newCourse.CreatedById = _userSession.UserId;
-        newCourse.Uid = await GetCourseUid(model.Title);
+        newCourse.Uid = GetCourseUid(model.Title);
         newCourse.ForSeriesOnly = true;
         newCourse.IsPublished = true;
 
@@ -665,34 +666,30 @@ public class SeriesService : ISeriesService
 
     #region PRIVATE METHODS
 
-    private async Task<string> GetSeriesUid(string title)
+    private static string GetSeriesUid(string title)
     {
         var trimmedTitle = title.Trim() // trim
             .ToLower().Replace("-", "", StringComparison.OrdinalIgnoreCase) // remove hyphens
             .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
 
-        // get the next series number from sequnce
-        //var nextSeriesNumber = await _context.GetNextSeriesNumber();
-        //return $"{trimmedTitle}-{nextSeriesNumber}";
         return $"{trimmedTitle}";
     }
 
-    private async Task<string> GetCourseUid(string title)
+    private string GetCourseUid(string title)
     {
         var trimmedTitle = title.Trim()  // trim
-            .ToLower().Replace("-", "", StringComparison.OrdinalIgnoreCase) // remove hyphens
-            .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
+             .ToLower().Replace("-", "", StringComparison.OrdinalIgnoreCase) // remove hyphens
+             .Replace(" ", "-", StringComparison.OrdinalIgnoreCase); // replace spaces with hyphens
 
-        // get the next course number from sequence
-        var nextCourseNumber = await _context.GetNextCourseNumber();
-        return $"{trimmedTitle}-{nextCourseNumber}";
+        return $"{trimmedTitle}";
     }
 
     private async void AddSeriesAuditLog(Series Series, string description)
     {
-        var newLog = new SeriesAuditLog
+        var newLog = new ContentLog
         {
-            Series = Series,
+            Content = Series,
+            ContentType = ContentTypes.Series,
             Description = description,
             CreatedById = _userSession.UserId
         };

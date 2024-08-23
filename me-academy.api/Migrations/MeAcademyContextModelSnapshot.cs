@@ -23,82 +23,6 @@ namespace me_academy.api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("me_academy.core.Models.App.AnnotatedAgreement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DeletedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
-
-                    b.Property<int>("DocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Tags")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Uid")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ViewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("DocumentId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("AnnotatedAgreements", "dbo");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.Code", b =>
                 {
                     b.Property<int>("Id")
@@ -134,6 +58,124 @@ namespace me_academy.api.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Codes", "dbo");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.ContentBase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DeletedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Tags")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Uid")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.ToTable("ContentBase", "dbo");
+
+                    b.HasDiscriminator<string>("ContentType").HasValue("ContentBase");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.ContentLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContentId");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("ContentLogs", "dbo", t =>
+                        {
+                            t.HasCheckConstraint("CK_ContentLog_ItemType", "[ContentType] IN ('Course', 'Series', 'SmeHub', 'AnnotatedAgreement')");
+                        });
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.Coupon", b =>
@@ -197,117 +239,6 @@ namespace me_academy.api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Coupons", "dbo");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.Course", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DeletedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(MAX)");
-
-                    b.Property<bool>("ForSeriesOnly")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("PublishedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("PublishedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Tags")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Uid")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ViewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("Uid");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("Courses", "dbo");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.CourseAuditLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("CreatedById");
-
-                    b.ToTable("CourseAuditLogs", "dbo");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.CourseDocument", b =>
@@ -805,6 +736,9 @@ namespace me_academy.api.Migrations
                     b.Property<string>("BillingAddress")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("CouponApplied")
                         .HasColumnType("decimal(18, 2)");
 
@@ -857,6 +791,8 @@ namespace me_academy.api.Migrations
 
                     b.HasIndex("AnnotatedAgreementId");
 
+                    b.HasIndex("ContentId");
+
                     b.HasIndex("CouponId");
 
                     b.HasIndex("CourseId");
@@ -866,6 +802,8 @@ namespace me_academy.api.Migrations
                     b.HasIndex("SeriesId");
 
                     b.HasIndex("SmeHubId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders", "dbo", t =>
                         {
@@ -914,114 +852,6 @@ namespace me_academy.api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles", "dbo");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.Series", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DeletedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("PublishedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("PublishedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Summary")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Tags")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Uid")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ViewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("PublishedById");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("Series", "dbo");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.SeriesAuditLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int>("SeriesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("SeriesId");
-
-                    b.ToTable("SeriesAuditLogs", "dbo");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.SeriesCourse", b =>
@@ -1325,87 +1155,6 @@ namespace me_academy.api.Migrations
                     b.ToTable("SeriesQuestionResponses", "dbo");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.SmeHub", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DeletedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(MAX)");
-
-                    b.Property<int>("DocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Tags")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("TypeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Uid")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int?>("UpdatedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedOnUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ViewCount")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("DocumentId");
-
-                    b.HasIndex("TypeId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("SmeHubs", "dbo");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.SmeHubType", b =>
                 {
                     b.Property<int>("Id")
@@ -1472,39 +1221,6 @@ namespace me_academy.api.Migrations
                     b.ToTable("Users", "dbo");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.UserContent", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserContents", "dbo");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.UserCourse", b =>
                 {
                     b.Property<int>("Id")
@@ -1519,10 +1235,13 @@ namespace me_academy.api.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
+                    b.Property<decimal>("Duration")
+                        .HasColumnType("decimal(20, 12)");
 
-                    b.Property<bool>("IsExpired")
+                    b.Property<DateTime>("ExpiresOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("Progress")
@@ -1573,10 +1292,10 @@ namespace me_academy.api.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
+                    b.Property<DateTime>("ExpiresOnUtc")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsExpired")
+                    b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
                     b.Property<int>("SeriesId")
@@ -1594,33 +1313,97 @@ namespace me_academy.api.Migrations
 
             modelBuilder.Entity("me_academy.core.Models.App.AnnotatedAgreement", b =>
                 {
-                    b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("me_academy.core.Models.App.ContentBase");
 
-                    b.HasOne("me_academy.core.Models.App.User", "DeletedBy")
-                        .WithMany()
-                        .HasForeignKey("DeletedById");
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("int");
 
-                    b.HasOne("me_academy.core.Models.App.Document", "Document")
-                        .WithMany()
-                        .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18, 2)");
 
-                    b.HasOne("me_academy.core.Models.App.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById");
+                    b.HasIndex("DocumentId");
 
-                    b.Navigation("CreatedBy");
+                    b.HasDiscriminator().HasValue("AnnotatedAgreement");
+                });
 
-                    b.Navigation("DeletedBy");
+            modelBuilder.Entity("me_academy.core.Models.App.Course", b =>
+                {
+                    b.HasBaseType("me_academy.core.Models.App.ContentBase");
 
-                    b.Navigation("Document");
+                    b.Property<bool>("ForSeriesOnly")
+                        .HasColumnType("bit");
 
-                    b.Navigation("UpdatedBy");
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("PublishedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PublishedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasIndex("Uid");
+
+                    b.HasDiscriminator().HasValue("Course");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.Series", b =>
+                {
+                    b.HasBaseType("me_academy.core.Models.App.ContentBase");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("PublishedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PublishedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasIndex("PublishedById");
+
+                    b.ToTable("ContentBase", "dbo", t =>
+                        {
+                            t.Property("IsPublished")
+                                .HasColumnName("Series_IsPublished");
+
+                            t.Property("PublishedById")
+                                .HasColumnName("Series_PublishedById");
+
+                            t.Property("PublishedOnUtc")
+                                .HasColumnName("Series_PublishedOnUtc");
+                        });
+
+                    b.HasDiscriminator().HasValue("Series");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.SmeHub", b =>
+                {
+                    b.HasBaseType("me_academy.core.Models.App.ContentBase");
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("TypeId");
+
+                    b.ToTable("ContentBase", "dbo", t =>
+                        {
+                            t.Property("DocumentId")
+                                .HasColumnName("SmeHub_DocumentId");
+
+                            t.Property("Price")
+                                .HasColumnName("SmeHub_Price");
+                        });
+
+                    b.HasDiscriminator().HasValue("SmeHub");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.Code", b =>
@@ -1634,7 +1417,7 @@ namespace me_academy.api.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.Course", b =>
+            modelBuilder.Entity("me_academy.core.Models.App.ContentBase", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
                         .WithMany()
@@ -1657,13 +1440,17 @@ namespace me_academy.api.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.CourseAuditLog", b =>
+            modelBuilder.Entity("me_academy.core.Models.App.ContentLog", b =>
                 {
-                    b.HasOne("me_academy.core.Models.App.Course", "Course")
-                        .WithMany("AuditLogs")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("me_academy.core.Models.App.ContentBase", "Content")
+                        .WithMany()
+                        .HasForeignKey("ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("me_academy.core.Models.App.Course", null)
+                        .WithMany("AuditLogs")
+                        .HasForeignKey("CourseId");
 
                     b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
                         .WithMany()
@@ -1671,7 +1458,7 @@ namespace me_academy.api.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Course");
+                    b.Navigation("Content");
 
                     b.Navigation("CreatedBy");
                 });
@@ -1867,6 +1654,12 @@ namespace me_academy.api.Migrations
                         .WithMany()
                         .HasForeignKey("AnnotatedAgreementId");
 
+                    b.HasOne("me_academy.core.Models.App.ContentBase", "Content")
+                        .WithMany()
+                        .HasForeignKey("ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("me_academy.core.Models.App.Coupon", "Coupon")
                         .WithMany("Orders")
                         .HasForeignKey("CouponId");
@@ -1887,7 +1680,15 @@ namespace me_academy.api.Migrations
                         .WithMany()
                         .HasForeignKey("SmeHubId");
 
+                    b.HasOne("me_academy.core.Models.App.User", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("AnnotatedAgreement");
+
+                    b.Navigation("Content");
 
                     b.Navigation("Coupon");
 
@@ -1898,6 +1699,8 @@ namespace me_academy.api.Migrations
                     b.Navigation("Series");
 
                     b.Navigation("SmeHub");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.RefreshToken", b =>
@@ -1909,54 +1712,6 @@ namespace me_academy.api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.Series", b =>
-                {
-                    b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("me_academy.core.Models.App.User", "DeletedBy")
-                        .WithMany()
-                        .HasForeignKey("DeletedById");
-
-                    b.HasOne("me_academy.core.Models.App.User", "PublishedBy")
-                        .WithMany()
-                        .HasForeignKey("PublishedById");
-
-                    b.HasOne("me_academy.core.Models.App.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("DeletedBy");
-
-                    b.Navigation("PublishedBy");
-
-                    b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.SeriesAuditLog", b =>
-                {
-                    b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("me_academy.core.Models.App.Series", "Series")
-                        .WithMany()
-                        .HasForeignKey("SeriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Series");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.SeriesCourse", b =>
@@ -2102,64 +1857,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.SmeHub", b =>
-                {
-                    b.HasOne("me_academy.core.Models.App.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("me_academy.core.Models.App.User", "DeletedBy")
-                        .WithMany()
-                        .HasForeignKey("DeletedById");
-
-                    b.HasOne("me_academy.core.Models.App.Document", "Document")
-                        .WithMany()
-                        .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("me_academy.core.Models.App.SmeHubType", "Type")
-                        .WithMany()
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("me_academy.core.Models.App.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("DeletedBy");
-
-                    b.Navigation("Document");
-
-                    b.Navigation("Type");
-
-                    b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.UserContent", b =>
-                {
-                    b.HasOne("me_academy.core.Models.App.Order", "Order")
-                        .WithOne("UserContent")
-                        .HasForeignKey("me_academy.core.Models.App.UserContent", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("me_academy.core.Models.App.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.UserCourse", b =>
                 {
                     b.HasOne("me_academy.core.Models.App.Course", "Course")
@@ -2201,9 +1898,79 @@ namespace me_academy.api.Migrations
                     b.Navigation("Series");
                 });
 
+            modelBuilder.Entity("me_academy.core.Models.App.AnnotatedAgreement", b =>
+                {
+                    b.HasOne("me_academy.core.Models.App.Document", "Document")
+                        .WithMany("AnnotatedAgreements")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.Series", b =>
+                {
+                    b.HasOne("me_academy.core.Models.App.User", "PublishedBy")
+                        .WithMany()
+                        .HasForeignKey("PublishedById");
+
+                    b.Navigation("PublishedBy");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.SmeHub", b =>
+                {
+                    b.HasOne("me_academy.core.Models.App.Document", "Document")
+                        .WithMany("SmeHubs")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("me_academy.core.Models.App.SmeHubType", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+
+                    b.Navigation("Type");
+                });
+
             modelBuilder.Entity("me_academy.core.Models.App.Coupon", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.CourseQuestion", b =>
+                {
+                    b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.Document", b =>
+                {
+                    b.Navigation("AnnotatedAgreements");
+
+                    b.Navigation("SmeHubs");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.Role", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.SeriesQuestion", b =>
+                {
+                    b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("me_academy.core.Models.App.User", b =>
+                {
+                    b.Navigation("Logins");
+
+                    b.Navigation("Orders");
+
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("me_academy.core.Models.App.Course", b =>
@@ -2227,21 +1994,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("Video");
                 });
 
-            modelBuilder.Entity("me_academy.core.Models.App.CourseQuestion", b =>
-                {
-                    b.Navigation("Options");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.Order", b =>
-                {
-                    b.Navigation("UserContent");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.Role", b =>
-                {
-                    b.Navigation("UserRoles");
-                });
-
             modelBuilder.Entity("me_academy.core.Models.App.Series", b =>
                 {
                     b.Navigation("Courses");
@@ -2251,18 +2003,6 @@ namespace me_academy.api.Migrations
                     b.Navigation("Prices");
 
                     b.Navigation("UserSeries");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.SeriesQuestion", b =>
-                {
-                    b.Navigation("Options");
-                });
-
-            modelBuilder.Entity("me_academy.core.Models.App.User", b =>
-                {
-                    b.Navigation("Logins");
-
-                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

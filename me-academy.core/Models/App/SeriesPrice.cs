@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using me_academy.core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace me_academy.core.Models.App;
 
@@ -16,6 +16,6 @@ public class SeriesPrice : BaseAppModel, ISoftDeletable
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
 
-    public virtual Series? Series { get; set; }
-    public virtual Duration? Duration { get; set; }
+    public virtual Series Series { get; set; }
+    public virtual Duration Duration { get; set; }
 }

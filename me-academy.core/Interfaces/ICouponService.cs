@@ -14,5 +14,5 @@ public interface ICouponService
     Task<Result> ActivateCoupon(int id);
     Task<Result> DeactivateCoupon(int id);
     Task<Result> ValidateCoupon(string code, decimal totalAmount);
-    Task<Result> GetCouponUsers(int id, PagingOptionModel request);
+    Result GetCouponUsers(int id, PagingOptionModel request);
 }

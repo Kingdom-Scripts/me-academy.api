@@ -1,8 +1,8 @@
-using System.Diagnostics;
-using System.Text.Json;
 using me_academy.core.Models.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace me_academy.core.Middlewares;
 
@@ -35,14 +35,13 @@ public class ErrorHandlerMiddleware
             response.ContentType = "application/json";
 
             _logger.LogError("Actual Error: {Error}", error);
-
             response.StatusCode = error switch
             {
-                KeyNotFoundException e => StatusCodes.Status404NotFound,// not found error
+                KeyNotFoundException => StatusCodes.Status404NotFound,// not found error
                 _ => StatusCodes.Status500InternalServerError,// unhandled error
             };
 
-            string? result = JsonSerializer.Serialize(new ErrorResult
+            string result = JsonSerializer.Serialize(new ErrorResult
             {
                 Success = false,
                 Message = error?.Message,
@@ -61,7 +60,7 @@ public class ErrorHandlerMiddleware
         // handle unauthorized error
         if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
         {
-            string? result = JsonSerializer.Serialize(new ErrorResult
+            string result = JsonSerializer.Serialize(new ErrorResult
             {
                 Success = false,
                 Message = "Authentication failed, please log in to access this resource",
@@ -76,7 +75,7 @@ public class ErrorHandlerMiddleware
         }
         else if (context.Response.StatusCode == StatusCodes.Status403Forbidden)
         {
-            string? result = JsonSerializer.Serialize(new ErrorResult
+            string result = JsonSerializer.Serialize(new ErrorResult
             {
                 Success = false,
                 Message = "You are not authorized to access this resource.",
@@ -91,10 +90,10 @@ public class ErrorHandlerMiddleware
         }
     }
 
-    private TraceInfo GetErrorTraceInfo(Exception ex)
+    private static TraceInfo GetErrorTraceInfo(Exception ex)
     {
         //Get a StackTrace object for the exception
-        StackTrace st = new StackTrace(ex, true);
+        StackTrace st = new(ex, true);
 
         List<StackFrame> frames = st.GetFrames().Where(x => x.GetFileName() != null).ToList();
 
@@ -102,7 +101,7 @@ public class ErrorHandlerMiddleware
 
         if (frame == null) return new TraceInfo();
 
-        TraceInfo trace = new TraceInfo
+        TraceInfo trace = new()
         {
             FileName = frame.GetFileName(),
             MethodName = frame.GetMethod().Name,

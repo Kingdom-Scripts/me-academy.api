@@ -8,10 +8,10 @@ public static class CustomFileValidator
     public class FileValidationResult
     {
         public bool IsValid { get; set; }
-        public string? ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; }
     }
 
-    public static FileValidationResult HaveValidFile(IFormFile? file)
+    public static FileValidationResult HaveValidFile(IFormFile file)
     {
         if (file == null)
         {

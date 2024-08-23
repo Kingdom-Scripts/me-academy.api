@@ -16,8 +16,8 @@ public class SeriesCourse : BaseAppModel, ISoftDeletable
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
 
-    public Series? Series { get; set; }
-    public Course? Course { get; set; }
-    public User? CreatedBy { get; set; }
-    public User? UpdatedBy { get; set; }
+    public Series Series { get; set; }
+    public Course Course { get; set; }
+    public User CreatedBy { get; set; }
+    public User UpdatedBy { get; set; }
 }

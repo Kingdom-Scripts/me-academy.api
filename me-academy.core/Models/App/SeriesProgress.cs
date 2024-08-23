@@ -2,7 +2,7 @@
 
 namespace me_academy.core.Models.App;
 
-public class SeriesProgress :BaseAppModel
+public class SeriesProgress : BaseAppModel
 {
     public int UserSeriesId { get; set; }
     public int CourseId { get; set; }
@@ -10,5 +10,5 @@ public class SeriesProgress :BaseAppModel
     [Column(TypeName = "decimal(20, 12)")]
     public decimal Progress { get; set; } = 0;
     public bool IsCompleted { get; set; } = false;
-    public Course? Course { get; internal set; }
+    public Course Course { get; internal set; }
 }

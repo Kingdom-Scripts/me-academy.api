@@ -9,6 +9,6 @@ public class SeriesAuditLog : BaseAppModel
     public required string Description { get; set; }
     public int CreatedById { get; set; }
 
-    public Series? Series { get; set; }
-    public User? CreatedBy { get; set; }
+    public Series Series { get; set; }
+    public User CreatedBy { get; set; }
 }

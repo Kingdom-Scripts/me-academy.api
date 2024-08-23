@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using me_academy.core.Interfaces;
+﻿using me_academy.core.Interfaces;
 using me_academy.core.Models.Input;
 using me_academy.core.Models.Input.Coupons;
 using me_academy.core.Models.Utilities;
@@ -212,9 +211,9 @@ public class CouponsController : BaseController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SuccessResult<List<UserCouponView>>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorResult))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(NotFoundErrorResult))]
-    public async Task<IActionResult> GetCouponUsers(int id, [FromQuery] PagingOptionModel request)
+    public IActionResult GetCouponUsers(int id, [FromQuery] PagingOptionModel request)
     {
-        var result = await _couponService.GetCouponUsers(id, request);
+        var result = _couponService.GetCouponUsers(id, request);
         return ProcessResponse(result);
     }
 }

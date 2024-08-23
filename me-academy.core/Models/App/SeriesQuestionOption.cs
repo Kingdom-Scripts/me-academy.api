@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using me_academy.core.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace me_academy.core.Models.App;
 
@@ -12,10 +12,10 @@ public class SeriesQuestionOption : BaseAppModel, ISoftDeletable
 
     public int? UpdatedById { get; set; }
     public DateTime? UpdatedOnUtc { get; set; }
-    
+
     public bool IsDeleted { get; set; }
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
 
-    public SeriesQuestion? Question { get; set; }
+    public SeriesQuestion Question { get; set; }
 }

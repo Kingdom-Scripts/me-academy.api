@@ -15,5 +15,5 @@ public class AnnotatedAgreementView
     public bool IsActive { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAtUtc { get; set; }
-    public string? DocumentThumbnailUrl { get; set; }
+    public string DocumentThumbnailUrl { get; set; }
 }

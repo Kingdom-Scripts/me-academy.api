@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using me_academy.core.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace me_academy.core.Models.App;
 
@@ -20,9 +20,9 @@ public class SeriesQuestion : BaseAppModel, ISoftDeletable
     public int? DeletedById { get; set; }
     public DateTime? DeletedOnUtc { get; set; }
 
-    public Series? Series { get; set; }
-    public Course? Course { get; set; }
-    public User? CreatedBy { get; set; }
-    public User? UpdatedBy { get; set; }
+    public Series Series { get; set; }
+    public Course Course { get; set; }
+    public User CreatedBy { get; set; }
+    public User UpdatedBy { get; set; }
     public ICollection<SeriesQuestionOption> Options { get; set; } = new List<SeriesQuestionOption>();
 }

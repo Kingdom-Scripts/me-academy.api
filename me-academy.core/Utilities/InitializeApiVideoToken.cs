@@ -34,13 +34,13 @@ public static class InitializeApiVideoToken
         if (!response.IsSuccessStatusCode)
         {
             string stringResponse = await response.Content.ReadAsStringAsync();
-            object? error = JsonConvert.DeserializeObject<object>(stringResponse);
+            object error = JsonConvert.DeserializeObject<object>(stringResponse);
             Log.Error("--> Could not get Api.Video Token: {@Error}", error ?? "Unknown error");
             return;
         }
 
         string resString = await response.Content.ReadAsStringAsync();
-        dynamic? tokenObj = JsonConvert.DeserializeObject<dynamic>(resString);
+        dynamic tokenObj = JsonConvert.DeserializeObject<dynamic>(resString);
         string token = tokenObj!.access_token;
         string refreshToken = tokenObj.refresh_token;
 

@@ -1,4 +1,3 @@
-using System.Text;
 using Mapster;
 using me_academy.core.Constants;
 using me_academy.core.Interfaces;
@@ -11,12 +10,12 @@ using me_academy.core.Models.Input.Videos;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
 using me_academy.core.Models.View.Series;
-using me_academy.core.Models.View.Videos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Serilog;
+using System.Text;
 
 namespace me_academy.core.Services;
 
@@ -42,17 +41,10 @@ public class VideoService : IVideoService
 
     public async Task<Result<ApiVideoToken>> GetUploadToken(int expiresInSec = 0)
     {
-        HttpResponseMessage response = new HttpResponseMessage();
-        if (expiresInSec == 0)
-        {
-            response = await _client.PostAsync("upload-tokens", null);
-        }
-        else
-        {
-            var request = new { ttl = expiresInSec };
-            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-            response = await _client.PostAsync("upload-tokens", content);
-        }
+        var request = new { ttl = expiresInSec };
+        var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+        HttpResponseMessage response = await _client.PostAsync("upload-tokens", content);
+
 
         if (!response.IsSuccessStatusCode)
             return new ErrorResult<ApiVideoToken>("Failed to get video upload token");
@@ -108,7 +100,6 @@ public class VideoService : IVideoService
         }
 
         string contentString = await response.Content.ReadAsStringAsync();
-        object? error = JsonConvert.DeserializeObject<object>(contentString);
         _logger.Error("Failed to set video details. {@Error}", contentString);
         return new ErrorResult("Failed to set video details.");
     }
@@ -130,7 +121,7 @@ public class VideoService : IVideoService
             if (!deleteResponse.IsSuccessStatusCode)
             {
                 string contentString = await deleteResponse.Content.ReadAsStringAsync();
-                object? error = JsonConvert.DeserializeObject<object>(contentString);
+                object error = JsonConvert.DeserializeObject<object>(contentString);
                 _logger.Error("Failed to delete video preview. {@Error}", error);
                 return new ErrorResult("Failed to delete existing video preview.");
             }
@@ -156,7 +147,7 @@ public class VideoService : IVideoService
         if (!response.IsSuccessStatusCode)
         {
             string contentString = await response.Content.ReadAsStringAsync();
-            object? error = JsonConvert.DeserializeObject<object>(contentString);
+            object error = JsonConvert.DeserializeObject<object>(contentString);
             _logger.Error("Failed to set video preview. {@Error}", error);
             return new ErrorResult("Failed to set video thumbnail.");
         }
@@ -185,7 +176,7 @@ public class VideoService : IVideoService
         }
 
         string contentString = await response.Content.ReadAsStringAsync();
-        object? error = JsonConvert.DeserializeObject<object>(contentString);
+        object error = JsonConvert.DeserializeObject<object>(contentString);
         _logger.Error("Failed to delete video. {@Error}", error);
         return new ErrorResult("Failed to delete video.");
     }
@@ -196,9 +187,10 @@ public class VideoService : IVideoService
         bool shouldHaveUnrestrictedAccess = _userSession.IsAnyAdmin || _userSession.IsCourseManager;
         if (!shouldHaveUnrestrictedAccess)
         {
+            var today = DateTime.UtcNow;
             var coursePaid = await _context.UserCourses
                 .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
-                .Where(cp => !cp.IsExpired)
+                .Where(cp => cp.ExpiresOnUtc.Date <= today.Date)
                 .AnyAsync();
             if (!coursePaid)
                 return new ForbiddenResult();
@@ -212,7 +204,7 @@ public class VideoService : IVideoService
             return new SuccessResult(StatusCodes.Status204NoContent, "Video information not found.");
 
         string videoId = courseVideo.VideoId!;
-        if (string.IsNullOrWhiteSpace(videoId) && !shouldHaveUnrestrictedAccess)
+        if (string.IsNullOrWhiteSpace(videoId) || !shouldHaveUnrestrictedAccess)
             return new ErrorResult("Video not uploaded.");
 
         var response = await _client.GetAsync($"videos/{videoId}");
@@ -241,9 +233,10 @@ public class VideoService : IVideoService
     public async Task<Result> GetUserCourseProgress(string courseUid)
     {
         // validate user has paid for course
+        var today = DateTime.UtcNow;
         var courseProgress = await _context.UserCourses
             .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
-            .Where(cp => !cp.IsExpired)
+            .Where(cp => cp.ExpiresOnUtc.Date <= today.Date)
             .FirstOrDefaultAsync();
 
         if (courseProgress is null)
@@ -285,9 +278,10 @@ public class VideoService : IVideoService
 
     public async Task<Result> ReportCourseProgress(string courseUid, ProgressReportModel model)
     {
+        var today = DateTime.UtcNow;
         var courseProgress = await _context.UserCourses
                .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
-               .Where(cp => !cp.IsExpired)
+               .Where(cp => cp.ExpiresOnUtc.Date <= today.Date)
                .FirstOrDefaultAsync();
 
         if (courseProgress is null)
@@ -306,9 +300,10 @@ public class VideoService : IVideoService
 
     public async Task<Result> CourseVideoCompleted(string courseUid)
     {
+        var today = DateTime.UtcNow;
         var courseProgress = await _context.UserCourses
             .Where(cp => cp.Course!.Uid == courseUid && cp.UserId == _userSession.UserId)
-            .Where(cp => !cp.IsExpired)
+            .Where(cp => cp.ExpiresOnUtc.Date <= today.Date)
             .FirstOrDefaultAsync();
 
         if (courseProgress is null)
@@ -327,9 +322,10 @@ public class VideoService : IVideoService
 
     public async Task<Result> GetUserSeriesProgress(string seriesUid)
     {
+        var today = DateTime.UtcNow;
         var userSeries = await _context.UserSeries
             .Where(sp => sp.Series!.Uid == seriesUid && sp.UserId == _userSession.UserId)
-            .Where(sp => !sp.IsExpired)
+            .Where(sp => sp.ExpiresOnUtc.Date <= today.Date)
             .FirstOrDefaultAsync();
 
         if (userSeries is null)
@@ -350,9 +346,10 @@ public class VideoService : IVideoService
 
     public async Task<Result> GetSeriesCourseVideoDetail(string seriesUid, string courseUid)
     {
+        var today = DateTime.UtcNow;
         var userSeries = await _context.UserSeries
             .Where(sp => sp.Series!.Uid == seriesUid && sp.UserId == _userSession.UserId)
-            .Where(sp => !sp.IsExpired)
+            .Where(sp => sp.ExpiresOnUtc.Date <= today.Date)
             .FirstOrDefaultAsync();
 
         if (userSeries is null)
@@ -410,9 +407,10 @@ public class VideoService : IVideoService
 
     public async Task<Result> ReportSeriesCourseProgress(string seriesUid, string courseUid, ProgressReportModel model)
     {
+        var today = DateTime.UtcNow;
         var userSeries = await _context.UserSeries
             .Where(sp => sp.Series!.Uid == seriesUid && sp.UserId == _userSession.UserId)
-            .Where(sp => !sp.IsExpired)
+            .Where(sp => sp.ExpiresOnUtc.Date <= today.Date)
             .FirstOrDefaultAsync();
 
         if (userSeries is null)
@@ -439,9 +437,10 @@ public class VideoService : IVideoService
 
     public async Task<Result> SeriesCourseVideoCompleted(string seriesUid, string courseUid)
     {
+        var today = DateTime.UtcNow;
         var userSeries = await _context.UserSeries
             .Where(sp => sp.Series!.Uid == seriesUid && sp.UserId == _userSession.UserId)
-            .Where(sp => !sp.IsExpired)
+            .Where(sp => sp.ExpiresOnUtc.Date <= today.Date)
             .FirstOrDefaultAsync();
 
         if (userSeries is null)

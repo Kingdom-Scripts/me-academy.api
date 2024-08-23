@@ -24,21 +24,18 @@ public class OrderService : IOrderService
     private readonly MeAcademyContext _context;
     private readonly UserSession _userSession;
     private readonly HttpClient _paystackClient;
-    private readonly BaseURLs _baseUrls;
     private readonly ICouponService _couponService;
     private readonly IAppCache _cache;
 
-    public OrderService(MeAcademyContext context, UserSession userSession, IHttpClientFactory httpClientFactory, IOptions<PasystackConfig> paystackConfig, IOptions<AppConfig> appConfig, ICouponService couponService, IAppCache cache)
+    public OrderService(MeAcademyContext context, UserSession userSession, IHttpClientFactory httpClientFactory, IOptions<PasystackConfig> paystackConfig, ICouponService couponService, IAppCache cache)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _userSession = userSession ?? throw new ArgumentNullException(nameof(userSession));
 
-        ArgumentException.ThrowIfNullOrEmpty(nameof(appConfig));
         ArgumentException.ThrowIfNullOrEmpty(nameof(paystackConfig));
         ArgumentException.ThrowIfNullOrEmpty(nameof(httpClientFactory));
 
         _paystackClient = httpClientFactory.CreateClient(paystackConfig.Value.HttpClientName);
-        _baseUrls = appConfig.Value.BaseURLs;
         _couponService = couponService;
         _cache = cache;
     }
@@ -53,7 +50,7 @@ public class OrderService : IOrderService
             UserId = _userSession.UserId,
         };
 
-        if (model.ItemType == OrderItemType.Course)
+        if (model.ItemType == ContentTypes.Course)
         {
             var course = await _context.Courses
               .Where(x => x.Uid == model.ItemUid)
@@ -65,7 +62,7 @@ public class OrderService : IOrderService
             if (course == null)
                 return new ErrorResult("Invalid course provided");
 
-            order.CourseId = course.Id;
+            order.ContentId = course.Id;
 
             // get course price
             var price = course.Prices.FirstOrDefault(x => x.DurationId == model.DurationId);
@@ -73,9 +70,8 @@ public class OrderService : IOrderService
                 return new ErrorResult("Invalid duration for course");
 
             order.ItemAmount = price.Price;
-
         }
-        else if (model.ItemType == OrderItemType.Series)
+        else if (model.ItemType == ContentTypes.Series)
         {
             var series = await _context.Series
               .Where(x => x.Uid == model.ItemUid)
@@ -87,16 +83,18 @@ public class OrderService : IOrderService
             if (series == null)
                 return new ErrorResult("Invalid series provided");
 
-            order.SeriesId = series.Id;
+            order.ContentId = series.Id;
 
             // get series price
-            var price = series.Prices.FirstOrDefault(x => x.DurationId == model.DurationId);
+            var price = series.Prices
+                .FirstOrDefault(x => x.DurationId == model.DurationId);
+
             if (price == null)
                 return new ErrorResult("Invalid duration for series");
 
             order.ItemAmount = price.Price;
         }
-        else if (model.ItemType == OrderItemType.SmeHub)
+        else if (model.ItemType == ContentTypes.SmeHub)
         {
             var smeHub = await _context.SmeHubs
               .Where(x => x.Uid == model.ItemUid)
@@ -108,11 +106,10 @@ public class OrderService : IOrderService
             if (smeHub == null)
                 return new ErrorResult("Invalid sme hub provided");
 
-            order.SmeHubId = smeHub.Id;
-
+            order.ContentId = smeHub.Id;
             order.ItemAmount = smeHub.Price;
         }
-        else if (model.ItemType == OrderItemType.AnnotatedAgreement)
+        else if (model.ItemType == ContentTypes.AnnotatedAgreement)
         {
             var annotatedAgreement = await _context.AnnotatedAgreements
               .Where(x => x.Uid == model.ItemUid)
@@ -124,7 +121,7 @@ public class OrderService : IOrderService
             if (annotatedAgreement == null)
                 return new ErrorResult("Invalid annotated agreement provided");
 
-            order.AnnotatedAgreementId = annotatedAgreement.Id;
+            order.ContentId = annotatedAgreement.Id;
 
             // get annotated agreement price
             order.ItemAmount = annotatedAgreement.Price;
@@ -136,10 +133,10 @@ public class OrderService : IOrderService
 
         // attach coupon
         order.TotalAmount = order.ItemAmount;
-
         if (!string.IsNullOrEmpty(model.CouponCode))
         {
-            var couponRes = await _couponService.ValidateCoupon(model.CouponCode, order.ItemAmount);
+            var couponRes = await _couponService
+                .ValidateCoupon(model.CouponCode, order.ItemAmount);
             if (couponRes is ErrorResult)
                 return couponRes;
 
@@ -220,16 +217,21 @@ public class OrderService : IOrderService
             .Include(x => x.Coupon)
             .FirstOrDefaultAsync();
 
-        if (order == null) return new NotFoundErrorResult("Invalid order.");
+        if (order == null)
+            return new NotFoundErrorResult("Invalid order.");
 
-        if (string.IsNullOrEmpty(order.Reference)) return new ErrorResult("Invalid payment confirmation attempt.");
+        if (string.IsNullOrEmpty(order.Reference))
+            return new ErrorResult("Invalid payment confirmation attempt.");
 
-        if (order.IsPaid) return new ErrorResult("Order payment is already completed.");
+        if (order.IsPaid)
+            return new ErrorResult("Order payment is already completed.");
 
         var verifyTransaction = await VerifyTransaction(order.Reference!);
 
-        if (!verifyTransaction.status) return new ErrorResult(verifyTransaction.message);
-        if (!verifyTransaction.status || verifyTransaction.data.status != "success") return new ErrorResult("Payment not completed");
+        if (!verifyTransaction.status)
+            return new ErrorResult(verifyTransaction.message);
+        if (!verifyTransaction.status || verifyTransaction.data.status != "success")
+            return new ErrorResult("Payment not completed");
 
         var today = DateTime.UtcNow;
         order.IsPaid = true;
@@ -241,27 +243,18 @@ public class OrderService : IOrderService
             order.Coupon!.TotalUsed++;
         }
 
-        var userContent = new UserContent
-        {
-            UserId = order.UserId,
-            StartDate = today,
-            EndDate = today.AddMonths(order.Duration!.Count)
-        };
-        order.UserContent = userContent;
         _context.Orders.Update(order);
 
         // Add Course progress
-        if (order.ItemType == OrderItemType.Course)
+        if (order.ItemType == ContentTypes.Course)
         {
             var userCourse = await _context.UserCourses
-                .Where(x => x.UserId == order.UserId && x.CourseId == order.CourseId)
+                .Where(x => x.UserId == order.UserId && x.CourseId == order.ContentId)
                 .FirstOrDefaultAsync();
 
             if (userCourse != null)
             {
-                userCourse.Progress = 0;
-                userCourse.IsCompleted = false;
-                userCourse.IsExpired = false;
+                userCourse.ExpiresOnUtc = today.AddMonths(order.Duration!.Count);
 
                 _context.UserCourses.Update(userCourse);
             }
@@ -270,28 +263,27 @@ public class OrderService : IOrderService
                 userCourse = new UserCourse
                 {
                     UserId = order.UserId,
-                    CourseId = order.CourseId!.Value,
+                    CourseId = order.ContentId,
+                    ExpiresOnUtc = today.AddMonths(order.Duration!.Count)
                 };
                 await _context.AddAsync(userCourse);
             }
         }
 
         // Add Series progress
-        else if (order.ItemType == OrderItemType.Series)
+        else if (order.ItemType == ContentTypes.Series)
         {
             var userSeries = await _context.UserSeries
-                .Where(x => x.UserId == order.UserId && x.SeriesId == order.SeriesId)
+                .Where(x => x.UserId == order.UserId && x.SeriesId == order.ContentId)
                 .FirstOrDefaultAsync();
 
             var series = await _context.Series
-                .Where(x => x.Id == order.SeriesId)
-                .Include(x => x.Courses)
+                .Where(x => x.Id == order.ContentId)
                 .FirstOrDefaultAsync();
 
             if (userSeries != null)
             {
-                userSeries.IsCompleted = false;
-                userSeries.IsExpired = false;
+                userSeries.ExpiresOnUtc = today.AddMonths(order.Duration!.Count);
 
                 _context.UserSeries.Update(userSeries);
             }
@@ -300,12 +292,22 @@ public class OrderService : IOrderService
                 userSeries = new UserSeries
                 {
                     UserId = order.UserId,
-                    SeriesId = order.SeriesId!.Value,
+                    SeriesId = order.ContentId,
+                    ExpiresOnUtc = today.AddMonths(order.Duration!.Count)
                 };
                 await _context.AddAsync(userSeries);
             }
 
-            foreach (var item in series!.Courses)
+            var seriesCourses = await _context.SeriesCourses
+                .Where(sc => sc.SeriesId == series.Id && !sc.IsDeleted)
+                .OrderBy(sc => sc.Order)
+                .Select(sc => new
+                {
+                    sc.CourseId,
+                    sc.Order
+                }).ToListAsync();
+
+            foreach (var item in seriesCourses)
             {
                 var seriesProgress = _context.SeriesProgress
                     .Where(x => x.UserSeriesId == userSeries.Id && x.CourseId == item.CourseId)
@@ -313,9 +315,7 @@ public class OrderService : IOrderService
 
                 if (seriesProgress != null)
                 {
-                    seriesProgress.Progress = 0;
                     seriesProgress.Order = item.Order;
-                    seriesProgress.IsCompleted = false;
 
                     _context.SeriesProgress.Update(seriesProgress);
                 }
@@ -335,10 +335,14 @@ public class OrderService : IOrderService
         int saved = await _context.SaveChangesAsync();
 
         if (saved < 1)
-            return new ErrorResult("An error occurred while saving your order details, kindly contact the support team.");
+            return new ErrorResult("An error occurred while saving your order details, " +
+                "kindly contact the support team.");
 
         // clear caches
-        _cache.ClearCaches(CouponCacheKeys.CouponUserList());
+        _cache.ClearCaches(
+            CouponCacheKeys.CouponUserList(),
+            StatsCacheKeys.TopRegistrants()
+         );
 
         return new SuccessResult("Payment completed successfully.");
     }

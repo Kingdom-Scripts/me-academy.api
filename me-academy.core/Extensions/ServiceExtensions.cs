@@ -3,9 +3,8 @@
  * Implement a background service using Quartz to expire user's courses.
  * Implement a background service using Quartz to expire user's series.
  * Implement a background service using Quartz to send email reminders to users.
- * Implement a background service using Quartz to find stale videos and delete them from api.video
+ * Implement a background service using Quartz to find stale videos (course videos and series course) and delete them from api.video
  * Implement a background service using Quartz to find stale documents and delete them from the file system
- * Implement a background service using Quartz to find and delete expired coupons
  */
 
 
@@ -23,6 +22,7 @@ using me_academy.core.Models.Input.Series;
 using me_academy.core.Models.Input.SmeHub;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View;
+using me_academy.core.Models.View.AnnotatedAgreement;
 using me_academy.core.Models.View.Coupons;
 using me_academy.core.Models.View.Courses;
 using me_academy.core.Models.View.Questions;
@@ -54,9 +54,8 @@ public static class ServiceExtensions
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
     /// <param name="configuration">The configuration for the application.</param>
-    /// <param name="isProduction">A flag indicating whether the application is running in a production environment.</param>
     /// <returns>The modified <see cref="IServiceCollection"/> for method chaining.</returns>
-    public static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration configuration, bool isProduction)
+    public static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration configuration)
     {
         // set up database
         string connectionString = configuration.GetConnectionString("MeAcademy")!;
@@ -121,7 +120,7 @@ public static class ServiceExtensions
         });
 
         // Add HTTP clients
-        services.AddHttpClient(HttpClientKeys.ApiVideo, async client =>
+        services.AddHttpClient(HttpClientKeys.ApiVideo, client =>
         {
             string baseAddress = configuration["AppConfig:ApiVideo:BaseUrl"]!;
 

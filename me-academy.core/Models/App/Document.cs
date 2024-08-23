@@ -19,5 +19,7 @@ public class Document : BaseAppModel
     [Required]
     public int CreatedById { get; set; }
 
-    public User? CreatedBy { get; set; }
+    public User CreatedBy { get; set; }
+    public List<SmeHub> SmeHubs { get; set; }
+    public List<AnnotatedAgreement> AnnotatedAgreements { get; set; }
 }

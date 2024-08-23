@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using me_academy.core.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace me_academy.core.Models.App;
 
@@ -12,7 +13,6 @@ public class MeAcademyContext : DbContext
     public required DbSet<AnnotatedAgreement> AnnotatedAgreements { get; set; }
     public required DbSet<Code> Codes { get; set; }
     public required DbSet<Course> Courses { get; set; }
-    public required DbSet<CourseAuditLog> CourseAuditLogs { get; set; }
     public required DbSet<CourseDocument> CourseDocuments { get; set; }
     public required DbSet<CourseLink> CourseLinks { get; set; }
     public required DbSet<CoursePrice> CoursePrices { get; set; }
@@ -30,7 +30,8 @@ public class MeAcademyContext : DbContext
     public required DbSet<RefreshToken> RefreshTokens { get; set; }
     public required DbSet<Role> Roles { get; set; }
     public required DbSet<Series> Series { get; set; }
-    public required DbSet<SeriesAuditLog> SeriesAuditLogs { get; set; }
+    public required DbSet<ContentLog> ContentLogs { get; set; }
+    //public required DbSet<SeriesAuditLog> SeriesAuditLogs { get; set; }
     public required DbSet<SeriesCourse> SeriesCourses { get; set; }
     public required DbSet<SeriesPreview> SeriesPreviews { get; set; }
     public required DbSet<SeriesPrice> SeriesPrices { get; set; }
@@ -40,7 +41,6 @@ public class MeAcademyContext : DbContext
     public required DbSet<SmeHub> SmeHubs { get; set; }
     public required DbSet<SmeHubType> SmeHubTypes { get; set; }
     public required DbSet<User> Users { get; set; }
-    public required DbSet<UserContent> UserContents { get; set; }
     public required DbSet<UserCourse> UserCourses { get; set; }
     public required DbSet<UserRole> UserRoles { get; set; }
     public required DbSet<UserSeries> UserSeries { get; set; }
@@ -52,15 +52,31 @@ public class MeAcademyContext : DbContext
 
         builder.HasDefaultSchema("dbo");
 
+        //builder.Entity<Course>().ToTable("Courses");
+        //builder.Entity<Series>().ToTable("Series");
+        //builder.Entity<SmeHub>().ToTable("SmeHubs");
+        //builder.Entity<AnnotatedAgreement>().ToTable("AnnotatedAgreements");
+
+        //// Configure ContentBase as a base type
+        //builder.Entity<Course>().HasBaseType<ContentBase>();
+        //builder.Entity<Series>().HasBaseType<ContentBase>();
+        //builder.Entity<SmeHub>().HasBaseType<ContentBase>();
+        //builder.Entity<AnnotatedAgreement>().HasBaseType<ContentBase>();
+
+        builder.Entity<Course>()
+            .HasIndex(c => c.Uid);
+
+        builder.Entity<ContentBase>()
+            .HasDiscriminator<string>("ContentType")
+            .HasValue<Course>("Course")
+            .HasValue<SmeHub>("SmeHub")
+            .HasValue<Series>("Series")
+            .HasValue<AnnotatedAgreement>("AnnotatedAgreement");
+
         builder.Entity<UserRole>(entity =>
         {
             entity.HasKey(t => new { t.RoleId, t.UserId });
         });
-
-        //builder.Entity<Login>()
-        //   .HasOne(l => l.User)
-        //   .WithMany(u => u.Logins)
-        //   .HasForeignKey(l => l.UserId);
 
         // Make both UserId and Domain unique in Login
         builder.Entity<Login>()
@@ -69,9 +85,6 @@ public class MeAcademyContext : DbContext
 
         builder.Entity<Duration>()
             .ToTable(p => p.HasCheckConstraint("CK_DurationType_Type", "[Type] IN ('Days', 'Weeks', 'Months', 'Years')"));
-
-        builder.Entity<Course>()
-            .HasIndex(c => c.Uid);
 
         builder.Entity<Document>()
             .HasOne(d => d.CreatedBy)
@@ -85,17 +98,18 @@ public class MeAcademyContext : DbContext
             .HasForeignKey(cd => cd.CreatedById)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.Entity<CourseAuditLog>()
-            .HasOne(cal => cal.Course)
-            .WithMany(c => c.AuditLogs)
-            .HasForeignKey(cal => cal.CourseId)
-            .OnDelete(DeleteBehavior.NoAction);
+        // TODO: remove the commented code
+        //builder.Entity<CourseAuditLog>()
+        //    .HasOne(cal => cal.Course)
+        //    .WithMany(c => c.AuditLogs)
+        //    .HasForeignKey(cal => cal.CourseId)
+        //    .OnDelete(DeleteBehavior.NoAction);
 
-        builder.Entity<CourseAuditLog>()
-            .HasOne(cal => cal.CreatedBy)
-            .WithMany()
-            .HasForeignKey(cal => cal.CreatedById)
-            .OnDelete(DeleteBehavior.NoAction);
+        //builder.Entity<CourseAuditLog>()
+        //    .HasOne(cal => cal.CreatedBy)
+        //    .WithMany()
+        //    .HasForeignKey(cal => cal.CreatedById)
+        //    .OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<CourseQuestion>()
             .HasOne(cal => cal.CreatedBy)
@@ -133,12 +147,6 @@ public class MeAcademyContext : DbContext
             .HasForeignKey(cal => cal.CreatedById)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.Entity<SeriesAuditLog>()
-            .HasOne(sal => sal.CreatedBy)
-            .WithMany()
-            .HasForeignKey(sal => sal.CreatedById)
-            .OnDelete(DeleteBehavior.NoAction);
-
         builder.Entity<SeriesCourse>()
             .HasOne(sal => sal.Series)
             .WithMany()
@@ -166,10 +174,35 @@ public class MeAcademyContext : DbContext
             .WithOne(sal => sal.Preview)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Entity<SmeHub>()
+            .HasOne(sh => sh.Document)
+            .WithMany(sh => sh.SmeHubs)
+            .HasForeignKey(sh => sh.DocumentId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<AnnotatedAgreement>()
+            .HasOne(sh => sh.Document)
+            .WithMany(sh => sh.AnnotatedAgreements)
+            .HasForeignKey(sh => sh.DocumentId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<ContentLog>()
+            .ToTable(p => p.HasCheckConstraint("CK_ContentLog_ItemType", $"[ContentType] IN {ContentTypes.DB_CONSTRAINT}"))
+            .HasOne(cl => cl.CreatedBy)
+            .WithMany()
+            .HasForeignKey(cl => cl.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
         builder.Entity<Order>()
-            .ToTable(p => p.HasCheckConstraint("CK_Order_ItemType", "[ItemType] IN ('Course', 'Series', 'SmeHub', 'AnnotatedAgreement')"))
-             .HasOne(o => o.UserContent)
-            .WithOne(uc => uc.Order)
-            .HasForeignKey<UserContent>(uc => uc.OrderId);
+            .ToTable(p => p.HasCheckConstraint("CK_Order_ItemType", $"[ItemType] IN {ContentTypes.DB_CONSTRAINT}"))
+            .HasOne(o => o.Content)
+            .WithMany()
+            .HasForeignKey(o => o.ContentId);
+
+        builder.Entity<Order>()
+            .HasOne(o => o.User)
+            .WithMany(u => u.Orders)
+            .HasForeignKey(o => o.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -1,5 +1,5 @@
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
+using System.Text.Json.Serialization;
 
 namespace me_academy.core.Models.Utilities;
 
@@ -148,21 +148,6 @@ public class ErrorResult<T> : Result<T>
         Status = status;
         Title = title;
     }
-
-    /// <summary>
-    /// Additional details about the error.
-    /// </summary>
-    public string Detail { get; set; }
-
-    /// <summary>
-    /// The instance where the error occurred.
-    /// </summary>
-    public string Instance { get; set; }
-
-    /// <summary>
-    /// The path associated with the error.
-    /// </summary>
-    public string Path { get; set; }
 
     // Ignore Success related properties
 

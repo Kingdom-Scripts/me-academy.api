@@ -1,9 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
-using me_academy.core.Constants;
-using me_academy.core.Interfaces;
+﻿using me_academy.core.Interfaces;
 using me_academy.core.Models.Configurations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,13 +7,17 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
+using System.Text;
 
 namespace me_academy.core.Middlewares;
 
 public class JWTMiddleware
 {
     private readonly RequestDelegate _next;
-    private ITokenHandler? _tokenHandler;
+    private ITokenHandler _tokenHandler;
 
     public JWTMiddleware(RequestDelegate next)
     {
@@ -37,7 +36,7 @@ public class JWTMiddleware
         }
 
         // get the token
-        string? token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        string token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
         // continue if token is null
         if (token == null)

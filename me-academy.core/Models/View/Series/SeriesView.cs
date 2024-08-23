@@ -14,7 +14,7 @@ public class SeriesView
     public bool IsPublished { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? PublishedOnUtc { get; set; }
-    public VideoView? Preview { get; set; }
-    public string? Duration { get; set; }
+    public VideoView Preview { get; set; }
+    public string Duration { get; set; }
     public bool HasBought { get; set; }
 }

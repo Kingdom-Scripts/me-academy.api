@@ -2,7 +2,7 @@
 
 namespace me_academy.core.Models.App;
 
-public class UserContent : BaseAppModel
+public class UserContents : BaseAppModel
 {
     public int UserId { get; set; }
 
@@ -11,7 +11,7 @@ public class UserContent : BaseAppModel
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
 
-    public User? User { get; set; }
+    public User User { get; set; }
     [ForeignKey("OrderId")]
-    public Order? Order { get; set; }
+    public Order Order { get; set; }
 }

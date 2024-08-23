@@ -33,6 +33,6 @@ public class InvitedUser : BaseAppModel
 
     [Required]
     public DateTime TokenExpiry { get; set; } = DateTime.UtcNow.AddDays(7);
-    
-    public User? CreatedBy { get; set; }
+
+    public User CreatedBy { get; set; }
 }

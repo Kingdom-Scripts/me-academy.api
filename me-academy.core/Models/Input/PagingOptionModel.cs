@@ -15,5 +15,5 @@ public class PagingOptionModel
     /// <summary>
     /// The search query to filter the results
     /// </summary>
-    public string? SearchQuery { get; set; }
+    public string SearchQuery { get; set; }
 }

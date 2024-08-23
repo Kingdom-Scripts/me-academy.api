@@ -6,10 +6,10 @@ public class NewOrderModel
 {
     public required string BillingAddress { get; set; }
     public int? DurationId { get; set; }
-    public string? CouponCode { get; set; }
-    public required string ItemUid { get; set; }
-    public required string ItemType { get; set; }
-    public required string CallBackUrl { get; set; }
+    public string CouponCode { get; set; }
+    public string ItemUid { get; set; }
+    public string ItemType { get; set; }
+    public string CallBackUrl { get; set; }
 }
 
 public class NewOrderValidator : AbstractValidator<NewOrderModel>

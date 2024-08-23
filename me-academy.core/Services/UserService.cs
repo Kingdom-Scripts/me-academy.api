@@ -110,7 +110,7 @@ public class UserService : IUserService
             return new ErrorResult("Unable to send invitation at the moment. Please try again.");
 
         // send invitation email
-        var args = new Dictionary<string, string?> {
+        var args = new Dictionary<string, string> {
             {
                 "url", url
             },
@@ -256,7 +256,7 @@ public class UserService : IUserService
             return new ErrorResult("Unable to send invitation at the moment. Please try again.");
 
         // send invitation email
-        var args = new Dictionary<string, string?> {
+        var args = new Dictionary<string, string> {
             {
                 "url", url
             },

@@ -1,14 +1,14 @@
-using System.ComponentModel.DataAnnotations;
 using me_academy.core.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace me_academy.core.Models.App;
 
 public class CourseQuestionOption : BaseAppModel, ISoftDeletable
 {
     public int QuestionId { get; set; }
-    [Required] [MaxLength(255)] public string Value { get; set; } = null!;
+    [Required][MaxLength(255)] public string Value { get; set; } = null!;
 
-    public CourseQuestion? Question { get; set; }
+    public CourseQuestion Question { get; set; }
 
     public int CreatedById { get; set; }
     public int? UpdatedById { get; set; }

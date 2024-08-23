@@ -20,7 +20,7 @@ public class FileService : IFileService
     private readonly UserSession _userSession;
 
     public FileService(IOptions<AppConfig> appConfig, IHostEnvironment hostEnvironment, MeAcademyContext context,
-        UserSession userSession, IHttpClientFactory clientFactory)
+        UserSession userSession)
     {
         if (appConfig == null) throw new ArgumentNullException(nameof(appConfig));
         _hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
@@ -51,7 +51,7 @@ public class FileService : IFileService
     public async Task<Result<Document>> UploadFileInternal(string folder, IFormFile file)
         => await Upload(folder, file);
 
-    public FileStreamResult? GetFile(string folder, string fileName)
+    public FileStreamResult GetFile(string folder, string fileName)
     {
         string filePath = Path.Combine(_hostEnvironment.ContentRootPath, _fileSettings.BaseFolder, folder, fileName);
         if (!File.Exists(filePath))
@@ -94,10 +94,8 @@ public class FileService : IFileService
         string filePath = Path.Combine(folderPath, fileUploadName);
         if (fileType != DocumentTypeEnum.IMAGE)
         {
-            await using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+            await using var stream = new FileStream(filePath, FileMode.Create);
+            await file.CopyToAsync(stream);
         }
         else
         {
@@ -125,33 +123,31 @@ public class FileService : IFileService
 
     private static async Task SaveImage(string filePath, string thumbnailPath, IFormFile image)
     {
-        await using (var stream = new MemoryStream())
-        {
-            await image.CopyToAsync(stream);
-            stream.Seek(0, SeekOrigin.Begin);
+        await using var stream = new MemoryStream();
+        await image.CopyToAsync(stream);
+        stream.Seek(0, SeekOrigin.Begin);
 
-            // Compress the image using Tinify
-            var source = await TinifyAPI.Tinify.FromBuffer(stream.ToArray());
+        // Compress the image using Tinify
+        var source = await TinifyAPI.Tinify.FromBuffer(stream.ToArray());
 
-            // get thumbnail
-            byte[]? thumbnail = await source
-                .Preserve("copyright", "creation")
-                .Resize(new
-                {
-                    method = "fit",
-                    width = 150,
-                    height = 150
-                }).ToBuffer();
+        // get thumbnail
+        byte[] thumbnail = await source
+            .Preserve("copyright", "creation")
+            .Resize(new
+            {
+                method = "fit",
+                width = 150,
+                height = 150
+            }).ToBuffer();
 
-            // compress original
-            byte[]? optimized = await source
-                .Preserve("copyright", "creation")
-                .ToBuffer();
+        // compress original
+        byte[] optimized = await source
+            .Preserve("copyright", "creation")
+            .ToBuffer();
 
-            // save files
-            await File.WriteAllBytesAsync(filePath, optimized);
-            await File.WriteAllBytesAsync(thumbnailPath, thumbnail);
-        }
+        // save files
+        await File.WriteAllBytesAsync(filePath, optimized);
+        await File.WriteAllBytesAsync(thumbnailPath, thumbnail);
     }
 
     private async Task<Result> Delete(int documentId)

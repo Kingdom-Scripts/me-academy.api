@@ -35,7 +35,7 @@ public class TokenHandler : ITokenHandler
 
     public async Task<Result> GenerateJwtToken(User user)
     {
-        DateTime expiresAt = DateTime.UtcNow.AddDays(_jwtConfig.Expires);
+        DateTime expiresAt = DateTime.UtcNow.AddMinutes(_jwtConfig.Expires);
 
         // get the request domain
         string requestDomain = _httpContextAccessor.HttpContext!.Request.Headers["Origin"].ToString();
@@ -128,10 +128,10 @@ public class TokenHandler : ITokenHandler
         claimIdentity.AddClaims(user.UserRoles.Select(role =>
             new Claim(ClaimTypes.Role, role.Role.Name)));
 
-        byte[]? key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+        byte[] key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
 
         // validate domain
-        string[]? domains = _jwtConfig.AllowedDomains.Split(",");
+        string[] domains = _jwtConfig.AllowedDomains.Split(",");
         if (!domains.Contains(requestDomain))
             throw new Exception("Unable to process request");
 
@@ -145,7 +145,7 @@ public class TokenHandler : ITokenHandler
         };
 
         var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-        string? token = tokenHandler.WriteToken(securityToken);
+        string token = tokenHandler.WriteToken(securityToken);
 
         return token;
     }
@@ -198,7 +198,7 @@ public class TokenHandler : ITokenHandler
     private async Task<string> GenerateRefreshToken(int userId)
     {
         // Create a byte array to store the random bytes
-        byte[]? randomNumber = new byte[64];
+        byte[] randomNumber = new byte[64];
 
         // Generate a random characters
         using var rng = RandomNumberGenerator.Create();

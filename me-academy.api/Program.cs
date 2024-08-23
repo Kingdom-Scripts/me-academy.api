@@ -98,7 +98,7 @@ try
             });
     });
 
-    builder.Services.ConfigureServices(builder.Configuration, builder.Environment.IsProduction());
+    builder.Services.ConfigureServices(builder.Configuration);
 
     var app = builder.Build();
 

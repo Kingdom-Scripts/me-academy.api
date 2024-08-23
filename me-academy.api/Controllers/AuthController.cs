@@ -2,7 +2,6 @@ using me_academy.core.Interfaces;
 using me_academy.core.Models.Input.Auth;
 using me_academy.core.Models.Utilities;
 using me_academy.core.Models.View.Auth;
-using me_academy.core.Models.View.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -110,7 +109,7 @@ public class AuthController : BaseController
     /// <summary>
     /// Request password reset email
     /// </summary>
-    /// <param name="email"></param>
+    /// <param name="model"></param>
     /// <returns></returns>
     [HttpPost("request-password-reset")]
     [AllowAnonymous]

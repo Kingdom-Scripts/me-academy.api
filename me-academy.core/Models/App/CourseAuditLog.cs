@@ -9,6 +9,6 @@ public class CourseAuditLog : BaseAppModel
     public required string Description { get; set; }
     public int CreatedById { get; set; }
 
-    public Course? Course { get; set; }
-    public User? CreatedBy { get; set; }
+    //public Course Course { get; set; }
+    public User CreatedBy { get; set; }
 }

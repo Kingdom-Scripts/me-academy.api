@@ -10,8 +10,13 @@ public class UserCourse : BaseAppModel
     [Column(TypeName = "decimal(20, 12)")]
     public decimal Progress { get; set; } = 0;
 
-    public bool IsCompleted { get; set; } = false;
-    public bool IsExpired { get; set; } = false; // TODO: create a job that expires user's courses
+    [Column(TypeName = "decimal(20, 12)")]
+    public decimal Duration { get; set; }
 
-    public Course? Course { get; set; }
+    public DateTime ExpiresOnUtc { get; set; }
+
+    public bool IsCompleted { get; set; } = false;
+    //public bool IsExpired { get; set; } = false; // TODO: create a job that expires user's courses
+
+    public Course Course { get; set; }
 }

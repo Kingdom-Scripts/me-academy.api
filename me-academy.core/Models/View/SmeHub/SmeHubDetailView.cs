@@ -8,7 +8,7 @@ public class SmeHubDetailView : SmeHubView
     public required string Description { get; set; }
     public List<string> Tags { get; set; } = new();
 
-    public DocumentView? Document { get; set; }
-    public ReferencedUserView? CreatedBy { get; set; }
-    public ReferencedUserView? UpdatedBy { get; set; }
+    public DocumentView Document { get; set; }
+    public ReferencedUserView CreatedBy { get; set; }
+    public ReferencedUserView UpdatedBy { get; set; }
 }

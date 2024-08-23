@@ -294,12 +294,14 @@ internal class CouponService : ICouponService
         return new SuccessResult(result);
     }
 
-    public async Task<Result> GetCouponUsers(int id, PagingOptionModel request)
+    public Result GetCouponUsers(int id, PagingOptionModel request)
     {
         string cacheKey = CacheUtil.GenerateCacheKey(request, id);
 
         // Retrieve the current list of cache keys and add the new key
-        var cacheKeys = _cache.GetOrAdd(CouponCacheKeys.CouponUserList(), () => new List<string>(), new TimeSpan(0, 45, 0));
+        var cacheKeys = _cache.GetOrAdd(CouponCacheKeys.CouponUserList(),
+            () => new List<string>(), new TimeSpan(0, 45, 0));
+
         if (!cacheKeys.Contains(cacheKey))
         {
             cacheKeys.Add(cacheKey);
@@ -307,7 +309,7 @@ internal class CouponService : ICouponService
         }
 
         // Try to get the cached result
-        var cachedResult = await _cache.GetOrAddAsync(cacheKey, async () =>
+        var cachedResult = _cache.GetOrAdd(cacheKey, () =>
         {
             return _context.Orders
                 .Where(o => o.CouponId == id && o.IsPaid)
@@ -316,8 +318,8 @@ internal class CouponService : ICouponService
                 .Select((o, index) => new UserCouponView
                 {
                     Index = index + 1,
-                    Name = o.UserContent.User.FirstName + " " + o.UserContent.User.LastName,
-                    Email = o.UserContent.User.Email,
+                    Name = o.User.FirstName + " " + o.User.LastName,
+                    Email = o.User.Email,
                     TotalCost = o.TotalAmount,
                     DiscountApplied = o.CouponApplied,
                     DatePurchased = o.PaidAt.Value
